@@ -11,7 +11,7 @@ import java.util.Optional;
  * Integer整数类型字段解析器
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
-class IntegerParserBase extends BaseFieldParser {
+class IntegerParser extends BaseFieldParser {
 
     /** 默认值 */
     private Integer defaultValue;
@@ -119,7 +119,7 @@ class IntegerParserBase extends BaseFieldParser {
      * @param fieldName
      * @param intervalStr
      */
-    public IntegerParserBase(Class objectClass, String fieldName, String intervalStr, Integer defaultValue) {
+    public IntegerParser(Class objectClass, String fieldName, String intervalStr, Integer defaultValue) {
         super(objectClass, fieldName, intervalStr);
         //默认值赋值
         this.defaultValue = defaultValue;

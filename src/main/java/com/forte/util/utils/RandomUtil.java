@@ -285,7 +285,7 @@ public class RandomUtil {
         return getProbability(0, prob);
     }
 
-    /* ———————————————————— getRandomFormArr : 根据概率获取boolean ———————————————————————— */
+    /* ———————————————————— getRandomElement : 从数组或者集合中获取一个随机元素 ———————————————————————— */
 
     /**
      * 从数组中返回一个随机元素

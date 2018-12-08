@@ -1,6 +1,7 @@
 package com.forte.util.utils;
 
 import com.forte.util.exception.ParameterSizeException;
+import com.forte.util.invoker.ElementInvoker;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.invoker.MethodInvoker;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -12,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 方法执行工具
@@ -116,6 +118,24 @@ public class MethodUtil {
      */
     public static Invoker createNullMethodInvoker(Object nullValue) {
         return new MethodInvoker(nullValue);
+    }
+
+    /**
+     * 创建一个数组元素获取执行者
+     * @param arr
+     * @return
+     */
+    public static Invoker createArrayElementInvoker(Object[] arr){
+        return new ElementInvoker(arr);
+    }
+
+    /**
+     * 创建一个集合元素获取执行者
+     * @param list
+     * @return
+     */
+    public static Invoker createListElementInvoker(List list){
+        return new ElementInvoker(list);
     }
 
 

@@ -339,8 +339,6 @@ abstract class BaseFieldParser implements FieldParser {
 
     /**
      * 获取一个整数类型字段值获取器
-     * @param intIntervalLength
-     * 整数的长度
      * @return
      */
     protected IntegerFieldValueGetter getIntegerFieldValueGetter(){

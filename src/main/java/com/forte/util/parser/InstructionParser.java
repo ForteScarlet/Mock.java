@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
-class InstructionParserBase extends BaseFieldParser {
+class InstructionParser extends BaseFieldParser {
 
     /**
      * 指令的字符串
@@ -154,7 +154,7 @@ class InstructionParserBase extends BaseFieldParser {
      * @param intervalStr    区间参数字符串
      * @param instructionStr 指令字符串
      */
-    public InstructionParserBase(Class objectClass, String fieldName, String intervalStr, String instructionStr) {
+    public InstructionParser(Class objectClass, String fieldName, String intervalStr, String instructionStr) {
         super(objectClass, fieldName, intervalStr);
         this.instructionStr = instructionStr;
     }

@@ -91,14 +91,13 @@ public class ParameterParser {
                         break;
                     case TYPE_MAP:
                         //如果是一个Map集合，说明这个字段映射着另一个假对象
-                        //这个Map集合对应的映射类型 应 当 必然是此字段的类型
+                        //这个Map集合对应的映射类型应该必然是此字段的类型
                         //获取假字段对象
                         mockField = mapTypeParse(objectClass, fieldName, intervalStr, value);
                         break;
                     case TYPE_ARRAY:
-                        //TODO 如果字段是数组类型，使用数组类型解析器进行解析
-
-
+                        //如果字段是数组类型，使用数组类型解析器进行解析
+                        mockField = arrayTypeParse(objectClass, fieldName, intervalStr, value);
                         break;
                     case TYPE_LIST:
                         //TODO 如果字段是list集合类型，使用集合类型解析器解析
@@ -131,7 +130,7 @@ public class ParameterParser {
      */
     private static MockField stringTypeParse(Class objectClass , String fieldName , String intervalStr , Object value){
         //是字符串，使用指令解析器
-        FieldParser fieldParser = new InstructionParserBase(objectClass, fieldName, intervalStr, (String) value);
+        FieldParser fieldParser = new InstructionParser(objectClass, fieldName, intervalStr, (String) value);
         //获取假字段封装类
         return fieldParser.getMockField();
     }
@@ -146,7 +145,7 @@ public class ParameterParser {
      */
     private static MockField doubleTypeParse(Class objectClass , String fieldName , String intervalStr , Object value){
         //是Double的浮点型，使用double浮点解析器
-        FieldParser fieldParser = new DoubleParserBase(objectClass, fieldName, intervalStr, (Double) value);
+        FieldParser fieldParser = new DoubleParser(objectClass, fieldName, intervalStr, (Double) value);
         //获取假字段封装类
         return fieldParser.getMockField();
     }
@@ -168,14 +167,14 @@ public class ParameterParser {
             String[] intervalSplit = intervalStr.split("\\.");
             if(intervalSplit.length > 1){
                 //如果切割'.'之后长度大于1，则说明有小数位数，使用浮点数解析器
-                fieldParser = new DoubleParserBase(objectClass, fieldName, intervalStr, ((Integer)value)*1.0);
+                fieldParser = new DoubleParser(objectClass, fieldName, intervalStr, ((Integer)value)*1.0);
             }else{
                 //如果长度不大于1，则说明没有小数位数，使用整形解析器
-                fieldParser = new IntegerParserBase(objectClass, fieldName, intervalStr, (Integer)value);
+                fieldParser = new IntegerParser(objectClass, fieldName, intervalStr, (Integer)value);
             }
         }else{
             //如果没有区间参数，直接使用整数解析器(此处的intervalStr必定为null)
-            fieldParser = new IntegerParserBase(objectClass, fieldName, intervalStr, (Integer)value);
+            fieldParser = new IntegerParser(objectClass, fieldName, intervalStr, (Integer)value);
         }
 
         //获取假字段封装类
@@ -206,12 +205,19 @@ public class ParameterParser {
     }
 
 
-    private static MockField ArrayTypeParse(Class objectClass , String fieldName , String intervalStr , Object value){
+    /**
+     * 数组类型参数解析
+     * @param objectClass
+     * @param fieldName
+     * @param intervalStr
+     * @param value
+     * @return
+     */
+    private static MockField arrayTypeParse(Class objectClass , String fieldName , String intervalStr , Object value){
         //准备字段解析器
-        FieldParser fieldParser = null;
-
-        //TODO 完成此方法
-
+        FieldParser fieldParser;
+        //当参数为一个数组的时候，使用数组解析器
+        fieldParser = new ArraysParser(objectClass , fieldName , intervalStr , (Object[])value);
 
         //获取假字段封装类
         return fieldParser.getMockField();

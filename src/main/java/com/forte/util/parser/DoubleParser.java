@@ -13,7 +13,7 @@ import java.util.*;
  *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
-class DoubleParserBase extends BaseFieldParser {
+class DoubleParser extends BaseFieldParser {
 
     /**
      * 参数默认值，唯一构造保证其必定有值，默认值为0
@@ -194,7 +194,7 @@ class DoubleParserBase extends BaseFieldParser {
      * @param intervalStr
      * @param defaultValue 默认值，如果未null则默认为0
      */
-    public DoubleParserBase(Class objectClass, String fieldName, String intervalStr, Double defaultValue) {
+    public DoubleParser(Class objectClass, String fieldName, String intervalStr, Double defaultValue) {
         super(objectClass, fieldName, intervalStr);
         //如果默认值为null，赋值为0
         this.defaultValue = defaultValue == null ? 0 : defaultValue;
