@@ -87,7 +87,7 @@ public class ParameterParser {
                     case TYPE_OBJECT:
                         // TODO 使用解析器，如果字段类型是集合或数组要重复输出
                         //如果是未知引用数据类型，保持原样赋值，直接获取一个假字段，里面为返回默认值的字段值获取器-lambda表达式创建
-                        mockField = new MockField(fieldName , () -> value);
+                        mockField = getDefaultObjectMockField(fieldName , value);
                         break;
                     case TYPE_MAP:
                         //如果是一个Map集合，说明这个字段映射着另一个假对象
@@ -105,6 +105,7 @@ public class ParameterParser {
                         break;
                     default:
                         //TODO 参数类型无法解析的情况
+                        System.out.println("无法解析");
                         break;
                 }
 
@@ -194,17 +195,29 @@ public class ParameterParser {
     private static MockField mapTypeParse(Class objectClass , String fieldName , String intervalStr , Object value){
         //如果是一个Map集合，说明这个字段映射着另一个假对象
         //也有可能只是一个普通的Map而不是映射关系
-        //TODO 需要判断字段的类型，如果字段类型也是Map，则不进行映射解析而是转化为ObjectField
+        //需要判断字段的类型，如果字段类型也是Map，则不进行映射解析而是转化为ObjectField
         //这个Map集合对应的映射类型应当必然是此字段的类型
         //获取此字段的class类型
+        // TODO 可能需要一个单独的map解析器
         Class fieldClass = FieldUtils.fieldClassGetter(objectClass, fieldName);
-        //将参数转化为Map<String , Object>类型
-        Map<String, Object> fieldMap = (Map<String, Object>)value;
-        //得到一个假对象数据，封装为一个MockField
-        MockObject parser = parser(fieldClass, fieldMap);
+        //判断类型
+        if(FieldUtils.isChild(fieldClass , Map.class)){
+            //如果字段是Map类型，直接返回此对象作为假字段对象，不做处理
+            return getDefaultObjectMockField(fieldName , value);
+        }else if(FieldUtils.isChild(fieldClass, List.class) && FieldUtils.getListGeneric(objectClass , fieldName).equals(Map.class) ){
+            //TODO 如果字段类型是List集合而且集合的泛型是Map类型，使用list类型解析器
+//            new ListParser();
+            return null;
+        }else{
+            //如果字段不是Map类型
+            //将参数转化为Map<String , Object>类型
+            Map<String, Object> fieldMap = (Map<String, Object>)value;
+            //得到一个假对象数据，封装为一个MockField
+            MockObject parser = parser(fieldClass, fieldMap);
 
-        //获取假字段对象
-        return objectToField(fieldName , parser);
+            //获取假字段对象
+            return objectToField(fieldName , parser);
+        }
     }
 
 
@@ -245,12 +258,15 @@ public class ParameterParser {
     }
 
 
-
-
-
-
-
-
+    /**
+     * 获取一个默认值假字段
+     * @param fieldName
+     * @param value
+     * @return
+     */
+    private static MockField getDefaultObjectMockField(String fieldName , Object value){
+        return new MockField(fieldName , () -> value);
+    }
 
     /**
      * 将一个假类对象封装为一个假字段对象

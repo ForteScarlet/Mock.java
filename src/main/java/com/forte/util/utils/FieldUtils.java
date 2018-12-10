@@ -400,7 +400,7 @@ public class FieldUtils {
      * @return
      * @throws ClassNotFoundException
      */
-    public Class getListGeneric(Field field) throws ClassNotFoundException {
+    public static Class getListGeneric(Field field) {
 
         ParameterizedType listGenericType = (ParameterizedType) field.getGenericType();
         Type[] listActualTypeArguments = listGenericType.getActualTypeArguments();
@@ -410,11 +410,42 @@ public class FieldUtils {
         } else if (listActualTypeArguments.length == 1) {
             //如果只有一种类型
             String typeName = listActualTypeArguments[0].getTypeName();
-            return Class.forName(typeName);
+            //如果此类型存在泛型，移除泛型
+            typeName = typeName.replaceAll("<[\\w\\.\\, ]+>" , "");
+            try {
+                return Class.forName(typeName);
+            } catch (ClassNotFoundException e) {
+                //将异常转化为运行时
+                throw new RuntimeException(e);
+            }
         } else {
             //如果多个类型，直接返回Object类型
             return Object.class;
         }
+    }
+
+    /**
+     * 获取一个list字段的泛型类型<br>
+     * 这个字段必须是一个list类型的字段！
+     * @param c
+     * @param fieldName
+     * @return
+     * @throws ClassNotFoundException
+     */
+    public static Class getListGeneric(Class c , String fieldName) {
+        return getListGeneric(fieldGetter(c , fieldName));
+    }
+
+    /**
+     * 获取一个list字段的泛型类型<br>
+     * 这个字段必须是一个list类型的字段！
+     * @param obj
+     * @param fieldName
+     * @return
+     * @throws ClassNotFoundException
+     */
+    public static Class getListGeneric(Object obj , String fieldName) {
+        return getListGeneric(obj.getClass() , fieldName);
     }
 
     /**
