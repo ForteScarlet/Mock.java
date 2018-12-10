@@ -100,9 +100,11 @@ public class ParameterParser {
                         mockField = arrayTypeParse(objectClass, fieldName, intervalStr, value);
                         break;
                     case TYPE_LIST:
-                        //TODO 如果字段是list集合类型，使用集合类型解析器解析
+                        //如果字段是list集合类型，使用集合类型解析器解析
+                        mockField = listTypeParse(objectClass, fieldName, intervalStr, value);
                         break;
                     default:
+                        //TODO 参数类型无法解析的情况
                         break;
                 }
 
@@ -113,8 +115,7 @@ public class ParameterParser {
 
 
         //解析结束，封装MockObject对象
-        MockObject<T> mockObject = getMockObject(objectClass, fields);
-        return mockObject;
+        return getMockObject(objectClass, fields);
 
     }
 
@@ -192,6 +193,8 @@ public class ParameterParser {
      */
     private static MockField mapTypeParse(Class objectClass , String fieldName , String intervalStr , Object value){
         //如果是一个Map集合，说明这个字段映射着另一个假对象
+        //也有可能只是一个普通的Map而不是映射关系
+        //TODO 需要判断字段的类型，如果字段类型也是Map，则不进行映射解析而是转化为ObjectField
         //这个Map集合对应的映射类型应当必然是此字段的类型
         //获取此字段的class类型
         Class fieldClass = FieldUtils.fieldClassGetter(objectClass, fieldName);
@@ -218,6 +221,24 @@ public class ParameterParser {
         FieldParser fieldParser;
         //当参数为一个数组的时候，使用数组解析器
         fieldParser = new ArraysParser(objectClass , fieldName , intervalStr , (Object[])value);
+
+        //获取假字段封装类
+        return fieldParser.getMockField();
+    }
+
+    /**
+     * 集合类型参数解析
+     * @param objectClass
+     * @param fieldName
+     * @param intervalStr
+     * @param value
+     * @return
+     */
+    private static MockField listTypeParse(Class objectClass , String fieldName , String intervalStr , Object value){
+        //准备字段解析器
+        FieldParser fieldParser;
+        //如果参数是list集合类型的，使用list参数解析器
+        fieldParser = new ListParser(objectClass , fieldName , intervalStr , (List)value);
 
         //获取假字段封装类
         return fieldParser.getMockField();
