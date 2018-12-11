@@ -8,14 +8,16 @@ import java.util.Random;
 
 /**
  * <p>
- * 随机数据助手,可能会用到的所有随机方法<br>
- * 此类所有的方法，只要在方法名前加上'@' 即可在Mock中作为映射指令
- * 例如:
- * <code>
- *     map.put("name" , "@cname");
- *     map.put("age" , "@age");
- *     map.put("place" , "@ctitle(2,5)");
- * </code>
+ *      随机数据助手,可能会用到的所有随机方法<br>
+ *      此类所有的方法，只要在方法名前加上'@' 即可在Mock中作为映射指令
+ *      例如:
+ *      <p>
+ *        <code>
+ *            <p>map.put("name" , "@cname");</p>
+ *            <p>map.put("age" , "@age");</p>
+ *            <p>map.put("place" , "@ctitle(2,5)");</p>
+ *        </code>
+ *      </p>
  * </p>
  *
  * <p><strong>--名称、title等相关</strong></p>

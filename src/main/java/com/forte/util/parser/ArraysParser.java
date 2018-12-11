@@ -46,6 +46,7 @@ class ArraysParser extends BaseFieldParser {
      */
     @Override
     public FieldValueGetter parserForArrayFieldValueGetter() {
+        //转化并返回结果
         return getArrayFieldValueGetter();
     }
 

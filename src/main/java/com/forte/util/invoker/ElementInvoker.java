@@ -28,7 +28,13 @@ public class ElementInvoker implements Invoker {
     @Override
     public Object invoke() throws Exception {
         //返回数组或者集合的随机值
-        return Optional.of(arr).map(RandomUtil::getRandomElement).orElse(RandomUtil.getRandomElement(list));
+        if(arr != null){
+            //如果有数组，使用数组
+            return RandomUtil.getRandomElement(arr);
+        }else{
+            //如果没有数组，使用集合
+            return RandomUtil.getRandomElement(list);
+        }
     }
 
     /**

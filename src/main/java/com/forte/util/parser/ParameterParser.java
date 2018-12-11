@@ -1,9 +1,14 @@
 package com.forte.util.parser;
 
 import com.forte.util.Mock;
+import com.forte.util.fieldvaluegetter.ArrayFieldValueGetter;
+import com.forte.util.fieldvaluegetter.FieldValueGetter;
+import com.forte.util.fieldvaluegetter.ListFieldValueGetter;
+import com.forte.util.invoker.Invoker;
 import com.forte.util.mockbean.MockBean;
 import com.forte.util.utils.FieldUtils;
 import com.forte.util.mockbean.MockField;
+import com.sun.xml.internal.ws.server.sei.ValueGetter;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -226,11 +231,31 @@ public class ParameterParser {
             //如果字段不是Map类型
             //将参数转化为Map<String , Object>类型
             Map<String, Object> fieldMap = (Map<String, Object>)value;
-            //得到一个假对象数据，封装为一个MockField
-            MockBean parser = parser(fieldClass, fieldMap);
+            //判断字段是否为list集合类型或数组类型
+            if(FieldUtils.isChild(fieldClass , List.class)){
+                //是list集合类型，获取集合的泛型类型
+                Class fieldListGenericClass = FieldUtils.getListGeneric(objectClass, fieldName);
+                //获取一个假对象
+                MockBean parser = parser(fieldListGenericClass, fieldMap);
 
-            //获取假字段对象
-            return objectToField(fieldName , parser);
+                FieldValueGetter fieldValueGetter = objectToListFieldValueGetter(parser, intervalStr);
+                return new MockField(fieldName , fieldValueGetter);
+            }else if(fieldClass.isArray()){
+                //是数组类型，获取数组的类型信息
+                Class fieldArrayGeneric = FieldUtils.getArrayGeneric(fieldClass);
+                //获取一个假对象
+                MockBean parser = parser(fieldArrayGeneric, fieldMap);
+                //TODO 数组类型
+                FieldValueGetter fieldValueGetter = objectToArrayFieldValueGetter(parser, intervalStr);
+                return new MockField(fieldName , fieldValueGetter);
+
+            }else{
+                //得到一个假对象数据，封装为一个MockField
+                MockBean parser = parser(fieldClass, fieldMap);
+
+               return objectToField(fieldName , parser);
+            }
+
         }
     }
 
@@ -291,6 +316,72 @@ public class ParameterParser {
         //使用lambda表达式，创建一个MOckField对象并返回
         return new MockField(fieldName , object::getObject);
     }
+
+
+    /**
+     * 将假字段对象转化为集合字段值获取器
+     * @param object
+     * @param intervalStr
+     * @return
+     */
+    private static FieldValueGetter objectToListFieldValueGetter(MockBean object , String intervalStr){
+        //创建一个方法执行者
+        Invoker invoker = object::getObject;
+
+        //获取区间参数
+        Integer[] integers = intervalParse(intervalStr);
+        //获取集合字段值获取器
+        return new ListFieldValueGetter(new Invoker[]{invoker}, integers);
+    }
+
+    /**
+     * 将假字段对象转化为数组字段值获取器
+     * @param object
+     * @param intervalStr
+     * @return
+     */
+    private static FieldValueGetter objectToArrayFieldValueGetter(MockBean object , String intervalStr){
+        //创建一个方法执行者
+        Invoker invoker = object::getObject;
+
+        //获取区间参数
+        Integer[] integers = intervalParse(intervalStr);
+        //获取集合字段值获取器
+        return new ArrayFieldValueGetter(new Invoker[]{invoker}, integers);
+    }
+
+    /**
+     * 解析区间参数
+     * @param intervalStr
+     * @return
+     */
+    private static Integer[] intervalParse(String intervalStr){
+        if(intervalStr == null){
+            //如果没有区间参数，直接返回[1,1]
+            return new Integer[]{1,1};
+        }else{
+            //有区间参数，解析
+            //切割，有可能有小数位的区间
+            //期望中，切割后长度最多为2
+            String[] split = intervalStr.split("\\.");
+            //整数位的区间参数
+            String integerInterval = split[0].trim();
+            if (integerInterval.length() > 0) {
+                //如果不是空的，切割
+                String[] splitIntInterval = integerInterval.split("-");
+                int intervalMin = Integer.parseInt(splitIntInterval[0]);
+                int intervalMax = splitIntInterval.length > 1 ? Integer.parseInt(splitIntInterval[1]) : 1;
+                return new Integer[]{intervalMin, intervalMax};
+            }else{
+                //如果为空，返回[1,1]
+                return new Integer[]{1,1};
+            }
+        }
+    }
+
+
+
+
 
     /**
      * 获取一个MockObject

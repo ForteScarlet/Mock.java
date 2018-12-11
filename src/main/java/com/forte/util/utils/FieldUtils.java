@@ -425,6 +425,27 @@ public class FieldUtils {
     }
 
     /**
+     * 获取数组的组件类型
+     * @param trr
+     * @param <T>
+     * @return
+     */
+    public static <T> Class getArrayGeneric(T[] trr){
+        //获取组件类型
+        return trr.getClass().getComponentType();
+    }
+
+    /**
+     * 获取数组的组件类型
+     * @param <T>
+     * @return
+     */
+    public static <T> Class getArrayGeneric(Class<T> tClass){
+        return tClass.getComponentType();
+    }
+
+
+    /**
      * 获取一个list字段的泛型类型<br>
      * 这个字段必须是一个list类型的字段！
      * @param c
