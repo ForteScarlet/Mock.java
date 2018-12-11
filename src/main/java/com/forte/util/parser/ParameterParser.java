@@ -1,7 +1,7 @@
 package com.forte.util.parser;
 
 import com.forte.util.Mock;
-import com.forte.util.mockbean.MockObject;
+import com.forte.util.mockbean.MockBean;
 import com.forte.util.utils.FieldUtils;
 import com.forte.util.mockbean.MockField;
 
@@ -40,7 +40,7 @@ public class ParameterParser {
      * @param objectClass 需要进行假数据封装的类对象
      * @param paramMap    参数集合
      */
-    public static <T> MockObject<T> parser(Class<T> objectClass, Map<String, Object> paramMap) {
+    public static <T> MockBean<T> parser(Class<T> objectClass, Map<String, Object> paramMap) {
         //使用线程安全list集合
         List<MockField> fields = Collections.synchronizedList(new ArrayList<>());
         //遍历并解析-（多线程同步）
@@ -85,9 +85,8 @@ public class ParameterParser {
                         mockField = integerTypeParse(objectClass, fieldName, intervalStr, value);
                         break;
                     case TYPE_OBJECT:
-                        // TODO 使用解析器，如果字段类型是集合或数组要重复输出
-                        //如果是未知引用数据类型，保持原样赋值，直接获取一个假字段，里面为返回默认值的字段值获取器-lambda表达式创建
-                        mockField = getDefaultObjectMockField(fieldName , value);
+                        //使用解析器，如果字段类型是集合或数组要重复输出
+                        mockField = objectTypeParse(objectClass, fieldName, intervalStr, value);
                         break;
                     case TYPE_MAP:
                         //如果是一个Map集合，说明这个字段映射着另一个假对象
@@ -185,6 +184,22 @@ public class ParameterParser {
 
 
     /**
+     * 未知的引用数据类型解析
+     * @param objectClass
+     * @param fieldName
+     * @param intervalStr
+     * @param value
+     * @return
+     */
+    private static MockField objectTypeParse(Class objectClass , String fieldName , String intervalStr , Object value){
+        ObjectParser objectParser = new ObjectParser(objectClass, fieldName, intervalStr, value);
+
+        //返回假字段对象
+        return objectParser.getMockField();
+    }
+
+
+   /**
      * Map集合类型解析
      * @param objectClass
      * @param fieldName
@@ -198,22 +213,21 @@ public class ParameterParser {
         //需要判断字段的类型，如果字段类型也是Map，则不进行映射解析而是转化为ObjectField
         //这个Map集合对应的映射类型应当必然是此字段的类型
         //获取此字段的class类型
-        // TODO 可能需要一个单独的map解析器
         Class fieldClass = FieldUtils.fieldClassGetter(objectClass, fieldName);
         //判断类型
         if(FieldUtils.isChild(fieldClass , Map.class)){
             //如果字段是Map类型，直接返回此对象作为假字段对象，不做处理
             return getDefaultObjectMockField(fieldName , value);
         }else if(FieldUtils.isChild(fieldClass, List.class) && FieldUtils.getListGeneric(objectClass , fieldName).equals(Map.class) ){
-            //TODO 如果字段类型是List集合而且集合的泛型是Map类型，使用list类型解析器
-//            new ListParser();
-            return null;
+            //如果字段类型是List集合而且集合的泛型是Map类型，使用Object类型解析器
+            ObjectParser objectParser = new ObjectParser(objectClass, fieldName, intervalStr, value);
+            return objectParser.getMockField();
         }else{
             //如果字段不是Map类型
             //将参数转化为Map<String , Object>类型
             Map<String, Object> fieldMap = (Map<String, Object>)value;
             //得到一个假对象数据，封装为一个MockField
-            MockObject parser = parser(fieldClass, fieldMap);
+            MockBean parser = parser(fieldClass, fieldMap);
 
             //获取假字段对象
             return objectToField(fieldName , parser);
@@ -273,7 +287,7 @@ public class ParameterParser {
      * @param object
      * @return
      */
-    private static MockField objectToField(String fieldName , MockObject object){
+    private static MockField objectToField(String fieldName , MockBean object){
         //使用lambda表达式，创建一个MOckField对象并返回
         return new MockField(fieldName , object::getObject);
     }
@@ -284,9 +298,9 @@ public class ParameterParser {
      * @param <T>
      * @return
      */
-    private static <T> MockObject<T> getMockObject(Class<T> objectObject, MockField[] fields) {
+    private static <T> MockBean<T> getMockObject(Class<T> objectObject, MockField[] fields) {
         //返回封装结果
-        return new MockObject<>(objectObject, fields);
+        return new MockBean<>(objectObject, fields);
     }
 
     /**
@@ -295,7 +309,7 @@ public class ParameterParser {
      * @param <T>
      * @return
      */
-    private static <T> MockObject<T> getMockObject(Class<T> objectObject, List<MockField> fields) {
+    private static <T> MockBean<T> getMockObject(Class<T> objectObject, List<MockField> fields) {
         //返回封装结果
         return getMockObject(objectObject, fields.toArray(new MockField[0]));
     }

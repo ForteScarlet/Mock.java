@@ -1,63 +1,47 @@
 package com.forte.util.mockbean;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 假对象的封装类，利用此类的getObject来获取一个对象
+ * 将{@link MockBean}封装并返回
  *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
- */
+ * @date 2018/12/11 16:11
+ * @since JDK1.8
+ **/
 public class MockObject<T> {
+    private final MockBean<T> mockBean;
 
     /**
-     * 需要封装假数据的对象
-     */
-    private Class<T> objectClass;
-
-    /**
-     * 假对象的全部字段
-     */
-    private MockField[] fields;
-
-    /**
-     * 获取对象
-     *
+     * 获取一个实例对象
      * @return
      */
-    public T getObject() {
-        //先创建一个实例
-        T instance;
-        //使用try抓取错误，若实例创建错误，直接返回null
-        try {
-            instance = objectClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        //如果没有出现异常，遍历字段并赋值
-        for (MockField field : fields) {
-            //捕获异常，如果出现异常，不做处理，即为使其值为null
-            try {
-                field.setValue(instance);
-            } catch (/*NullPointerException |*/ NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            }
+    public T getOne(){
+        return mockBean.getObject();
+    }
+
+    /**
+     * 获取多个实例对象，作为list集合返回
+     * @return
+     */
+    public List<T> getList(int num){
+        List<T> list = new ArrayList<>();
+
+        //获取多个
+        for(int i = 0;i<num;i++){
+            list.add(mockBean.getObject());
         }
 
-        //返回这个实例
-        return instance;
-
+        return list;
     }
 
 
     /**
-     * 构造方法
-     *
-     * @param objectClass
-     * @param fields
+     * 唯一构造
+     * @param mockBean
      */
-    public MockObject(Class<T> objectClass, MockField[] fields) {
-        this.objectClass = objectClass;
-        this.fields = fields;
+    public MockObject(MockBean<T> mockBean){
+        this.mockBean = mockBean;
     }
 }

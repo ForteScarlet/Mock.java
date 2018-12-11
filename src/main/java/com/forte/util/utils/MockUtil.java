@@ -7,7 +7,16 @@ import java.util.Date;
 import java.util.Random;
 
 /**
- * 随机数据助手,可能会用到的所有随即方法<br>
+ * <p>
+ * 随机数据助手,可能会用到的所有随机方法<br>
+ * 此类所有的方法，只要在方法名前加上'@' 即可在Mock中作为映射指令
+ * 例如:
+ * <code>
+ *     map.put("name" , "@cname");
+ *     map.put("age" , "@age");
+ *     map.put("place" , "@ctitle(2,5)");
+ * </code>
+ * </p>
  *
  * <p><strong>--名称、title等相关</strong></p>
  * <ul>
@@ -158,6 +167,7 @@ import java.util.Random;
  * <li>
  * {@link MockUtil#color()}<em>获取一个随机颜色的16进制代码</em>
  * </li>
+ * </ul>
  * <p><strong>--text相关</strong></p>
  * <ul>
  * <li>
@@ -557,6 +567,7 @@ public class MockUtil {
 
     /**
      * 获取指定区间[a,b]的小数，默认小数位数为0，double类型
+     *
      * @param a
      * @param b
      * @return
@@ -567,11 +578,12 @@ public class MockUtil {
 
     /**
      * 获取指定数值为a的小数，默认小数位数为0，double类型
+     *
      * @param a
      * @return
      */
     public static Double doubles(Integer a) {
-        return a*1.0;
+        return a * 1.0;
     }
 
 

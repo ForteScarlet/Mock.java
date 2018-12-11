@@ -176,7 +176,7 @@ public class FieldUtils {
      * @return
      */
     public static Class fieldClassGetter(Class c , String fieldName){
-        return fieldGetter(c , fieldName).getClass();
+        return fieldGetter(c , fieldName).getType();
     }
 
 

@@ -1,5 +1,6 @@
 package com.forte.util;
 
+import com.forte.util.mockbean.MockBean;
 import com.forte.util.mockbean.MockObject;
 import com.forte.util.parser.ParameterParser;
 import com.forte.util.utils.MockUtil;
@@ -8,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -16,7 +18,8 @@ import java.util.stream.Collectors;
  * javaBean假数据生成工具
  * </h4>
  * <p>
- * 使用静态方法：{@link #set(Class, Map)} 来添加一个类的假数据类型映射
+ * 使用静态方法：{@link #set(Class, Map)} 来添加一个类的假数据类型映射<br>
+ * 语法基本与Mock.js中的类似，字符串参数中可以使用<code>@+方法名</code>的方式指定随机方法(随机方法详见{@link MockUtil},此类也可以直接使用)
  * </p>
  * <p>
  * <ul>
@@ -27,16 +30,23 @@ import java.util.stream.Collectors;
  * <p>
  *  为类中的引用类型对象赋值的时候，有两种方式：
  *  <ul>
- *      <li>map.set("user" , new HashMap<String , Object></>)
+ *      <li>
+ *          <code>
+ *              map.set("user" , new HashMap<String , Object>)
+ *          </code>
  *         ->  即为字段再配置一个map映射集合
  *      </li>
- *      <li>map.set("user.name" , "@cname")
+ *      <li>
+ *          <code>
+ *              map.set("user.name" , "@cname")
+ *          </code>
  *         ->  使用"."分割，即使用多层级对象赋值，此方式需要保证引用类型的对象有无参构造，且字段有getter方法
  *      </li>
  *  </ul>
  * </p>
  *
  * @author ForteScarlet
+ * @version 0.5-beta
  */
 public class Mock {
 
@@ -81,9 +91,9 @@ public class Mock {
     }
 
     /**
-     * 保存全部记录的class与其对应的假对象{@link MockObject}
+     * 保存全部记录的class与其对应的假对象{@link MockBean}
      */
-    private static final Map<Class, MockObject> MOCK_OBJECT;
+    private static final Map<Class, MockBean> MOCK_OBJECT;
 
     /**
      * MockUtil中的全部方法
@@ -94,14 +104,36 @@ public class Mock {
      * 添加数据记录
      *
      * @param objClass 映射的class
-     * @param map      映射的规则对象
-     *                 key:对应的字段
-     *                 可解析的对象：
+     * @param map      <p>映射的规则对象</p>
+     *                 <p>
+     *                 <ul>
+     *                  <li>key:对应的字段</li>
+     *                  <li>
+     *                      value:映射参数，可以是：
+     *                      <ul>
+     *                           <li>字符串</li>
+     *                           <li>若干随机方法指令(指令详见{@link MockUtil})</li>
+     *                           <li>整数(Integer)</li>
+     *                           <li>浮点数(Double)</li>
+     *                           <li>数组或集合类型</li>
+     *                           <li>Map集合类型(可作为新的映射，也可直接作为参数)</li>
+     *                           <li>任意引用数据类型</li>
+     *                      </ul>
+     *                  </li>
+     *                 </ul>
+     *                 </p>
+     *                 <p>
+     *                  如果映射的对象中有多层级对象，支持使用多层级字段映射，例如：
+     *                      <code>
+     *                          map.put("friend.name" , "@canme")
+     *                      </code>
+     *                 </p>
+     *
      */
     public static <T> void set(Class<T> objClass, Map<String, Object> map) {
 
         //使用参数解析器进行解析
-        MockObject<T> parser = ParameterParser.parser(objClass, map);
+        MockBean<T> parser = ParameterParser.parser(objClass, map);
 
 
         //添加
@@ -115,14 +147,8 @@ public class Mock {
      * @param <T>
      * @return
      */
-    public static <T> T get(Class<T> objClass) {
-        MockObject<T> mockObject = MOCK_OBJECT.get(objClass);
-        //如果经过了解析，获取，如果没有，返回null
-        if (mockObject == null) {
-            return null;
-        } else {
-            return mockObject.getObject();
-        }
+    public static <T> MockObject<T> get(Class<T> objClass) {
+        return Optional.ofNullable(MOCK_OBJECT.get(objClass)).map(m -> new MockObject(m)).orElse(null);
     }
 
 
