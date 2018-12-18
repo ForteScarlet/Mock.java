@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+/**
+ * 随机值获取工具类
+ */
 public class RandomUtil {
-
 
     /* ——————————————————————— getNumber : 获取随机长度字母(仅数字，尽量不要超过int的最大数上限长度) ——————————————————————————— */
 

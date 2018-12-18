@@ -5,15 +5,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 /**
- * 获取一个随机中文姓名 代码来源于网络 讲道理 ， 效果不是特别好 而且关于字符编码的转换也不确定处理的好<br>
+ * 获取一个随机中文姓名 代码灵感来源于网络 讲道理，效果不是特别好 而且关于字符编码的转换也不确定处理的好<br>
  * 目前已知bug：随机汉字有时候会出现中文顿号：丶
- *
- * @author CSDN博客-@Emilio66
+ * @author ForteScarlet
  */
 public class ChineseUtil {
 
     /**
-     * 598 百家姓
+     * 百家姓
      */
     private static final String[] Surname = {"赵", "钱", "孙", "李", "周", "吴", "郑", "王", "冯", "陈", "褚", "卫", "蒋", "沈", "韩", "杨",
             "朱", "秦", "尤", "许", "何", "吕", "施", "张", "孔", "曹", "严", "华", "金", "魏", "陶", "姜", "戚", "谢", "邹", "喻", "柏",
@@ -114,10 +113,10 @@ public class ChineseUtil {
         String str2 = null;
         int highPos, lowPos;
         Random random = new Random();
-        // 区码，0xA0打头，从第16区开始，即0xB0=11*16=176,16~55一级汉字，56~87二级汉字
+        //区码，0xA0打头，从第16区开始，即0xB0=11*16=176,16~55一级汉字，56~87二级汉字
         highPos = (176 + Math.abs(random.nextInt(71)));
         random = new Random();
-        // 位码，0xA0打头，范围第1~94列
+        //位码，0xA0打头，范围第1~94列
         lowPos = 161 + Math.abs(random.nextInt(94));
 
         byte[] bArr = new byte[2];

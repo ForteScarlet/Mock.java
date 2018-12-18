@@ -6,7 +6,7 @@
 
     <groupId>com.forte</groupId>
     <artifactId>mockUtil</artifactId>
-    <version>0.1-IN-DEVELOPMENT</version>
+    <version>0.5-IN-DEVELOPMENT</version>
     <build>
         <plugins>
             <plugin>

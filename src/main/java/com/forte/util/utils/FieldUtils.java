@@ -8,20 +8,53 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 字段操作工具，提供丰富的方法，以反射的方式从对象中获取字段的值。<br>
+ * <p>
+ * 字段操作工具，提供丰富的方法，以反射的方式从对象中获取值或赋值。<br>
  * 其中:<br>
  * - objectGetter方法可以允许使用多级字段，例如"user.child.name"<br>
- * - getExcelNum方法可以获取Excel中列的数字坐标，例如:"AA" => 27
- *
+ * - getExcelNum方法可以获取Excel中列的数字坐标，例如:"AA" => 27<br>
+ * </p>
+ * <br>
+ * <p>
  * 实现了缓存优化，使得效率大幅上升
  * 由于希望将其作为一个简单的工具类使用，因此全部使用内部类实现
- *  2018-12-15 多层级缓存优化测试结果：
- *  没有缓存的:
- *  总用时：1635s ; 1635950ms
- *  平均用时：.33ms
- *  有缓存的:
- *  总用时：18s ; 18216ms
- *  平均用时：.00ms
+ *  <blockquote>
+ *   <p>2018-12-15 多层级缓存优化-getter测试结果：</p>
+ *   <footer>
+ *       次数：500w<br>
+ *       深度：100 <br>
+ *       -没有缓存的:<br>
+ *        &nbsp;&nbsp;&nbsp;&nbsp;
+ *        >总用时：1635s ; 1635950ms<br>
+ *        &nbsp;&nbsp;&nbsp;&nbsp;
+ *          >平均用时：.33ms<br>
+ *       -有缓存的:<br>
+ *          &nbsp;&nbsp;&nbsp;&nbsp;
+ *          >总用时：18s ; 18216ms<br>
+ *          &nbsp;&nbsp;&nbsp;&nbsp;
+ *          >平均用时：.00ms<br>
+ * </footer>
+ * </blockquote>
+ * <br>
+ *  <blockquote>
+ *   <p>2018-12-15至2018-12-16 多层级缓存优化-getter测试结果：</p>
+ *   <footer>
+ *      次数：5亿<br>
+ *      深度：200<br>
+ *      -没有缓存的：<br>
+ *          &nbsp;&nbsp;&nbsp;&nbsp;
+ *          >总用时：至终止程序为止，用时11 小时 50 分 13 秒
+ *          &nbsp;&nbsp;&nbsp;&nbsp;
+ *          >控制台可见进度：6.89%左右
+ *          &nbsp;&nbsp;&nbsp;&nbsp;
+ *          >未执行完成，中途终止
+ *      -有缓存的：<br>
+ *            &nbsp;&nbsp;&nbsp;&nbsp;
+ *           >总用时：3433s ; 3433008ms
+ *
+ * </footer>
+ * </blockquote>
+ * </p>
  *
  * @author ForteScarlet
  */
@@ -467,6 +500,7 @@ public class FieldUtils {
             //计入单缓存-当前-同时将getter方法提前计入缓存
             SingleCacheField<?> singleCacheField = saveSingleCacheFieldGetter(t.getClass(), field, getter);
 
+
             //此字段的实例对象-直接使用与上面相同的方式获取执行结果而不是使用自我调用
             Object innerObject = getter.invoke(t);
 
@@ -506,7 +540,9 @@ public class FieldUtils {
      * 通过对象的setter为字段赋值
      * 支持类似“user.child”这种多层级的赋值方式
      * 赋值的字段必须有其对应的公共set方法
-     * 如果多层级对象中有非底层级字段为null，将会为其创建一个新的实例
+     * 如果多层级对象中有非底层级字段为null，将会尝试为其创建一个新的实例
+     *
+     * TODO 旧
      *
      * @param t         对象
      * @param fieldName 需要赋值的字段
@@ -520,13 +556,13 @@ public class FieldUtils {
         //如果分割后只有一个字段值，直接进行赋值
         if (split.length == 1) {
 
-            //先查询缓存
-            Method cacheFieldSetter = getCacheFieldSetter(t.getClass() , fieldName);
-            if(cacheFieldSetter != null){
-                //如果缓存中有这个setter，直接使用
-                //赋值
-                MethodUtil.invoke(t , new Object[]{value} , cacheFieldSetter);
-            }
+//            //先查询缓存
+//            Method cacheFieldSetter = getCacheFieldSetter(t.getClass() , fieldName);
+//            if(cacheFieldSetter != null){
+//                //如果缓存中有这个setter，直接使用
+//                //赋值
+//                MethodUtil.invoke(t , new Object[]{value} , cacheFieldSetter);
+//            }
 
             //获取其set方法,返回执行结果
             String setterName = "set" + FieldUtils.headUpper(fieldName);
@@ -534,9 +570,10 @@ public class FieldUtils {
             Method setter = getFieldSetter(t , fieldName);
 
             //如果没有setter,展示异常提醒
+            // 直接抛出异常
             if(setter == null){
                 String error = "没有找到["+ t.getClass() +"]中的字段["+ fieldName +"]的setter方法，无法进行赋值";
-                new NoSuchFieldError(error).printStackTrace();
+                throw new NoSuchFieldError(error);
             }else{
                 //计入缓存-当前
                 saveSingleCacheFieldSetter(t.getClass() , fieldName , setter);
@@ -565,6 +602,122 @@ public class FieldUtils {
             objectSetter(fieldObject, fieldName, value);
         }
     }
+
+    /**
+     * 通过对象的setter为字段赋值
+     * 支持类似“user.child”这种多层级的赋值方式
+     * 赋值的字段必须有其对应的公共set方法
+     * 如果多层级对象中有非底层级字段为null，将会尝试为其创建一个新的实例
+     * @param t
+     * @param fieldName
+     * @param param
+     * @throws NoSuchMethodException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public static void objectSetter2(Object t, String fieldName, Object param) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        // TODO 发现bug，此方法会导致缓存无法储存
+        objectSetter(t , t , fieldName , fieldName , 1 , param);
+    }
+
+    /**
+     * 通过对象的setter为字段赋值
+     * 支持类似“user.child”这种多层级的赋值方式
+     * 赋值的字段必须有其对应的公共set方法
+     * 如果多层级对象中有非底层级字段为null，将会尝试为其创建一个新的实例
+     * @param t
+     * @param root
+     * @param fieldName
+     * @param realFieldName
+     * @param level
+     * @param param
+     */
+    private static void objectSetter(Object t, Object root, String fieldName, String realFieldName, int level, Object param) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+        // TODO 实现缓存的setter方法
+        // TODO 发现bug，此方法会导致缓存无法储存和获取，导致getter效率大幅度下降
+        //先查询缓存
+        CacheField cacheField = getCacheField(t.getClass(), fieldName);
+        if(cacheField != null){
+            //如果有缓存，获取执行结果
+            InvokeResult invokeResult = cacheField.fieldValueSet(t, param);
+            if(invokeResult.isSuccess()){
+                //如果赋值成功，结束方法
+                return;
+            }
+        }
+        //判断是否有用“.”分割
+        String[] split = fieldName.split("\\.");
+        //如果分割后只有一个字段值，直接进行赋值
+        if(split.length == 1){
+            //单层字段，获取setter方法
+            Method setter = getFieldSetter(t, fieldName);
+            if(setter == null){
+                //如果没有setter，抛出异常
+                throw new NoSuchMethodException("没有找到类["+ t.getClass() +"]字段["+ fieldName +"]的setter方法");
+            }
+
+
+            //如果有此方法，计入缓存-当前
+            SingleCacheField<?> singleCacheField = saveSingleCacheFieldSetter(t.getClass(), fieldName, setter);
+            //如果层数等级与真实字段相同且等级不为1,说明这是多层级字段的最终字段，保存
+            if(level != 1 && level == realFieldName.split("\\.").length){
+                saveLevelCacheField(root.getClass() , realFieldName , singleCacheField);
+            }
+
+            //执行赋值
+            MethodUtil.invoke(t, new Object[]{param}, setter);
+        }else{
+            //否则为多层字段，获取第一个字段名
+            String field = split[0];
+            //移除第一个字段
+            List<String> list = Arrays.stream(split).collect(Collectors.toList());
+            list.remove(0);
+            //拼接剩余
+            String newFieldName = String.join(".", list);
+
+
+             /*
+                以下的setter获取方法均为当前字段的，即field字段
+             */
+
+            //获取其get方法和set方法,返回执行结果
+            //获取setter方法
+            Method setter = getFieldSetter(t , field);
+            if(setter == null){
+                //抛出没有此方法异常
+                throw new NoSuchMethodException("没有找到类["+ t.getClass() +"]字段["+ field +"]的setter方法");
+            }
+
+            //计入单缓存-当前-同时将setter方法提前计入缓存
+            SingleCacheField<?> singleCacheField = saveSingleCacheFieldSetter(t.getClass(), field, setter);
+
+            //获取此字段的实例对象，使用objectGetter方法，可以省去一部计入缓存的步骤
+            Object fieldInstance = objectGetter(t, field);
+
+            //如果当前字段的值为null，赋值
+            if(fieldInstance == null){
+                fieldInstance = getFieldClass(t, field).newInstance();
+                //为当前字段对象赋一个新的值
+                objectSetter(t, field, fieldInstance);
+
+            }
+
+            //将setter计入缓存
+            //计入多层级缓存-当前
+            //获取字段名-切割真实字段名
+            String levelFieldName = Arrays.stream(realFieldName.split("\\.")).limit(level).collect(Collectors.joining("."));
+            saveLevelCacheField(root.getClass() , levelFieldName , singleCacheField);
+
+
+            //寻找下一层字段
+            objectSetter(fieldInstance, root, newFieldName, realFieldName, level+1, param);
+
+        }
+
+    }
+
+
 
     /**
      * 获取对象指定字段对象
@@ -889,12 +1042,20 @@ public class FieldUtils {
      */
     private static interface CacheField<T>{
         /**
-         * 获取一个缓存字段的值的方法
+         * 获取一个缓存字段的值
          * @param object
          *用于获取字段值的实例
          * @return
          */
         InvokeResult fieldValue(T object);
+
+        /**
+         * 为缓存字段的值赋值
+         * @param object
+         * @param param
+         * @return
+         */
+        InvokeResult fieldValueSet(T object, Object param);
 
         /**
          * 获取Getter方法
@@ -929,7 +1090,6 @@ public class FieldUtils {
      */
     private static <T> SingleCacheField<T> saveSingleCacheField(@NotNull Class<T> fieldWhereClass , @NotNull Field field, @Nullable Method getter , @Nullable Method setter){
         if(field.getName().split("\\.").length > 1){
-            // TODO 如果并非单层字段，抛出异常，考虑解决方法
             throw new RuntimeException("字段["+ field +"]并非单层字段");
         }
         //先查看是否有这个字段
@@ -1149,7 +1309,7 @@ public class FieldUtils {
                     //执行getter方法
                     Object invoke = GETTER.invoke(obj);
                     return InvokeResult.success(invoke);
-                } catch (IllegalAccessException | InvocationTargetException e) {
+                } catch (Exception e) {
                     return InvokeResult.fail();
                 }
             }else{
@@ -1266,7 +1426,7 @@ public class FieldUtils {
         }
 
         /**
-         * 获取字段的实例
+         * 获取字段的实例值
          * @param object
          * @return
          */
@@ -1274,7 +1434,29 @@ public class FieldUtils {
         public InvokeResult fieldValue(Object object) {
             return objectGetter(object);
         }
+
+        /**
+         * 为字段赋值
+         * @param object
+         * @param param
+         * @return
+         */
+        @Override
+        public InvokeResult fieldValueSet(T object, Object param) {
+            //赋值
+            try {
+                MethodUtil.invoke(object , new Object[]{param} , SETTER);
+                //如果没有出现异常，则说明方法执行成功，返回成功信息
+                return InvokeResult.emptySuccess();
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                //如果出现异常，则说明方法执行错误，返回错误信息
+                return InvokeResult.fail();
+            }
+        }
+
     }
+
+
 
 
     /* —————————————————————————————————————— 多层缓存对象相关方法 —————————————————————————————————————————— */
@@ -1325,7 +1507,7 @@ public class FieldUtils {
                                                                   @NotNull  SingleCacheField<T> thisCacheField){
 
         //TODO 删除
-//        System.out.println("尝试储存多层级字段：root:["+ rootClass +"]的["+ fieldName +"];真正:["+ thisCacheField.getFieldWhereClassIn() +"] -> ["+ thisCacheField.getFieldName() +"]");
+        System.out.println("尝试储存多层级字段：root:["+ rootClass +"] 的 ["+ fieldName +"];真正:["+ thisCacheField.getFieldWhereClassIn() +"] -> ["+ thisCacheField.getFieldName() +"]");
 
 
         //通过根类获取
@@ -1336,9 +1518,8 @@ public class FieldUtils {
             LevelCacheField<R,T> levelCacheField = levelCacheFieldHashMap.get(fieldName);
 
             if(levelCacheField == null){
-                //已经存在此多层级字段，修改
                 //没有此多层级对象，创建并添加
-                levelCacheField = new LevelCacheField<>(rootClass, fieldName, null, null, thisCacheField);
+                levelCacheField = new LevelCacheField<>(rootClass, fieldName, upper, lower, thisCacheField);
                 levelCacheFieldHashMap.put(fieldName , levelCacheField);
             }
 
@@ -1508,67 +1689,6 @@ public class FieldUtils {
             return thisLevelField.getField();
         }
 
-        /**
-         * 使用根类具体对象返回当前层级的当前字段的值
-         * 从上层对象遍历至此，由远到近
-         * @return
-         */
-        private Object thisLevelFieldGetter(R r){
-            //如果有上层对象
-            if(upperLevelField != null){
-                //如果有上层对象，则先获取上层对象的字段值，再根据上层对象的字段值返回对象获取当前字段值
-                //上层字段值的获取对象的类型为根类类型
-                //得到上层对象的值，使用上层对象获取本类对象
-                Object upperInvoke = upperLevelField.thisLevelFieldGetter(r);
-                if(upperInvoke != null){
-                    try {
-                        //使用上层字段的值执行getter
-                        return getThisLevelField().getGetter().invoke(upperInvoke);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        // TODO 出现异常，展示异常并返回一个null
-                        e.printStackTrace();
-                        return null;
-                    }
-                }else{
-                    //如果上层返回值为null，则直接返回null
-                    return null;
-                }
-            }else{
-                //如果没有上层对象
-                //如果level不为1，则尝试查询上层，如果查询不到则返回null
-                if(LEVEL != 1){
-                    // 查询上层字段
-                    LevelCacheField<R, ?> upperLevelCacheField = findUpperLevelCacheField(this);
-                    if(upperLevelCacheField != null){
-                        //如果查询到了，赋值并重新获取
-                        this.upperLevelField = upperLevelCacheField;
-                        return thisLevelFieldGetter(r);
-//                        //如果查询到了，则赋值并获取上层对象值
-//                        this.upperLevelField = upperLevelCacheField;
-//                        Object upperInvoke = upperLevelCacheField.thisLevelFieldGetter(r);
-//                        //使用上层字段的值执行getter
-//                        try {
-//                            return getThisLevelField().getGetter().invoke(upperInvoke);
-//                        } catch (IllegalAccessException | InvocationTargetException e) {
-//                            // TODO 出现异常，展示异常并返回一个null
-//                            e.printStackTrace();
-//                            return null;
-//                        }
-                    }else{
-                        //如果没有找到上层对象，返回null
-                        return null;
-                    }
-                }else{
-                    //如果level为1没有上层对象，认为当前即为根类，获取当前层字段值
-                    InvokeResult invokeResult = thisLevelField.objectGetter(r);
-                    //抛出异常并不合适，这里选择不做处理，直接返回null
-                    return invokeResult.getInvoke();
-                }
-            }
-        }
-
-
-
 
         /* —————————— getter setter —————————— */
 
@@ -1708,6 +1828,122 @@ public class FieldUtils {
 
         }
 
+        /**
+         * 使用根类具体对象返回当前层级的当前字段的值
+         * 从上层对象遍历至此，由远到近
+         * @return
+         */
+        private Object thisLevelFieldGetter(R r){
+            //如果有上层对象
+            if(upperLevelField != null){
+                //如果有上层对象，则先获取上层对象的字段值，再根据上层对象的字段值返回对象获取当前字段值
+                //上层字段值的获取对象的类型为根类类型
+                //得到上层对象的值，使用上层对象获取本类对象
+                Object upperInvoke = upperLevelField.thisLevelFieldGetter(r);
+                if(upperInvoke != null){
+                    try {
+                        //使用上层字段的值执行getter
+                        return getThisLevelField().getGetter().invoke(upperInvoke);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        // 出现异常，展示异常并返回一个null
+                        e.printStackTrace();
+                        return null;
+                    }
+                }else{
+                    //如果上层返回值为null，则直接返回null
+                    return null;
+                }
+            }else{
+                //如果没有上层对象
+                //如果level不为1，则尝试查询上层，如果查询不到则返回null
+                if(LEVEL != 1){
+                    // 查询上层字段
+                    LevelCacheField<R, ?> upperLevelCacheField = findUpperLevelCacheField(this);
+                    if(upperLevelCacheField != null){
+                        //如果查询到了，赋值并重新获取
+                        this.upperLevelField = upperLevelCacheField;
+                        return thisLevelFieldGetter(r);
+                    }else{
+                        //如果没有找到上层对象，返回null
+                        return null;
+                    }
+                }else{
+                    //如果level为1没有上层对象，认为当前即为根类，获取当前层字段值
+                    InvokeResult invokeResult = thisLevelField.objectGetter(r);
+                    //抛出异常并不合适，这里选择不做处理，直接返回null
+                    return invokeResult.getInvoke();
+                }
+            }
+        }
+
+
+        /**
+         * 为字段赋值
+         * @param object
+         * @param param
+         * @return
+         */
+        private Boolean thisLevelFieldSetter(R object, Object param) {
+            //如果有上层字段，
+            if(upperLevelField != null){
+                //如果有上层字段值，则先获取上层字段的字段值，再根据上层字段的值为当前字段赋值
+                Object upperInvoke = upperLevelField.thisLevelFieldGetter(object);
+                //如果上层对象的获取值为null，尝试为上层字段赋一个新的实例对象
+                if(upperInvoke == null){
+                    try {
+                        //获取上层对象的SETTER方法和字段类型
+                        Method upperSetter = upperLevelField.getSetter();
+                        Object upperInstance = upperLevelField.getThisLevelField().getFieldType().newInstance();
+                        //为上层字段的上层字段赋值
+                        //获取上上层对象的实例
+                        InvokeResult upperUpperInvokeResult = upperLevelField.upperLevelField.fieldValue(object);
+                        //如果获取失败或没有值，直接返回null
+                        if(upperUpperInvokeResult.isSuccess() && upperUpperInvokeResult.getInvoke() != null){
+                            MethodUtil.invoke(upperUpperInvokeResult, new Object[]{upperInstance}, upperSetter);
+                            //赋值之后重新获取
+                            return thisLevelFieldSetter(object , param);
+                        }else{
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //若是出现异常，则说明上层对象无法赋值
+                        //没有上层对象则无法为本层对象赋值，直接返回false
+                        return false;
+                    }
+                }else{
+                    try {
+                        //上层对象的获取值不为null，使用上层对象的返回值赋值
+                        Method setter = thisLevelField.getSetter();
+                        MethodUtil.invoke(object, new Object[]{param}, setter);
+                        return true;
+                    } catch (Exception e) {
+                        //如果出现异常，则说明赋值出现错误，返回false
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }else{
+                //如果没有上层对象，判断层级
+                if(LEVEL != 1){
+                    //如果层级不为1，则尝试查询上层，如果查询不到则返回null
+                    LevelCacheField<R,?> upperLevelCacheField = findUpperLevelCacheField(this);
+                    if(upperLevelCacheField != null){
+                        //如果查询到了，赋值并重新查询
+                        this.upperLevelField = upperLevelCacheField;
+                        return thisLevelFieldSetter(object, param);
+                    }else{
+                        //没有查询到，直接返回false
+                        return false;
+                    }
+                }else{
+                    //层级为1，则本类即为根类，直接赋值并返回赋值结果
+                    InvokeResult invokeResult = thisLevelField.objectSetter(object, param);
+                    return invokeResult.isSuccess();
+                }
+            }
+        }
+
 
         /**
          * 获取字段的实例
@@ -1723,6 +1959,23 @@ public class FieldUtils {
                 return InvokeResult.fail();
             }
         }
+
+        /**
+         * 为字段赋值并封装结果
+         * @param r
+         * @param param
+         * @return
+         */
+        @Override
+        public InvokeResult fieldValueSet(R r , Object param){
+            Boolean isSuccess = thisLevelFieldSetter(r, param);
+            if(isSuccess){
+                return InvokeResult.emptySuccess();
+            }else{
+                return InvokeResult.fail();
+            }
+        }
+
     }
 
 
@@ -1779,13 +2032,14 @@ public class FieldUtils {
             //是单层的
             HashMap<String, SingleCacheField> singleCacheFieldHashMap = SINGLE_FIELD_CACHE_MAP.get(fieldWhereClass);
             //如果有此字段的信息，返回获取值，如果没有直接返回null
-            return Optional.ofNullable(singleCacheFieldHashMap).map(m -> m.get(fieldName)).orElse(null);
+            SingleCacheField singleCacheField = Optional.ofNullable(singleCacheFieldHashMap).map(m -> m.get(fieldName)).orElse(null);
+            return singleCacheField;
         }else{
             //如果长度不为1，则认为是多层对象
             HashMap<String, LevelCacheField> levelCacheFieldHashMap = LEVEL_FIELD_CACHE_MAP.get(fieldWhereClass);
             //如果有此字段的信息，返回获取值，如果没有直接返回null
-            return Optional.ofNullable(levelCacheFieldHashMap).map(m -> m.get(fieldName)).orElse(null);
-
+            LevelCacheField levelCacheField = Optional.ofNullable(levelCacheFieldHashMap).map(m -> m.get(fieldName)).orElse(null);
+            return levelCacheField;
         }
     }
 
@@ -1814,20 +2068,20 @@ public class FieldUtils {
 
     /* TODO  —————————————————————————————————— 测试用 ———————————————————————————————————————— */
 
-    public static void show(){
 
 
 
-    }
 
-    public static void showUpper(LevelCacheField levelCacheField){
-        if(levelCacheField.getUpperLevelField() == null){
-            System.out.println("[null]");
-        }else{
-            System.out.println('['+levelCacheField.getUpperLevelField().getFieldName()+']');
-            showUpper(levelCacheField);
-        }
-    }
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 构造私有化
