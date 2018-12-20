@@ -6,6 +6,7 @@ import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.fieldvaluegetter.ListFieldValueGetter;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.mockbean.MockBean;
+import com.forte.util.mockbean.MockObject;
 import com.forte.util.utils.FieldUtils;
 import com.forte.util.mockbean.MockField;
 import com.sun.xml.internal.ws.server.sei.ValueGetter;
@@ -236,7 +237,8 @@ public class ParameterParser {
                 //是list集合类型，获取集合的泛型类型
                 Class fieldListGenericClass = FieldUtils.getListGeneric(objectClass, fieldName);
                 //获取一个假对象
-                MockBean parser = parser(fieldListGenericClass, fieldMap);
+                //同时保存此对象的解析
+                MockBean parser = Mock.set(fieldListGenericClass, fieldMap);
 
                 FieldValueGetter fieldValueGetter = objectToListFieldValueGetter(parser, intervalStr);
                 return new MockField(fieldName , fieldValueGetter);
@@ -244,14 +246,19 @@ public class ParameterParser {
                 //是数组类型，获取数组的类型信息
                 Class fieldArrayGeneric = FieldUtils.getArrayGeneric(fieldClass);
                 //获取一个假对象
-                MockBean parser = parser(fieldArrayGeneric, fieldMap);
+//                MockBean parser = parser(fieldArrayGeneric, fieldMap);
+                //同时保存此对象的解析
+                MockBean parser = Mock.set(fieldArrayGeneric, fieldMap);
+
                 //TODO 数组类型
                 FieldValueGetter fieldValueGetter = objectToArrayFieldValueGetter(parser, intervalStr);
                 return new MockField(fieldName , fieldValueGetter);
 
             }else{
                 //得到一个假对象数据，封装为一个MockField
-                MockBean parser = parser(fieldClass, fieldMap);
+//                MockBean parser = parser(fieldClass, fieldMap);
+                //同时保存此对象的解析
+                MockBean parser = Mock.set(fieldClass, fieldMap);
 
                return objectToField(fieldName , parser);
             }

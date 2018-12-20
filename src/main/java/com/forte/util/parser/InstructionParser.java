@@ -3,7 +3,9 @@ package com.forte.util.parser;
 import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
+import com.forte.util.utils.RandomUtil;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -138,13 +140,53 @@ class InstructionParser extends BaseFieldParser {
             }
         } else {
             //如果没有能够匹配的@方法，则说明指令部分就是普通的字符串，创建一个方法执行者为空值的未知类型字段值获取器: ObjectFieldValueGetter
-            //因为是没有@方法的普通字符串，没有多余字符，使用Object类型的字段值获取器即可
-            fieldValueGetter = getObjectFieldValueGetter(MethodUtil.createNullMethodInvoker(instructionStr));
+            Integer[] intervalData = getIntervalData();
+            //判断区间参数是否存在
+            if(intervalData == null){
+                //因为是没有@方法的普通字符串，没有多余字符，使用Object类型的字段值获取器即可
+                fieldValueGetter = getObjectFieldValueGetter(MethodUtil.createNullMethodInvoker(instructionStr));
+            }else{
+                //有区间参数，获取一个对字符串重复输出的Invoker
+                fieldValueGetter = getStringFieldValueGetter(new Invoker[]{MethodUtil.createNullMethodInvoker(instructionStr)});
+            }
+
+
         }
         //返回结果
         return fieldValueGetter;
     }
 
+
+    /**
+     * 获取区间参数区间，如果没有区间参数则返回null
+     * @return
+     */
+    private Integer[] getIntervalData(){
+        //获取参数
+        Integer min = intervalMin;
+        Integer max = intervalMax;
+
+        //判断区间参数
+        if(min == null){
+            //如果没左参数
+            if(max == null){
+                //如果右参数也没有，直接返回一个[1,1]的区间
+                return null;
+            }else{
+                //如果有右参数，参数同化
+                min = max;
+            }
+        }else{
+            //有左参数，判断右参数
+            if(max == null){
+                //没有右参数，同化
+                max = min;
+            }
+            //否则都有，不变
+        }
+        //返回结果
+        return new Integer[]{min ,max};
+    }
 
     /**
      * 构造

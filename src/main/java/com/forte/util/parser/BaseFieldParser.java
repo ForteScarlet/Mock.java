@@ -163,11 +163,10 @@ abstract class BaseFieldParser implements FieldParser {
             //获取方法名称
             String methodName = methodStr.replaceAll(replaceForNameRegex, "");
 
-
             //获取方法的参数
             String[] params = getMethodParams(methodStr);
             //获取方法对象
-            Method method = getMethodFrommName(methodName, params.length);
+            Method method = getMethodFromName(methodName, params.length);
             //返回一个方法执行者，如果为没有对应的方法则创建一个空执行者，返回原本的字符串
             if (method == null) {
                 invokerList.add(MethodUtil.createNullMethodInvoker(methodStr));
@@ -210,18 +209,19 @@ abstract class BaseFieldParser implements FieldParser {
 
     /**
      * 通过名称获取方法
-     * @param methodName   方法名称
+     * @param methodName   纯方法名称
      * @param paramsLength 参数数量
      * @return MockUtil中对应方法名与参数数量的方法对象，如果没有获取到则返回null
      */
-    public static Method getMethodFrommName(String methodName, int paramsLength) {
+    public static Method getMethodFromName(String methodName, int paramsLength) {
         //过滤出方法名匹配,参数长度也匹配的方法
         Method value = null;
+
         try {
-            value =
-                    Mock._getMockMethod().entrySet().stream()
-                    .filter(e -> e.getKey().startsWith(methodName) && e.getValue().getParameters().length == paramsLength)
-                    .findFirst().get().getValue();
+            //取值，理论上来说最后的过滤结果应该只有一个结果
+            value = Mock._getMockMethod().entrySet().stream()
+                    .filter(e -> e.getKey().replaceAll("\\([\\w\\.\\,]*\\)","").equals(methodName) && e.getValue().getParameters().length == paramsLength).findFirst().get().getValue();
+
         } catch (NoSuchElementException e) {
         }
 

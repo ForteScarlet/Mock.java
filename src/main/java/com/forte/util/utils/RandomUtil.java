@@ -196,7 +196,12 @@ public class RandomUtil {
         }
 
         //返回结果
-        return numFormat(dnum, sb.toString());
+        String douStr = numFormat(dnum, sb.toString());
+        if(douStr.startsWith(".")){
+            //如果开头是点，说明首位是0，补位
+            douStr = "0" + douStr;
+        }
+        return douStr;
     }
 
 

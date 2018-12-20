@@ -93,7 +93,7 @@ public class Mock {
     /**
      * 保存全部记录的class与其对应的假对象{@link MockBean}
      */
-    private static final Map<Class, MockBean> MOCK_OBJECT;
+    private static final Map<Class, MockObject> MOCK_OBJECT;
 
     /**
      * MockUtil中的全部方法
@@ -123,21 +123,25 @@ public class Mock {
      *                 </ul>
      *                 </p>
      *                 <p>
-     *                  如果映射的对象中有多层级对象，支持使用多层级字段映射，例如：
+     *                  如果映射的对象中有多层级对象，支持使用多层级字段映射，例如：<br>
      *                      <code>
-     *                          map.put("friend.name" , "@canme")
+     *                          map.put("friend.name" , "@canme");
      *                      </code>
      *                 </p>
      *
      */
-    public static <T> void set(Class<T> objClass, Map<String, Object> map) {
+    public static <T> MockBean<T> set(Class<T> objClass, Map<String, Object> map) {
 
         //使用参数解析器进行解析
         MockBean<T> parser = ParameterParser.parser(objClass, map);
 
-
         //添加
-        MOCK_OBJECT.put(objClass, parser);
+        MOCK_OBJECT.put(objClass, new MockObject<>(parser));
+
+        //提醒系统的垃圾回收
+        System.gc();
+
+        return parser;
     }
 
     /**
@@ -148,7 +152,7 @@ public class Mock {
      * @return
      */
     public static <T> MockObject<T> get(Class<T> objClass) {
-        return Optional.ofNullable(MOCK_OBJECT.get(objClass)).map(m -> new MockObject(m)).orElse(null);
+        return Optional.ofNullable(MOCK_OBJECT.get(objClass)).orElse(null);
     }
 
 

@@ -34,6 +34,8 @@ public class MockField {
 
     /**
      * 为传入的对象的对应的参数赋值
+     * 通过FieldUtils工具类使用setter方法赋值
+     * @see FieldUtils
      *
      * @param
      */

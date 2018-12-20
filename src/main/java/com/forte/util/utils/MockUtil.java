@@ -20,6 +20,8 @@ import java.util.Random;
  *      </p>
  * </p>
  *
+ *  <p>※以下列表仅供参考，一切以方法内实际参数为准，此注释有些情况可能未及时更新。</p>
+ *
  * <p><strong>--名称、title等相关</strong></p>
  * <ul>
  * <li>
@@ -239,6 +241,8 @@ import java.util.Random;
  * {@link MockUtil#url()}<em>随机一个url</em>
  * </li>
  * </ul>
+ *
+ * 注意：此类在进行方法重载的时候不应出现参数数量相同的重载方法
  *
  * @author ForteScarlet
  */

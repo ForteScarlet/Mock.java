@@ -2,11 +2,12 @@ package com.forte.util.utils;
 
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
  * 获取一个随机中文姓名 代码灵感来源于网络 讲道理，效果不是特别好 而且关于字符编码的转换也不确定处理的好<br>
- * 目前已知bug：随机汉字有时候会出现中文顿号：丶
+ * 目前已知bug：随机汉字有时候会出现中文顿号：丶和�
  * @author ForteScarlet
  */
 public class ChineseUtil {
@@ -65,6 +66,7 @@ public class ChineseUtil {
         }
         return name;
     }
+
 
     /**
      * 获得多个随机姓氏
@@ -129,6 +131,17 @@ public class ChineseUtil {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
+        //先以粗暴的方式解决获取错误的bug
+        String[] failStr = {"�" , "丶"};
+
+        String end = str2;
+
+        if(Arrays.stream(failStr).anyMatch(s -> s.equals(end))){
+            //如果出现了错误的字符串，重新获取
+            return getChinese(encoding);
+        }
+
         return str2;
     }
 
