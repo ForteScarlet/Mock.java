@@ -16,9 +16,27 @@
 >
 > 以下介绍的版本：v1.0
 >
-> *※ 版本更新内容后期将会添加至文档末尾 ： <a href="#更新公告">更新公告</a>*
+> *※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>*
+>
+>
 
 ## 使用方法
+### 安装
+
+在maven项目下，从pom.xml中导入以下地址：
+
+```xml
+<dependency>
+    <groupId>io.gitee.ForteScarlet</groupId>
+    <artifactId>mock.java</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
+
+
+### 使用
+
 > 相信使用过Mock.js的各位大佬应该知道，在使用Mock.js的时候是用的JSON格式的参数。
 > 但是，Java可是没法直接识别JSON的啊！
 > 所以，我们采用最接近JSON格式的方式：**Map集合**。
@@ -315,3 +333,10 @@ map.put("user","@name");
 ### v1.0  (2018.12.20)
 
 更新README.md文档。
+
+
+
+## 更新计划
+
+* 添加注解式的映射
+* 使@函数支持自定义

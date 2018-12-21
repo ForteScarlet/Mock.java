@@ -3,7 +3,7 @@ package com.forte.util.parser;
 import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
-import com.sun.istack.internal.Nullable;
+
 
 import java.util.*;
 
@@ -176,7 +176,7 @@ class DoubleParser extends BaseFieldParser {
         Integer[][] intervals = new Integer[][]{intIntervals , doubleIntervals};
 
         //获取整数部分区间参数,可能为null
-        @Nullable Integer[] intIntervalsData = getIntIntervalsData();
+         Integer[] intIntervalsData = getIntIntervalsData();
         //获取小数部分区间参数,此结果必定不为null
         Integer[] doubleIntervalsData = getDoubleIntervalsData();
 

@@ -6,10 +6,8 @@ import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.fieldvaluegetter.ListFieldValueGetter;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.mockbean.MockBean;
-import com.forte.util.mockbean.MockObject;
 import com.forte.util.utils.FieldUtils;
 import com.forte.util.mockbean.MockField;
-import com.sun.xml.internal.ws.server.sei.ValueGetter;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -109,7 +107,6 @@ public class ParameterParser {
                         mockField = listTypeParse(objectClass, fieldName, intervalStr, value);
                         break;
                     default:
-                        //TODO 参数类型无法解析的情况
                         System.out.println("无法解析");
                         break;
                 }
@@ -181,7 +178,7 @@ public class ParameterParser {
             }
         }else{
             //如果没有区间参数，直接使用整数解析器(此处的intervalStr必定为null)
-            fieldParser = new IntegerParser(objectClass, fieldName, intervalStr, (Integer)value);
+            fieldParser = new IntegerParser(objectClass, fieldName, null, (Integer)value);
         }
 
         //获取假字段封装类
@@ -250,7 +247,6 @@ public class ParameterParser {
                 //同时保存此对象的解析
                 MockBean parser = Mock.set(fieldArrayGeneric, fieldMap);
 
-                //TODO 数组类型
                 FieldValueGetter fieldValueGetter = objectToArrayFieldValueGetter(parser, intervalStr);
                 return new MockField(fieldName , fieldValueGetter);
 

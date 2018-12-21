@@ -1,7 +1,7 @@
 package com.forte.util.invoker;
 
 import com.forte.util.utils.RandomUtil;
-import com.sun.istack.internal.NotNull;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class ElementInvoker implements Invoker {
      * 数组构造
      * @param arr
      */
-    public ElementInvoker(@NotNull Object[] arr){
+    public ElementInvoker(Object[] arr){
         this.arr = arr;
     }
 
@@ -49,7 +49,7 @@ public class ElementInvoker implements Invoker {
      * 集合构造
      * @param list
      */
-    public ElementInvoker(@NotNull List list){
+    public ElementInvoker(List list){
         this.list = list;
     }
 

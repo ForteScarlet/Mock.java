@@ -1,7 +1,7 @@
 package com.forte.util.utils;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+
+
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -1088,7 +1088,7 @@ public class FieldUtils {
      * @param getter
      * @param setter
      */
-    private static <T> SingleCacheField<T> saveSingleCacheField(@NotNull Class<T> fieldWhereClass , @NotNull Field field, @Nullable Method getter , @Nullable Method setter){
+    private static <T> SingleCacheField<T> saveSingleCacheField(Class<T> fieldWhereClass , Field field,  Method getter ,  Method setter){
         if(field.getName().split("\\.").length > 1){
             throw new RuntimeException("字段["+ field +"]并非单层字段");
         }
@@ -1143,7 +1143,7 @@ public class FieldUtils {
      * @param <T>
      * @return
      */
-    private static <T> SingleCacheField<T> saveSingleCacheField(@NotNull Class<T> fieldWhereClass , @NotNull Field field){
+    private static <T> SingleCacheField<T> saveSingleCacheField(Class<T> fieldWhereClass , Field field){
         return saveSingleCacheField(fieldWhereClass , field , null , null);
     }
 
@@ -1155,7 +1155,7 @@ public class FieldUtils {
      * @param getter
      * @param setter
      */
-    private static <T> SingleCacheField<T> saveSingleCacheField(@NotNull Class<T> fieldWhereClass , @NotNull String fieldName , @Nullable Method getter , @Nullable Method setter){
+    private static <T> SingleCacheField<T> saveSingleCacheField(Class<T> fieldWhereClass , String fieldName ,  Method getter ,  Method setter){
         return saveSingleCacheField(fieldWhereClass , getField(fieldWhereClass ,fieldName) , getter , setter);
     }
 
@@ -1167,7 +1167,7 @@ public class FieldUtils {
      * @param <T>
      * @return
      */
-    private static <T> SingleCacheField<T> saveSingleCacheField(@NotNull Class<T> fieldWhereClass , @NotNull String fieldName){
+    private static <T> SingleCacheField<T> saveSingleCacheField(Class<T> fieldWhereClass , String fieldName){
         return saveSingleCacheField(fieldWhereClass , getField(fieldWhereClass ,fieldName));
     }
 
@@ -1181,7 +1181,7 @@ public class FieldUtils {
      * @param getter
      * @param <T>
      */
-    private static <T> SingleCacheField<T> saveSingleCacheFieldGetter(@NotNull Class<T> fieldWhereClass , @NotNull String fieldName , @NotNull Method getter){
+    private static <T> SingleCacheField<T> saveSingleCacheFieldGetter(Class<T> fieldWhereClass , String fieldName , Method getter){
         return saveSingleCacheField(fieldWhereClass , fieldName , getter , null);
     }
 
@@ -1192,7 +1192,7 @@ public class FieldUtils {
      * @param getter
      * @param <T>
      */
-    private static <T> SingleCacheField<T> saveSingleCacheFieldGetter(@NotNull Class<T> fieldWhereClass , @NotNull Field field , @NotNull Method getter){
+    private static <T> SingleCacheField<T> saveSingleCacheFieldGetter(Class<T> fieldWhereClass , Field field , Method getter){
         return saveSingleCacheField(fieldWhereClass , field , getter , null);
     }
 
@@ -1203,7 +1203,7 @@ public class FieldUtils {
      * @param setter
      * @param <T>
      */
-    private static <T> SingleCacheField<T> saveSingleCacheFieldSetter(@NotNull Class<T> fieldWhereClass , @NotNull String fieldName , @NotNull Method setter){
+    private static <T> SingleCacheField<T> saveSingleCacheFieldSetter(Class<T> fieldWhereClass , String fieldName , Method setter){
         return saveSingleCacheField(fieldWhereClass , fieldName , null , setter);
     }
 
@@ -1214,7 +1214,7 @@ public class FieldUtils {
      * @param setter
      * @param <T>
      */
-    private static <T> SingleCacheField<T> saveSingleCacheFieldSetter(@NotNull Class<T> fieldWhereClass , @NotNull Field field , @NotNull Method setter){
+    private static <T> SingleCacheField<T> saveSingleCacheFieldSetter(Class<T> fieldWhereClass , Field field , Method setter){
         return saveSingleCacheField(fieldWhereClass , field , null , setter);
     }
 
@@ -1222,7 +1222,7 @@ public class FieldUtils {
      * 更新一个或新增加一个字段缓存
      * @param newSingleCacheField
      */
-    private static void updateSingleCacheField(@NotNull SingleCacheField newSingleCacheField){
+    private static void updateSingleCacheField(SingleCacheField newSingleCacheField){
         //字段所在类的Class对象
         Class fieldWhereClassIn = newSingleCacheField.getFieldWhereClassIn();
         //从缓存中获取整个Map集合
@@ -1248,7 +1248,7 @@ public class FieldUtils {
      * @param fieldName
      * @return
      */
-    private static Method getCacheFieldGetter(@NotNull Class<?> fieldWhereClass , @NotNull String fieldName){
+    private static Method getCacheFieldGetter(Class<?> fieldWhereClass , String fieldName){
         //如果缓存中存在此字段，返回getter，否则返回null
         return Optional.ofNullable(getCacheField(fieldWhereClass , fieldName)).map(CacheField::getGetter).orElse(null);
     }
@@ -1259,7 +1259,7 @@ public class FieldUtils {
      * @param fieldName
      * @return
      */
-    private static Method getCacheFieldSetter(@NotNull Class<?> fieldWhereClass , @NotNull String fieldName){
+    private static Method getCacheFieldSetter(Class<?> fieldWhereClass , String fieldName){
         //如果缓存中存在此字段，返回getter，否则返回null
         return Optional.ofNullable(getCacheField(fieldWhereClass , fieldName)).map(CacheField::getSetter).orElse(null);
     }
@@ -1500,11 +1500,11 @@ public class FieldUtils {
      * @return
      *     保存或更新的多层级对象
      */
-    private static <R,T> LevelCacheField<R,T> saveLevelCacheField(@NotNull  Class<R> rootClass ,
-                                                                  @NotNull  String fieldName ,
-                                                                  @Nullable LevelCacheField<R , ?> upper ,
-                                                                  @Nullable LevelCacheField<R , ?> lower ,
-                                                                  @NotNull  SingleCacheField<T> thisCacheField){
+    private static <R,T> LevelCacheField<R,T> saveLevelCacheField( Class<R> rootClass ,
+                                                                   String fieldName ,
+                                                                   LevelCacheField<R , ?> upper ,
+                                                                   LevelCacheField<R , ?> lower ,
+                                                                   SingleCacheField<T> thisCacheField){
 
         //TODO 删除
         System.out.println("尝试储存多层级字段：root:["+ rootClass +"] 的 ["+ fieldName +"];真正:["+ thisCacheField.getFieldWhereClassIn() +"] -> ["+ thisCacheField.getFieldName() +"]");
@@ -1589,9 +1589,9 @@ public class FieldUtils {
      * @param <T>
      * @return
      */
-    private static <R,T> LevelCacheField<R,T> saveLevelCacheField(@NotNull  Class<R> rootClass ,
-                                                                  @NotNull  String fieldName ,
-                                                                  @NotNull  SingleCacheField<T> thisCacheField){
+    private static <R,T> LevelCacheField<R,T> saveLevelCacheField( Class<R> rootClass ,
+                                                                   String fieldName ,
+                                                                   SingleCacheField<T> thisCacheField){
         return saveLevelCacheField(rootClass, fieldName, null , null , thisCacheField);
     }
 
@@ -1605,10 +1605,10 @@ public class FieldUtils {
      * @param <T>
      * @return
      */
-    private static <R,T> LevelCacheField<R,T> saveLevelCacheFieldUpper(@NotNull  Class<R> rootClass ,
-                                                                       @NotNull  String fieldName ,
-                                                                       @Nullable LevelCacheField<R , ?> upper ,
-                                                                       @NotNull  SingleCacheField<T> thisCacheField){
+    private static <R,T> LevelCacheField<R,T> saveLevelCacheFieldUpper( Class<R> rootClass ,
+                                                                        String fieldName ,
+                                                                        LevelCacheField<R , ?> upper ,
+                                                                        SingleCacheField<T> thisCacheField){
         return saveLevelCacheField(rootClass, fieldName, upper , null , thisCacheField);
     }
 
@@ -1622,10 +1622,10 @@ public class FieldUtils {
      * @param <T>
      * @return
      */
-    private static <R,T> LevelCacheField<R,T> saveLevelCacheFieldLower(@NotNull  Class<R> rootClass ,
-                                                                       @NotNull  String fieldName ,
-                                                                       @Nullable LevelCacheField<R , ?> lower ,
-                                                                       @NotNull  SingleCacheField<T> thisCacheField){
+    private static <R,T> LevelCacheField<R,T> saveLevelCacheFieldLower( Class<R> rootClass ,
+                                                                        String fieldName ,
+                                                                        LevelCacheField<R , ?> lower ,
+                                                                        SingleCacheField<T> thisCacheField){
         return saveLevelCacheField(rootClass, fieldName, null , lower , thisCacheField);
     }
 
@@ -1792,7 +1792,7 @@ public class FieldUtils {
         }
 
         /** 构造 */
-        public LevelCacheField(@NotNull Class rootClass , @NotNull String fieldName, LevelCacheField upperLevelField, LevelCacheField lowerLevelField, @NotNull SingleCacheField<T> thisLevelField){
+        public LevelCacheField(Class rootClass , String fieldName, LevelCacheField upperLevelField, LevelCacheField lowerLevelField, SingleCacheField<T> thisLevelField){
             //验证必要参数
             allNonNull(rootClass , fieldName , thisLevelField);
 
@@ -2025,7 +2025,7 @@ public class FieldUtils {
      * @param fieldWhereClass
      * @return
      */
-    private static <T> CacheField<T> getCacheField(@NotNull Class<T> fieldWhereClass , String fieldName){
+    private static <T> CacheField<T> getCacheField(Class<T> fieldWhereClass , String fieldName){
         //判断这是单层字段还是多层字段
         String[] split = fieldName.split("\\.");
         if(split.length == 1){

@@ -2,7 +2,7 @@ package com.forte.util.fieldvaluegetter;
 
 import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
-import com.sun.istack.internal.NotNull;
+
 
 /**
  * Double类型字段值获取器
@@ -34,7 +34,7 @@ public class DoubleFieldValueGetter implements FieldValueGetter<Double> {
     /**
      * 构造方法，只需要一个方法执行者
      */
-    public DoubleFieldValueGetter(@NotNull Invoker invoker) {
+    public DoubleFieldValueGetter(Invoker invoker) {
         this.invoker = invoker;
     }
 

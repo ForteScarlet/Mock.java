@@ -3,8 +3,8 @@ package com.forte.util.fieldvaluegetter;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
 import com.forte.util.utils.RandomUtil;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+
+
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -191,7 +191,7 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
      * @param integerInterval 区间参数
      * @param moreStrs        多余字符
      */
-    public ListFieldValueGetter(@NotNull Invoker[] invokers, @Nullable Integer[] integerInterval, @Nullable String[] moreStrs) {
+    public ListFieldValueGetter(Invoker[] invokers,  Integer[] integerInterval,  String[] moreStrs) {
         this.invokers = invokers;
         //如果多余字符长度为0，则赋值为null
         this.moreStrs = moreStrs.length == 0 ? null : moreStrs;
@@ -210,7 +210,7 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
      * @param invokers 方法执行者
      * @param moreStrs 多余字符
      */
-    public ListFieldValueGetter(@NotNull Invoker[] invokers, @Nullable String[] moreStrs) {
+    public ListFieldValueGetter(Invoker[] invokers,  String[] moreStrs) {
         this.invokers = invokers;
         this.integerInterval = new Integer[]{1, 1};
         //如果多余字符长度为0，则赋值为null
@@ -224,7 +224,7 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
      * @param invokers        方法执行者
      * @param integerInterval 区间参数
      */
-    public ListFieldValueGetter(@NotNull Invoker[] invokers, @Nullable Integer[] integerInterval) {
+    public ListFieldValueGetter(Invoker[] invokers,  Integer[] integerInterval) {
         this.invokers = invokers;
         //判断：数组为null || 长度大于2 || 左参数为null || 左右参数都为null
         //如果为true，则使用默认的数组
@@ -243,7 +243,7 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
      *
      * @param invokers 方法执行者
      */
-    public ListFieldValueGetter(@NotNull Invoker[] invokers) {
+    public ListFieldValueGetter(Invoker[] invokers) {
         this.invokers = invokers;
         this.integerInterval = new Integer[]{1, 1};
         //多余字符赋值为null

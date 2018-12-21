@@ -1,7 +1,7 @@
 package com.forte.util.fieldvaluegetter;
 
 import com.forte.util.invoker.Invoker;
-import com.sun.istack.internal.NotNull;
+
 
 /**
  * 整数类型字段值获取器
@@ -34,7 +34,7 @@ public class IntegerFieldValueGetter implements FieldValueGetter<Integer> {
     /**
      * 构造方法，只需要一个方法执行者
      */
-    public IntegerFieldValueGetter(@NotNull Invoker invoker) {
+    public IntegerFieldValueGetter(Invoker invoker) {
         this.invoker = invoker;
     }
 

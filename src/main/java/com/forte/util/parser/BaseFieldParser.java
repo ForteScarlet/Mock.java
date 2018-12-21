@@ -7,8 +7,8 @@ import com.forte.util.mockbean.*;
 import com.forte.util.utils.RegexUtil;
 import com.forte.util.utils.FieldUtils;
 import com.forte.util.utils.MethodUtil;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+
+
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -398,7 +398,7 @@ abstract class BaseFieldParser implements FieldParser {
      * 整数部分数值
      * @return
      */
-    protected DoubleFieldValueGetter getDoubleFieldValueGetter(@NotNull Integer intInterval){
+    protected DoubleFieldValueGetter getDoubleFieldValueGetter(Integer intInterval){
         //获取方法执行者
         String methodName = DOUBLE_METHOD_NAME + "("+ intInterval +")";
         //获取方法执行者
@@ -416,7 +416,7 @@ abstract class BaseFieldParser implements FieldParser {
      * 整数部分区间最大值
      * @return
      */
-    protected DoubleFieldValueGetter getDoubleFieldValueGetter(@NotNull Integer intIntervalMin , @NotNull Integer intIntervalMax){
+    protected DoubleFieldValueGetter getDoubleFieldValueGetter(Integer intIntervalMin , Integer intIntervalMax){
         return getDoubleFieldValueGetter(intIntervalMin , intIntervalMax , 0 , 0);
     }
 
@@ -430,7 +430,7 @@ abstract class BaseFieldParser implements FieldParser {
      *  小数部分位数
      * @return
      */
-    protected DoubleFieldValueGetter getDoubleFieldValueGetter(@NotNull Integer intIntervalMin , Integer intIntervalMax , @NotNull Integer doubleInterval){
+    protected DoubleFieldValueGetter getDoubleFieldValueGetter(Integer intIntervalMin , Integer intIntervalMax , Integer doubleInterval){
         return getDoubleFieldValueGetter(intIntervalMin , intIntervalMax , doubleInterval , doubleInterval);
     }
 
@@ -446,7 +446,7 @@ abstract class BaseFieldParser implements FieldParser {
      * 小数部分最大位数区间
      * @return
      */
-    protected DoubleFieldValueGetter getDoubleFieldValueGetter(@NotNull Integer intIntervalMin , Integer intIntervalMax , @NotNull Integer doubleIntervalMin , Integer doubleIntervalMax){
+    protected DoubleFieldValueGetter getDoubleFieldValueGetter(Integer intIntervalMin , Integer intIntervalMax , Integer doubleIntervalMin , Integer doubleIntervalMax){
         //有一下4种情况种可能，
         //1 - 4个参数都有
         //2 - 整数部分没有右参数
@@ -792,7 +792,7 @@ abstract class BaseFieldParser implements FieldParser {
      * @param fieldName
      * @param intervalStr
      */
-    public BaseFieldParser(Class objectClass, String fieldName, @Nullable String intervalStr) {
+    public BaseFieldParser(Class objectClass, String fieldName,  String intervalStr) {
         //保存数据
         this.objectClass = objectClass;
         this.fieldName = fieldName;
