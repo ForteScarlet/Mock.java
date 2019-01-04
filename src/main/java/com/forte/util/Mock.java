@@ -1,5 +1,8 @@
 package com.forte.util;
 
+import com.forte.util.exception.MockException;
+import com.forte.util.loader.DefaultMockMethodLoader;
+import com.forte.util.loader.MethodLoader;
 import com.forte.util.mockbean.MockBean;
 import com.forte.util.mockbean.MockObject;
 import com.forte.util.parser.ParameterParser;
@@ -52,8 +55,8 @@ public class Mock {
 
     /* 静态代码块加载资源 */
     static {
-        //创建线程安全的map集合,保存全部记录
-        MOCK_OBJECT = new ConcurrentHashMap<>();
+        //创建线程安全的map集合,保存全部映射记录，初始容量为10
+        MOCK_OBJECT = new ConcurrentHashMap<>(10);
 
         //创建map，这里的map理论上不需要线程同步
         Map<String, Method> mockUtilMethods;
@@ -100,8 +103,35 @@ public class Mock {
      */
     private static final Map<String, Method> MOCK_METHOD;
 
+
     /**
-     * 添加数据记录
+     * 添加一个数据映射
+     * @param objClass
+     * @param map
+     * @param <T>
+     * @return
+     */
+    public static <T> MockBean<T> setResult(Class<T> objClass, Map<String, Object> map, boolean reset) {
+        //如果不是重新设置且此映射已经存在，将会抛出异常
+        if(!reset && MOCK_OBJECT.get(objClass) != null){
+            throw new MockException("此映射已存在！");
+        }
+
+        //使用参数解析器进行解析
+        MockBean<T> parser = ParameterParser.parser(objClass, map);
+
+        //添加
+        MOCK_OBJECT.put(objClass, new MockObject<>(parser));
+
+        //提醒系统的垃圾回收
+        System.gc();
+
+        return parser;
+    }
+
+
+    /**
+     * 添加数据记录，如果要添加的映射已存在，则会抛出异常
      *
      * @param objClass 映射的class
      * @param map      <p>映射的规则对象</p>
@@ -130,19 +160,23 @@ public class Mock {
      *                 </p>
      *
      */
-    public static <T> MockBean<T> set(Class<T> objClass, Map<String, Object> map) {
-
-        //使用参数解析器进行解析
-        MockBean<T> parser = ParameterParser.parser(objClass, map);
-
-        //添加
-        MOCK_OBJECT.put(objClass, new MockObject<>(parser));
-
-        //提醒系统的垃圾回收
-        System.gc();
-
-        return parser;
+    public static <T> void set(Class<T> objClass, Map<String, Object> map) {
+        //设置并保存映射
+        setResult(objClass, map, false);
     }
+
+
+    /**
+     * 添加数据记录，如果要添加的映射已存在，则会覆盖
+     * @param objClass
+     * @param map
+     * @param <T>
+     */
+    public static <T> void reset(Class<T> objClass, Map<String, Object> map){
+        //设置并保存映射
+        setResult(objClass, map, true);
+    }
+
 
     /**
      * 获取一个实例对象
@@ -157,8 +191,17 @@ public class Mock {
 
 
     /**
-     * 获取方法集合，方法名为了不常见而不被外界使用
+     * 获取方法加载器
      * @return
+     */
+    public static MethodLoader mockMethodLoader(){
+        return new DefaultMockMethodLoader();
+    }
+
+    /**
+     * 获取Mock方法集合
+     * @return
+     * 全部已被加载的映射方法
      */
     public static Map<String, Method> _getMockMethod() {
         return MOCK_METHOD;

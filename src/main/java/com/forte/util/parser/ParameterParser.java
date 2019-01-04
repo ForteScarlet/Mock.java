@@ -235,7 +235,7 @@ public class ParameterParser {
                 Class fieldListGenericClass = FieldUtils.getListGeneric(objectClass, fieldName);
                 //获取一个假对象
                 //同时保存此对象的解析
-                MockBean parser = Mock.set(fieldListGenericClass, fieldMap);
+                MockBean parser = Mock.setResult(fieldListGenericClass, fieldMap, true);
 
                 FieldValueGetter fieldValueGetter = objectToListFieldValueGetter(parser, intervalStr);
                 return new MockField(fieldName , fieldValueGetter);
@@ -245,7 +245,7 @@ public class ParameterParser {
                 //获取一个假对象
 //                MockBean parser = parser(fieldArrayGeneric, fieldMap);
                 //同时保存此对象的解析
-                MockBean parser = Mock.set(fieldArrayGeneric, fieldMap);
+                MockBean parser = Mock.setResult(fieldArrayGeneric, fieldMap, true);
 
                 FieldValueGetter fieldValueGetter = objectToArrayFieldValueGetter(parser, intervalStr);
                 return new MockField(fieldName , fieldValueGetter);
@@ -254,7 +254,7 @@ public class ParameterParser {
                 //得到一个假对象数据，封装为一个MockField
 //                MockBean parser = parser(fieldClass, fieldMap);
                 //同时保存此对象的解析
-                MockBean parser = Mock.set(fieldClass, fieldMap);
+                MockBean parser = Mock.setResult(fieldClass, fieldMap, true);
 
                return objectToField(fieldName , parser);
             }

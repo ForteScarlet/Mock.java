@@ -12,16 +12,9 @@ import javax.script.ScriptException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.SimpleTimeZone;
-import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * 方法执行工具
@@ -44,7 +37,7 @@ public class MethodUtil {
     public static Object invoke(Object obj, Object[] args, Method method) throws InvocationTargetException, IllegalAccessException {
         //获取参数的数据类型数组，准备转化数据类型
         Parameter[] parameters = method.getParameters();
-        //如果传入参数与方法参数数量不符 ，
+        //如果传入参数与方法参数数量不符 ，抛出异常
         //不知道是否能识别 String... args 这种参数
         if (args.length != parameters.length) {
             throw new ParameterSizeException();
@@ -83,6 +76,16 @@ public class MethodUtil {
         }
 
         throw new NoSuchMethodException();
+    }
+
+
+    /**
+     * Filter out the Object Methods<br>
+     * 过滤掉Object中继承来的方法
+     * @param methods       需要过滤的方法列表
+     */
+    public static List<Method> getOriginal(List<Method> methods){
+        return methods.stream().parallel().filter(m -> Arrays.stream(Object.class.getMethods()).noneMatch(om -> om.equals(m))).collect(Collectors.toList());
     }
 
 

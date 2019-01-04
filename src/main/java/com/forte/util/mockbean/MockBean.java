@@ -25,6 +25,7 @@ public class MockBean<T> {
      * @return
      */
     public T getObject() {
+
         //先创建一个实例
         T instance;
         //使用try抓取错误，若实例创建错误，直接返回null

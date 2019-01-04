@@ -14,7 +14,7 @@ import java.util.Optional;
  * 解析方式与过程大致与{@link ArraysParser}相同
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
-public class ListParser extends BaseFieldParser {
+class ListParser extends BaseFieldParser {
 
 
     /** 参数传入的数组 */

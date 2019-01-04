@@ -4,11 +4,10 @@ package com.forte.util.exception;
  * 假数据解析异常
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
-public class MockParserException extends RuntimeException{
+public class MockParserException extends MockException{
 
     public MockParserException() {
     }
-
     public MockParserException(String message) {
         super(message);
     }

@@ -7,7 +7,7 @@ import com.forte.util.invoker.Invoker;
  * 引用数据类型字段解析器
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
-public class ObjectParser extends BaseFieldParser {
+class ObjectParser extends BaseFieldParser {
 
 
     /** 参数中的默认值 */

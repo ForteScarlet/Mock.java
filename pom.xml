@@ -12,7 +12,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.gitee.ForteScarlet</groupId>
     <artifactId>mock.java</artifactId>
-    <version>1.0</version>
+    <!-- 版本号 -->
+    <version>1.1</version>
     <packaging>jar</packaging>
     <name>Mock For Java</name>
     <url>https://github.com/ForteScarlet/Mock.java.git</url>
@@ -25,7 +26,7 @@
     </properties>
 
     <dependencies>
-        <!-- apache的BeanUtils -->
+        <!-- 依赖apache的BeanUtils -->
         <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
         <dependency>
             <groupId>commons-beanutils</groupId>
@@ -201,7 +202,27 @@
     <!-- 开发者信息 -->
     <developers>
         <developer>
+            <!-- SCM里项目开发者的唯一标识符 -->
+            <!--<id> HELLO WORLD </id>-->
+            <!-- 项目开发者的主页的URL -->
+            <!--<url></url>-->
+            <!-- 项目开发者在项目中扮演的角色，角色元素描述了各种角色 -->
+            <roles>
+                <role> a single programmer </role>
+            </roles>
+            <!-- 项目开发者所属组织 -->
+            <!--<organization> demo </organization>-->
+            <!-- 项目开发者所属组织的URL -->
+            <!--<organizationUrl> http://hi.baidu.com/xxx </organizationUrl>-->
+            <!-- 项目开发者属性，如即时消息如何处理等 -->
+            <!--<properties>-->
+                <!--<dept> No </dept>-->
+            <!--</properties>-->
+            <!-- 项目开发者所在时区， -11到12范围内的整数。 -->
+            <!--<timezone> -5 </timezone>-->
+            <!-- 项目开发者的全名 -->
             <name>ForteScarlet</name>
+            <!-- 项目开发者的email -->
             <email>ForteScarlet@163.com</email>
         </developer>
     </developers>

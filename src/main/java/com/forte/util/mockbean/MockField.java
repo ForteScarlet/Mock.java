@@ -40,6 +40,7 @@ public class MockField {
      * @param
      */
     public void setValue(Object bean) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+
         FieldUtils.objectSetter(bean, fieldName, getValue());
     }
 
