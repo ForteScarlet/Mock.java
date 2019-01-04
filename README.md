@@ -17,7 +17,7 @@
 >
 > 最低JDK版本：JDK8
 >
-> 以下介绍的版本：v1.0
+> 以下介绍的版本：v1.1 (第一版)
 >
 > *※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>*
 >
@@ -78,14 +78,14 @@
 
 ### 设置字段映射的方式：
 
-#### 	1:创建对象字段与随机值语法的映射关系(Map<String , Object> 类型的Map集合)
+#### 	1·创建对象字段与随机值语法的映射关系(Map<String , Object> 类型的Map集合)
 
 >  创建的这个Map，Key值代表了映射的字段名，value值代表了映射语法
 > 由于这毕竟与弱引用类型语言不同，所以在设置映射的时候请务必注意字段的数据类型。
 
 ​	`Map<String, Object> map = new HashMap<>();`	
 
-#### 	2:添加字段映射 
+#### 	2·添加字段映射 
 
 > 字段映射中，value值所用到的 @函数 可以从 [JavaDoc文档](helpDoc/index.html) 中查阅[**MockUtil**]类中的方法，MockUtil中的全部方法均可作为 @函数 出现在value值中。
 >
@@ -232,7 +232,7 @@ map.put("user","@name");
 
 
 
-#### 	3:获取假字段封装对象
+#### 	3·获取假字段封装对象
 
 通过Mock的get方法获取一个已经添加过映射记录的数据
 
@@ -299,6 +299,56 @@ map.put("user","@name");
 
     > 获取指定数量的多个结果，并根据给定规则转化为Map集合
 
+## 自定义@函数
+
+> 有时候，我提供的MockUtil中的方法可能无法满足您的需求，那么这时候，就需要一个可以对@函数进行扩展、加强的窗口。在v1.1版本中，我添加了这个功能。(这个功能测数量很少，可能会存在很多bug)
+
+### 1· 获取自定义@函数加载器
+
+```java
+//获取@函数加载器
+MethodLoader methodLoader = Mock.mockMethodLoader();
+```
+
+函数加载器支持链式加载，也支持一次性加载
+
+链式：
+
+```java
+LoadResults loadResults = methodLoader
+				//添加指定类中的指定方法名的方法
+                .append(Demo1.class, "testMethod")
+    			//添加指定类中的多个指定方法名的方法
+                .appendByNames(Demo2.class, new String[]{"method1" , "method2"})
+    			//添加指定类中的多个符合指定正则回则的方法
+                .appendByRegex(Demo3.class, "[a-zA-Z]+")
+    			//还有很多...敬请查阅API文档
+                .load();
+```
+
+> 使用链式加载的时候，请务必记住在结尾使用load()进行加载，否则方法集将无法被加载，而是一直留存在等待区。
+
+非链式：
+
+```java
+methodLoader.add(Demo1.class, "testMethod");
+```
+
+通过以上代码可以发现，加载完成后都会有一个` LoadResults` 类作为返回值，这个类是在方法加载后的一个加载报告封装类，通过`LoadResults` 可以获取到刚刚加载的方法谁成功了，谁失败了，失败了的方法为什么失败等信息：
+
+```java
+ 		
+Map<Boolean, Set<Method>> map = loadResults.loadResults();//加载的方法集根据成功与否分组
+Set<Method> successMethods = loadResults.loadSuccessResults();//加载成功的方法集
+Map<Method, Exception> whyFailMap = loadResults.whyFail();//加载失败的方法以及抛出的异常
+int successNum = loadResults.successNums();//成功的个数
+int failNum = loadResults.failNums();//失败的个数
+```
+
+假若加载成功后，则此方法便可以直接在映射中直接用@开头作为使用@函数使用了~
+
+
+
 
 
 # 工具类介绍
@@ -334,7 +384,7 @@ map.put("user","@name");
 ## 更新公告
 
 ### v1.1  (2019.1.4)
-支持导入自定义方法的导入(使用Mock.mockMethodLoader()方法获取到的方法加载者进行加载，该方法加载者支持链式编程 ※ 文档尚未更新。)
+支持导入自定义方法的导入
 
 ### v1.0  (2018.12.20)
 
@@ -345,4 +395,4 @@ map.put("user","@name");
 ## 更新计划
 
 * 添加注解式的映射
-* 使@函数支持自定义
+* ~~使@函数支持自定义~~( √ )

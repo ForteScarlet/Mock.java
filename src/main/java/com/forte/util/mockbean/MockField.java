@@ -65,9 +65,10 @@ public class MockField {
 
     /**
      * 构造
-     * TODO 考虑是否要加上匹配的class对象
      */
     public MockField(String fieldName, FieldValueGetter fieldValueGetter) {
+        //考虑是否要加上匹配的class对象
+        //似乎不需要
         this.fieldName = fieldName;
         this.valueGetter = fieldValueGetter;
     }

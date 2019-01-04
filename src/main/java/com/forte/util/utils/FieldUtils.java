@@ -1506,9 +1506,6 @@ public class FieldUtils {
                                                                    LevelCacheField<R , ?> lower ,
                                                                    SingleCacheField<T> thisCacheField){
 
-        //TODO 删除
-        System.out.println("尝试储存多层级字段：root:["+ rootClass +"] 的 ["+ fieldName +"];真正:["+ thisCacheField.getFieldWhereClassIn() +"] -> ["+ thisCacheField.getFieldName() +"]");
-
 
         //通过根类获取
         HashMap<String, LevelCacheField> levelCacheFieldHashMap = LEVEL_FIELD_CACHE_MAP.get(rootClass);
@@ -2064,23 +2061,6 @@ public class FieldUtils {
             super("上层对象没有返回值：" + upper);
         }
     }
-
-
-    /* TODO  —————————————————————————————————— 测试用 ———————————————————————————————————————— */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
