@@ -47,6 +47,13 @@ public class MockBean<T> {
         return instance;
     }
 
+    /**
+     * 获取假字段集
+     * @return
+     */
+    protected MockField[] getFields(){
+        return fields;
+    }
 
     /**
      * 构造方法

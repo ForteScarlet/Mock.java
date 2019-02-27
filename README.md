@@ -13,11 +13,11 @@
 >
 >  *工具类介绍：<a href="#工具类介绍">工具类介绍</a>
 >
-> 当前版本：v1.1
+> 当前版本：v1.2
 >
 > 最低JDK版本：JDK8
 >
-> 以下介绍的版本：v1.1 (第一版)
+> 以下介绍的版本：v1.2 (第一版)
 >
 > *※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>*
 >
@@ -26,13 +26,13 @@
 ## 使用方法
 ### 安装
 
-在maven项目下，从pom.xml中导入以下地址：
+在maven项目下，从pom.xml中导入以下地址（仅以最新版本作为示例）：
 
 ```xml
 <dependency>
     <groupId>io.gitee.ForteScarlet</groupId>
     <artifactId>mock.java</artifactId>
-    <version>1.0</version>
+    <version>1.2</version>
 </dependency>
 ```
 
@@ -78,7 +78,7 @@
 
 ### 设置字段映射的方式：
 
-#### 	1·创建对象字段与随机值语法的映射关系(Map<String , Object> 类型的Map集合)
+#### 	1·创建对象字段与随机值语法的映射关系(Map<String , Object> 类型的键值对)
 
 >  创建的这个Map，Key值代表了映射的字段名，value值代表了映射语法
 > 由于这毕竟与弱引用类型语言不同，所以在设置映射的时候请务必注意字段的数据类型。
@@ -115,8 +115,6 @@ map.put("user","@name");
 >
 > - ##### 仅有字段映射
 >
-> - 
->
 >   > 任务分配器首先会根据参数(value)的类型分配字段解析器，然后再根据字段类型进行取值。
 >   >
 >   > 参数类型有一下几种情况：
@@ -139,7 +137,13 @@ map.put("user","@name");
 >   map.put("name1" , "@name");
 >   map.put("name2" , "@title(2)");
 >   map.put("name3" , "这是一个名字");
->   //此处的friend是一个Friend类，friendMap是对friend字段的映射
+>   
+>   //下面三个email字段的参数，如果是中文，必须放在单引号或双引号中才会生效，英文不受限制
+>   map.put("email1" , "@email('这是中文')");
+>   map.put("email2" , "@email('this is english')");
+>   map.put("email3" , "@email(this is english)");
+>   
+>   //下面的friend字段的字段类型是一个Friend类，friendMap是对friend字段的映射，也就是嵌套映射
 >   //此friendMap的映射无需单独进行记录
 >   map.put("friend" , friendMap);
 >   
@@ -244,16 +248,23 @@ map.put("user","@name");
   //添加一个映射
   map.put("age|10-40" , 2);
   //记录类的映射
+  //1、使用javaBean封装
   Mock.set(User.class , map);
+  //2、或者直接使用Map类型，不再需要javaBean的class对象，但是需要指定一个映射名
+  Mock.set("userMap", map);
   ```
 
 
   *  然后使用get方法得到假对象封装类
 
-    ```java
-    //已经记录过User类的映射,获取封装类
-    MockObject<User> mockObject = Mock.get(User.class);
-    ```
+```java
+//已经记录过User类的映射,获取封装类
+//1、如果是使用的javaBean记录的，使用javaBean获取
+MockObject<User> mockObject = Mock.get(User.class);
+//2、或者你之前是使用map记录的，使用记录时保存的映射名获取
+//注：MockMapObject 对象实现了MockObject接口
+MockMapObject mockMapObject = Mock.get("userMap");
+```
 
   * 根据MockObject中提供的API来获取你所需要的结果：
 
@@ -363,19 +374,25 @@ int failNum = loadResults.failNums();//失败的个数
 
 ----
 
-##### FieldUtils - 反射工具类
+##### FieldUtils - 字段相关反射工具类
 
-这是工具类包下最大的一个工具类，内部代码量有2092行 ( *含注释* )、三个内部类、两个内部异常、一个内部接口。
+这是工具类包下最大的一个工具类，至少体积是最大的，用到的次数也是最大的。
 
-为什么这么多内部类呢？因为这个工具类在对字段进行取值的时候，使用了单层级字段、多层级字段的双缓存机制，不论你是单层字段，还是多层对象嵌套的字段，只需获取一次后，再次获取的效率与直接调用getter方法无异。本人做过5亿数据量的字段值获取测试，经过缓存后获取效率超大幅的提高 。（ *关于测试的结果可以查看[JavaDoc文档](helpDoc/index.html) 中此类的文档注释。*）
+这个工具类在对字段进行取值的时候，使用了单层级字段、多层级字段的双缓存机制，不论你是单层字段，还是多层对象嵌套的字段，只需获取一次后，再次获取的效率与直接调用getter方法无异。某天做过5亿数据量的字段值获取测试，经过缓存后获取效率超大幅的提高 。（ *关于测试的结果可以查看[JavaDoc文档](helpDoc/index.html) 中此类的文档注释。*）
+
+至少它对这个框架来讲用处很大，但是一般情况下来讲，用反射频繁获取字段值的情况并不多见呢..
 
 ##### MockUtil - 随机值获取工具类
 
-这是本框架的核心工具类，所有的@函数都是基于动态获取MockUtil中的方法而实现的。（ *后期考虑可以使使用者对随机值方法进行横向扩展，即自定义@函数。*）
+这是本框架的核心工具类之一，所有的@函数都是基于动态获取MockUtil中的方法而实现的。（ ~~*后期考虑可以使使用者对随机值方法进行横向扩展，即自定义@函数。*~~ ( 已实现 )）
 
 ##### RandomUtil - 随机值、数值区间工具类
 
 它与上面的MockUtil 最大的不同点是它主要是获取一些范围区间内的随机值、随机码、浮点数的小数保留等，更偏向于一种对数据、数值的操作。
+
+##### SingleFactory - 单例工厂
+
+一个简单的、以乐观锁为原理的线程安全的单例工厂，提供丰富的API来设置、保存、替换单例对象。
 
 ###### 还有其他...
 
@@ -383,7 +400,16 @@ int failNum = loadResults.failNums();//失败的个数
 
 ## 更新公告
 
+### v1.2 (2019.2.27)
+
+※ 与上一版本不兼容点：将MockObject类变更为接口类型
+
+支持直接获取Map类型，不再必须指定一个javaBean了
+
+@函数中的字符串参数可以支持中文了，但是中文请务必放在单引号或双引号之中才可以生效
+
 ### v1.1  (2019.1.4)
+
 支持导入自定义方法的导入
 
 ### v1.0  (2018.12.20)
@@ -394,5 +420,11 @@ int failNum = loadResults.failNums();//失败的个数
 
 ## 更新计划
 
+* ~~支持生成Map键值对对象而非指定JavaBean对象~~( √ )
 * 添加注解式的映射
 * ~~使@函数支持自定义~~( √ )
+* ~~部分需要字符串的参数可支持中文~~( √ )
+
+- 除了@函数以外，增加一个#参数，例如：如果你添加了一个map类型映射，取名“map1”,当你在其他映射中使用“#map1”的时候，边可直接添加映射名为map1的map映射。
+
+  #参数 用于对映射进行嵌套，使得bean映射和map映射可以进行交互。目前两种映射还无法进行交互

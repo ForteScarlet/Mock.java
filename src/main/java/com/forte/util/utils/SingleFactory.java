@@ -318,7 +318,7 @@ public abstract class SingleFactory {
          * 获取单例
          */
         private T get() {
-            for (; ; ) {
+            for (;;) {
                 //获取
                 T currect = single.get();
                 //如果存在直接返回

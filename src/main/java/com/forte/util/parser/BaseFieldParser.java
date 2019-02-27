@@ -3,12 +3,10 @@ package com.forte.util.parser;
 import com.forte.util.Mock;
 import com.forte.util.fieldvaluegetter.*;
 import com.forte.util.invoker.Invoker;
-import com.forte.util.mockbean.*;
-import com.forte.util.utils.RegexUtil;
+import com.forte.util.mockbean.MockField;
 import com.forte.util.utils.FieldUtils;
 import com.forte.util.utils.MethodUtil;
-
-
+import com.forte.util.utils.RegexUtil;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -145,6 +143,14 @@ abstract class BaseFieldParser implements FieldParser {
 
 
     /**
+     * 为方法{@link #getMethodInvoker}服务，提供正则来获取方法名
+     * @return
+     */
+    private static String getReplaceForNameRegex(){
+        return "@|(\\(\\))|(\\(((\\w+)|('.+')|(\".+\"))(\\,((\\w+)|('.+')|(\".+\")))*\\))";
+    }
+
+    /**
      * 解析方法字符串并获取方法执行者
      * @param methods
      * 方法名列表
@@ -152,9 +158,10 @@ abstract class BaseFieldParser implements FieldParser {
      */
     protected static List<Invoker> getMethodInvoker(String[] methods) {
         //移除@符号、空括号、一个参数的括号、两个参数的括号
-        String replaceForNameRegex = "@|(\\(\\))|(\\(\\w+(\\,\\w+)*\\))";
+//        String replaceForNameRegex = "@|(\\(\\))|(\\(\\w+(\\,\\w+)*\\))";
+        String replaceForNameRegex = getReplaceForNameRegex();
 //        String replaceForParamRegex = "[(@" + getMethodNameRegexs() + ")\\(\\)]";
-        String regex = "@" + getMethodNameRegexs() + "(((\\((\\w+|\\w+\\,\\w+)\\))|(\\(\\))|())?)";
+//        String regex = "@" + getMethodNameRegexs() + "(((\\((\\w+|\\w+\\,\\w+)\\))|(\\(\\))|())?)";
 
         List<Invoker> invokerList = new ArrayList<>();
 
@@ -179,6 +186,12 @@ abstract class BaseFieldParser implements FieldParser {
         return invokerList;
     }
 
+    public static void main(String[] args) throws Exception {
+        String me = "@email('哈哈233')";
+        Invoker oneMethodInvoker = getOneMethodInvoker(me);
+        System.out.println(oneMethodInvoker.invoke());
+    }
+
     /**
      * 获取匹配MockUtil中的方法的正则
      *
@@ -189,22 +202,26 @@ abstract class BaseFieldParser implements FieldParser {
         //全数量参数匹配、参数间空格匹配（参数为任意字符匹配）- 有bug
 //        String regex = "(@"+ collect +"+((\\((.+(\\,.+)*)\\))|(\\(\\))|()|))";
         //全数量参数匹配、参数\\w匹配
-        String regex = "(@" + collect + "+((\\((\\w+(\\,\\w+)*)\\))|(\\(\\))|())?)";
+//        String regex = "(@" + collect + "+((\\((\\w+(\\,\\w+)*)\\))|(\\(\\))|())?)";
+
+        //尝试支持中文字符串
+        String regex = "(@" + collect + "+((\\((((\\w+)|('.+')|(\".+\"))(\\,((\\w+)|('.+')|(\".+\")))*)\\))|(\\(\\))|())?)";
+
         //值匹配0-1-2个参数
 //        String regex = "(@"+ collect +"+((\\((\\w+|\\w+\\,\\w+)\\))|(\\(\\))|())?)";
         return regex;
     }
 
+
     /**
      * 从方法字符串中获取参数
-     *
      * @param methodStr 方法字符串
      * @return
      */
     public static String[] getMethodParams(String methodStr) {
         String replaceForParamRegex = "(@" + getMethodNameRegexs() + ")|\\(|\\)";
         String[] split = methodStr.replaceAll(replaceForParamRegex, "").split("\\,");
-        return Arrays.stream(split).map(String::trim).filter(s -> s.length() > 0).toArray(String[]::new);
+        return Arrays.stream(split).map(s -> s.trim().replaceAll("['\"]", "")).filter(s -> s.length() > 0).toArray(String[]::new);
     }
 
     /**
@@ -221,7 +238,6 @@ abstract class BaseFieldParser implements FieldParser {
             //取值，理论上来说最后的过滤结果应该只有一个结果
             value = Mock._getMockMethod().entrySet().stream()
                     .filter(e -> e.getKey().replaceAll("\\([\\w\\.\\,]*\\)","").equals(methodName) && e.getValue().getParameters().length == paramsLength).findFirst().get().getValue();
-
         } catch (NoSuchElementException e) {
         }
 
@@ -797,7 +813,10 @@ abstract class BaseFieldParser implements FieldParser {
         this.objectClass = objectClass;
         this.fieldName = fieldName;
         //获取此字段的数据类型
-        this.fieldClass = FieldUtils.fieldClassGetter(objectClass, fieldName);
+        if(objectClass != null)
+            this.fieldClass = FieldUtils.fieldClassGetter(objectClass, fieldName);
+        else
+            this.fieldClass = Object.class;
         //解析区间参数,如果有的话
         if (intervalStr != null) {
             //切割，看看有没有小数位的区间

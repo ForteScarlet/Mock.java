@@ -1,10 +1,11 @@
 package com.forte.util;
 
+
 import com.forte.util.exception.MockException;
+import com.forte.util.factory.MockObjectFactory;
 import com.forte.util.loader.DefaultMockMethodLoader;
 import com.forte.util.loader.MethodLoader;
-import com.forte.util.mockbean.MockBean;
-import com.forte.util.mockbean.MockObject;
+import com.forte.util.mockbean.*;
 import com.forte.util.parser.ParameterParser;
 import com.forte.util.utils.MockUtil;
 
@@ -57,9 +58,11 @@ public class Mock {
     static {
         //创建线程安全的map集合,保存全部映射记录，初始容量为10
         MOCK_OBJECT = new ConcurrentHashMap<>(10);
+        MOCK_MAP = new ConcurrentHashMap<>(10);
 
         //创建map，这里的map理论上不需要线程同步
         Map<String, Method> mockUtilMethods;
+
         //加载这些方法，防止每次都使用反射去调用方法。
         //直接调用的话无法掌控参数，所以必须使用反射的形式进行调用
         Class<MockUtil> mockUtilClass = MockUtil.class;
@@ -96,12 +99,19 @@ public class Mock {
     /**
      * 保存全部记录的class与其对应的假对象{@link MockBean}
      */
-    private static final Map<Class, MockObject> MOCK_OBJECT;
+    private static final Map<Class, MockNormalObject> MOCK_OBJECT;
+
+    /**
+//     * Map类型假对象
+     */
+    private static final Map<String, MockMapObject> MOCK_MAP;
+
 
     /**
      * MockUtil中的全部方法
      */
     private static final Map<String, Method> MOCK_METHOD;
+
 
 
     /**
@@ -112,22 +122,51 @@ public class Mock {
      * @return
      */
     public static <T> MockBean<T> setResult(Class<T> objClass, Map<String, Object> map, boolean reset) {
-        //如果不是重新设置且此映射已经存在，将会抛出异常
+        //如果不是重新设置且此映射已经存在，并且objClass对象存在，将会抛出异常
         if(!reset && MOCK_OBJECT.get(objClass) != null){
             throw new MockException("此映射已存在！");
         }
 
-        //使用参数解析器进行解析
-        MockBean<T> parser = ParameterParser.parser(objClass, map);
+            MockBean<T> parser;
 
-        //添加
-        MOCK_OBJECT.put(objClass, new MockObject<>(parser));
+            //使用参数解析器进行解析
+            parser = ParameterParser.parser(objClass, map);
+
+            //如果类型不是Map类型，添加
+            MOCK_OBJECT.put(objClass, new MockNormalObject<>(parser));
+
+            //提醒系统的垃圾回收
+            System.gc();
+
+            return parser;
+    }
+
+    /**
+     * 添加一个map类型的映射
+     * @param resultName
+     * @param map
+     * @param reset
+     * @return
+     */
+    public static MockMapBean setResult(String resultName, Map<String, Object> map, boolean reset){
+        //如果不是重新设置且此映射已经存在，并且objClass对象存在，将会抛出异常
+        if(!reset && MOCK_MAP.get(resultName) != null){
+            throw new MockException("此映射已存在！");
+        }
+
+        MockMapBean parser;
+
+        //使用参数解析器进行解析
+        parser = ParameterParser.parser(map);
+        MOCK_MAP.put(resultName, MockObjectFactory.createMapObj(parser));
 
         //提醒系统的垃圾回收
         System.gc();
 
         return parser;
     }
+
+
 
 
     /**
@@ -155,14 +194,25 @@ public class Mock {
      *                 <p>
      *                  如果映射的对象中有多层级对象，支持使用多层级字段映射，例如：<br>
      *                      <code>
-     *                          map.put("friend.name" , "@canme");
+     *                          map.put("friend.name" , "@cname");
      *                      </code>
      *                 </p>
      *
      */
     public static <T> void set(Class<T> objClass, Map<String, Object> map) {
-        //设置并保存映射
+        //设置并保存映射，不可覆盖
         setResult(objClass, map, false);
+    }
+
+    /**
+     * 添加数据记录，如果要添加的映射已存在，则会抛出异常
+     * @param resultName
+     * @param map
+     * @param <T>
+     */
+    public static <T> void set(String resultName, Map<String, Object> map) {
+        //设置并保存映射，不可覆盖
+        setResult(resultName, map, false);
     }
 
 
@@ -177,6 +227,17 @@ public class Mock {
         setResult(objClass, map, true);
     }
 
+    /**
+     * 添加数据记录，如果要添加的映射已存在，则会覆盖
+     * @param resultName
+     * @param map
+     * @param <T>
+     */
+    public static <T> void reset(String resultName, Map<String, Object> map){
+        //设置并保存映射
+        setResult(resultName, map, true);
+    }
+
 
     /**
      * 获取一个实例对象
@@ -187,6 +248,18 @@ public class Mock {
      */
     public static <T> MockObject<T> get(Class<T> objClass) {
         return Optional.ofNullable(MOCK_OBJECT.get(objClass)).orElse(null);
+    }
+
+
+    /**
+     * 获取一个实例对象
+     *
+     * @param resultName
+     * @param <T>
+     * @return
+     */
+    public static <T> MockMapObject get(String resultName) {
+        return Optional.ofNullable(MOCK_MAP.get(resultName)).orElse(null);
     }
 
 
@@ -206,6 +279,7 @@ public class Mock {
     public static Map<String, Method> _getMockMethod() {
         return MOCK_METHOD;
     }
+
 
 
 }

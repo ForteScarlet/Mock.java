@@ -835,17 +835,20 @@ public class FieldUtils {
     }
 
 
+
+
+
+
     /**
      * 获取一个list字段的泛型类型<br>
      * 这个字段必须是一个list类型的字段！
-     *
-     * @param field 字段
+     * @param listField 字段
      * @return
      * @throws ClassNotFoundException
      */
-    public static Class getListGeneric(Field field) {
+    public static Class getListFieldGeneric(Field listField) {
 
-        ParameterizedType listGenericType = (ParameterizedType) field.getGenericType();
+        ParameterizedType listGenericType = (ParameterizedType) listField.getGenericType();
         Type[] listActualTypeArguments = listGenericType.getActualTypeArguments();
         if (listActualTypeArguments.length == 0) {
             //如果没有数据
@@ -896,8 +899,8 @@ public class FieldUtils {
      * @return
      * @throws ClassNotFoundException
      */
-    public static Class getListGeneric(Class c , String fieldName) {
-        return getListGeneric(fieldGetter(c , fieldName));
+    public static Class getListFieldGeneric(Class c , String fieldName) {
+        return getListFieldGeneric(fieldGetter(c , fieldName));
     }
 
     /**
@@ -908,9 +911,11 @@ public class FieldUtils {
      * @return
      * @throws ClassNotFoundException
      */
-    public static Class getListGeneric(Object obj , String fieldName) {
-        return getListGeneric(obj.getClass() , fieldName);
+    public static Class getListFieldGeneric(Object obj , String fieldName) {
+        return getListFieldGeneric(obj.getClass() , fieldName);
     }
+
+
 
     /**
      * 判断一个Class对象是否为另一个对象的实现类
@@ -924,6 +929,7 @@ public class FieldUtils {
         if (child.equals(findFather)) {
             return true;
         }
+
         /*
             两个方向，一个是向父继承类递归，一个是向接口递归
          */

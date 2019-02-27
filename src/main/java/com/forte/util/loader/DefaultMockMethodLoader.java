@@ -28,7 +28,7 @@ public class DefaultMockMethodLoader implements MethodLoader {
     private Set<Method> waitingMethods = new HashSet<>(10);
 
     /**
-     * 根据方法名加载一个方法，如果方法名对应了多个方法，则会全部进行判断，可能会有多个方法
+     * 根据方法名加载一个方法，如果方法名对应了多个方法，则会全部进行判断，因此可能会有多个方法
      * @param loadClz       指定类
      * @param methodName    方法名
      * @return  返回自身-链式
@@ -318,7 +318,7 @@ public class DefaultMockMethodLoader implements MethodLoader {
             methodMap.put(key, m);
 
             //添加记录
-            MOCK_METHOD.put(key , m);
+            MOCK_METHOD.put(key, m);
 
             return methodMap.entrySet().stream();
         }).map(e -> {

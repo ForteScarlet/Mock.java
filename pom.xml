@@ -12,8 +12,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.gitee.ForteScarlet</groupId>
     <artifactId>mock.java</artifactId>
+
     <!-- 版本号 -->
-    <version>1.1</version>
+    <version>1.2</version>
     <packaging>jar</packaging>
     <name>Mock For Java</name>
     <url>https://github.com/ForteScarlet/Mock.java.git</url>

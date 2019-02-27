@@ -1,11 +1,13 @@
 package com.forte.util.parser;
 
 import com.forte.util.Mock;
+import com.forte.util.factory.MockBeanFactory;
 import com.forte.util.fieldvaluegetter.ArrayFieldValueGetter;
 import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.fieldvaluegetter.ListFieldValueGetter;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.mockbean.MockBean;
+import com.forte.util.mockbean.MockMapBean;
 import com.forte.util.utils.FieldUtils;
 import com.forte.util.mockbean.MockField;
 
@@ -26,9 +28,9 @@ public class ParameterParser {
 
     /* ———— 目前预期类型 ————
      * String / Double / Integer / Map / Object / array&list
-     * */
+     */
 
-    /* 内部使用的各类型的常量，用于switch，为参数分配解析器 */
+    /* 内部使用的各类型的常量，用于switch语句，为参数分配解析器 */
 
     private static final int TYPE_STRING = 0;
     private static final int TYPE_DOUBLE = 1;
@@ -38,8 +40,9 @@ public class ParameterParser {
     private static final int TYPE_LIST = 5;
     private static final int TYPE_ARRAY = 6;
 
+
     /**
-     * 对参数进行解析
+     * 对参数进行解析-普通类型
      *
      * @param objectClass 需要进行假数据封装的类对象
      * @param paramMap    参数集合
@@ -60,67 +63,111 @@ public class ParameterParser {
             String fieldName = split[0];
             //区间参数字符串
             String intervalStr = split.length > 1 ? split[1] : null;
-            //如果对象中不存在此字段，不进行解析
+            //如果对象不是Map类型且对象中不存在此字段，不进行解析
             if (FieldUtils.isFieldExist(objectClass, fieldName)) {
-            /*
-                判断参数类型
-                预期类型：
-                String / Double / Integer / Map<Class , Map<String , Object>> / object / array 。。。。。。
-             */
-                //准备字段解析器
-//                FieldParser baseFieldParser;
-                //准备假字段对象
-                MockField mockField = null;
-                int typeNum = typeReferee(value);
-                //根据字段参数分配解析器
-                switch (typeNum) {
-                    case TYPE_STRING:
-                        //是字符串，使用指令解析器
-                        //获取假字段封装类
-                        mockField = stringTypeParse(objectClass, fieldName, intervalStr, value);
-                        break;
-                    case TYPE_DOUBLE:
-                        //是Double的浮点型，使用double浮点解析器
-                        //获取假字段封装类
-                        mockField = doubleTypeParse(objectClass, fieldName, intervalStr, value);
-                        break;
-                    case TYPE_INTEGER:
-                        //整数解析并获取假字段封装类
-                        mockField = integerTypeParse(objectClass, fieldName, intervalStr, value);
-                        break;
-                    case TYPE_OBJECT:
-                        //使用解析器，如果字段类型是集合或数组要重复输出
-                        mockField = objectTypeParse(objectClass, fieldName, intervalStr, value);
-                        break;
-                    case TYPE_MAP:
-                        //如果是一个Map集合，说明这个字段映射着另一个假对象
-                        //这个Map集合对应的映射类型应该必然是此字段的类型
-                        //获取假字段对象
-                        mockField = mapTypeParse(objectClass, fieldName, intervalStr, value);
-                        break;
-                    case TYPE_ARRAY:
-                        //如果字段是数组类型，使用数组类型解析器进行解析
-                        mockField = arrayTypeParse(objectClass, fieldName, intervalStr, value);
-                        break;
-                    case TYPE_LIST:
-                        //如果字段是list集合类型，使用集合类型解析器解析
-                        mockField = listTypeParse(objectClass, fieldName, intervalStr, value);
-                        break;
-                    default:
-                        System.out.println("无法解析");
-                        break;
-                }
-
-                //添加假字段对象
-                fields.add(mockField);
+                parser(objectClass, fieldName, intervalStr, value, fields);
             }
         });
 
 
         //解析结束，封装MockObject对象
-        return getMockObject(objectClass, fields);
+        return getMockBean(objectClass, fields);
+    }
+
+    /**
+     * 对参数进行解析-map类型
+     *
+     * @param paramMap    参数集合
+     */
+    public static <T> MockMapBean parser(Map<String, Object> paramMap) {
+        //使用线程安全list集合
+        List<MockField> fields = Collections.synchronizedList(new ArrayList<>());
+        //遍历并解析-（多线程同步）
+        //如果是.entrySet().parallelStream().forEach的话，似乎会出现一个迷之bug
+        //如果结果没有任何输出语句打印控制台，会报NullPointer的错
+        //已解决，需要使fields这个集合成为线程安全的集合
+        paramMap.entrySet().parallelStream().forEach(e -> {
+            //解析
+            Object value = e.getValue();
+            //切割名称，检测是否有区间函数
+            String[] split = e.getKey().split("\\|");
+            //字段名
+            String fieldName = split[0];
+            //区间参数字符串
+            String intervalStr = split.length > 1 ? split[1] : null;
+            //进行解析
+            parser(null, fieldName, intervalStr, value, fields);
+        });
+
+
+        //解析结束，封装MockObject对象
+        return getMockMapBean(fields);
+    }
+
+
+    /**
+     * 解析
+     * @param objectClass   封装类型
+     * @param fieldName     字段名称
+     * @param intervalStr   区间字符串
+     * @param value         参数
+     * @param fields        保存字段用的list
+     */
+    private static void parser(Class<?> objectClass, String fieldName, String intervalStr, Object value, List<MockField> fields){
+            /*
+                判断参数类型
+                预期类型：
+                String / Double / Integer / Map<Class , Map<String , Object>> / object / array 。。。。。。
+             */
+        //准备字段解析器
+        //准备假字段对象
+        MockField mockField = null;
+        int typeNum = typeReferee(value);
+        //根据字段参数分配解析器
+        switch (typeNum) {
+            case TYPE_STRING:
+                //是字符串，使用指令解析器
+                //获取假字段封装类
+                mockField = stringTypeParse(objectClass, fieldName, intervalStr, value);
+                break;
+            case TYPE_DOUBLE:
+                //是Double的浮点型，使用double浮点解析器
+                //获取假字段封装类
+                mockField = doubleTypeParse(objectClass, fieldName, intervalStr, value);
+                break;
+            case TYPE_INTEGER:
+                //整数解析并获取假字段封装类
+                mockField = integerTypeParse(objectClass, fieldName, intervalStr, value);
+                break;
+            case TYPE_OBJECT:
+                //使用解析器，如果字段类型是集合或数组要重复输出
+                mockField = objectTypeParse(objectClass, fieldName, intervalStr, value);
+                break;
+            case TYPE_MAP:
+                //如果是一个Map集合，说明这个字段映射着另一个假对象
+                //这个Map集合对应的映射类型应该必然是此字段的类型
+                //获取假字段对象
+                mockField = mapTypeParse(objectClass, fieldName, intervalStr, value);
+                break;
+            case TYPE_ARRAY:
+                //如果字段是数组类型，使用数组类型解析器进行解析
+                mockField = arrayTypeParse(objectClass, fieldName, intervalStr, value);
+                break;
+            case TYPE_LIST:
+                //如果字段是list集合类型，使用集合类型解析器解析
+                mockField = listTypeParse(objectClass, fieldName, intervalStr, value);
+                break;
+            default:
+                System.out.println("无法解析映射类[ "+ objectClass +" ]中的字段：" + fieldName);
+                break;
+        }
+
+        //添加假字段对象
+        fields.add(mockField);
 
     }
+
+
 
     /* —————————————————————— 各个情况的解析方法 —————————————————— */
 
@@ -216,23 +263,30 @@ public class ParameterParser {
         //需要判断字段的类型，如果字段类型也是Map，则不进行映射解析而是转化为ObjectField
         //这个Map集合对应的映射类型应当必然是此字段的类型
         //获取此字段的class类型
-        Class fieldClass = FieldUtils.fieldClassGetter(objectClass, fieldName);
+        Class fieldClass;
+        if(objectClass != null){
+            fieldClass = FieldUtils.fieldClassGetter(objectClass, fieldName);
+        }else{
+            fieldClass = Object.class;
+        }
+
+
         //判断类型
         if(FieldUtils.isChild(fieldClass , Map.class)){
-            //如果字段是Map类型，直接返回此对象作为假字段对象，不做处理
+            // 直接返回此对象作为假字段对象，不做处理
             return getDefaultObjectMockField(fieldName , value);
-        }else if(FieldUtils.isChild(fieldClass, List.class) && FieldUtils.getListGeneric(objectClass , fieldName).equals(Map.class) ){
+        }else if(FieldUtils.isChild(fieldClass, List.class) && FieldUtils.getListFieldGeneric(objectClass , fieldName).equals(Map.class) ){
             //如果字段类型是List集合而且集合的泛型是Map类型，使用Object类型解析器
             ObjectParser objectParser = new ObjectParser(objectClass, fieldName, intervalStr, value);
             return objectParser.getMockField();
         }else{
-            //如果字段不是Map类型
             //将参数转化为Map<String , Object>类型
             Map<String, Object> fieldMap = (Map<String, Object>)value;
+            //如果字段不是Map类型
             //判断字段是否为list集合类型或数组类型
             if(FieldUtils.isChild(fieldClass , List.class)){
                 //是list集合类型，获取集合的泛型类型
-                Class fieldListGenericClass = FieldUtils.getListGeneric(objectClass, fieldName);
+                Class fieldListGenericClass = FieldUtils.getListFieldGeneric(objectClass, fieldName);
                 //获取一个假对象
                 //同时保存此对象的解析
                 MockBean parser = Mock.setResult(fieldListGenericClass, fieldMap, true);
@@ -254,11 +308,15 @@ public class ParameterParser {
                 //得到一个假对象数据，封装为一个MockField
 //                MockBean parser = parser(fieldClass, fieldMap);
                 //同时保存此对象的解析
-                MockBean parser = Mock.setResult(fieldClass, fieldMap, true);
-
-               return objectToField(fieldName , parser);
+                if(objectClass == null){
+                    //如果为null，说明此为map类型对象的解析，则此处同样使用map类型的解析, result的名称使用""
+                    MockMapBean parser = Mock.setResult("", fieldMap, true);
+                    return objectToField(fieldName , parser);
+                }else{
+                    MockBean parser = Mock.setResult(fieldClass, fieldMap, true);
+                    return objectToField(fieldName , parser);
+                }
             }
-
         }
     }
 
@@ -387,30 +445,61 @@ public class ParameterParser {
 
 
     /**
-     * 获取一个MockObject
+     * 获取一个MockBean
      *
      * @param <T>
      * @return
      */
-    private static <T> MockBean<T> getMockObject(Class<T> objectObject, MockField[] fields) {
+    private static <T> MockBean<T> getMockBean(Class<T> objectObject, MockField[] fields) {
         //返回封装结果
-        return new MockBean<>(objectObject, fields);
+        return MockBeanFactory.createMockBean(objectObject, fields);
     }
 
     /**
-     * 获取一个MockObject
-     *
-     * @param <T>
+     * 获取一个MockBean
+     */
+    private static <T> MockBean<T> getMockBean(Class<T> objectObject, List<MockField> fields) {
+        //返回封装结果
+        return getMockBean(objectObject, fields.toArray(new MockField[0]));
+    }
+
+    /**
+     * 获取一个MockMapBean
+     * @param fields
      * @return
      */
-    private static <T> MockBean<T> getMockObject(Class<T> objectObject, List<MockField> fields) {
-        //返回封装结果
-        return getMockObject(objectObject, fields.toArray(new MockField[0]));
+    private static MockMapBean getMockMapBean(MockField[] fields){
+        return MockBeanFactory.createMockMapBean(fields);
     }
+
+
+    /**
+     * 获取一个MockMapBean
+     * @param fields
+     * @return
+     */
+    private static MockMapBean getMockMapBean(List<MockField> fields){
+        return getMockMapBean(fields.toArray(new MockField[0]));
+    }
+
+    /**
+     * 获取一个map类型封装对象
+     */
+    private static MockBean<Map> getMockMap(MockField[] fields){
+        //TODO
+        return new MockMapBean(fields);
+    }
+
+    /**
+     * 获取一个map类型封装对象
+     */
+    private static MockBean<Map> getMockMap(List<MockField> fields){
+        return getMockMap(fields.toArray(new MockField[0]));
+    }
+
 
     /**
      * 判断这个类型在预期类型中是哪一个类型的
-     *
      * @return
      */
     private static int typeReferee(Object object) {
