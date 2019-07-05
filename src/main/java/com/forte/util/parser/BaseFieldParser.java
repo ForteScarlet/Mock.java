@@ -99,8 +99,8 @@ abstract class BaseFieldParser implements FieldParser {
     /**
      * 看看有没有匹配的方法
      *
-     * @param name
-     * @return
+     * @param name 方法名
+     * @return  是否有
      */
     protected static boolean match(String name) {
         //获取正则
@@ -110,8 +110,8 @@ abstract class BaseFieldParser implements FieldParser {
 
     /**
      * 获取匹配的方法
-     *
-     * @return
+     * @param name 方法名
+     * @return  匹配的方法合集
      */
     protected static String[] getMethods(String name) {
         //获取正则
@@ -127,8 +127,7 @@ abstract class BaseFieldParser implements FieldParser {
     protected static String[] getMethodsSplit(String name) {
         //获取正则
         String regex = getMethodRegex();
-        String[] matcher = name.split(regex);
-        return matcher;
+        return name.split(regex);
     }
 
 
@@ -186,11 +185,6 @@ abstract class BaseFieldParser implements FieldParser {
         return invokerList;
     }
 
-    public static void main(String[] args) throws Exception {
-        String me = "@email('哈哈233')";
-        Invoker oneMethodInvoker = getOneMethodInvoker(me);
-        System.out.println(oneMethodInvoker.invoke());
-    }
 
     /**
      * 获取匹配MockUtil中的方法的正则
@@ -205,7 +199,7 @@ abstract class BaseFieldParser implements FieldParser {
 //        String regex = "(@" + collect + "+((\\((\\w+(\\,\\w+)*)\\))|(\\(\\))|())?)";
 
         //尝试支持中文字符串
-        String regex = "(@" + collect + "+((\\((((\\w+)|('.+')|(\".+\"))(\\,((\\w+)|('.+')|(\".+\")))*)\\))|(\\(\\))|())?)";
+        String regex = "(@" + collect + "{1}((\\((((\\w)+|('.+')|(\".+\"))(\\,((\\w)+|('.+')|(\".+\")))*)\\))|(\\(\\))|())?)";
 
         //值匹配0-1-2个参数
 //        String regex = "(@"+ collect +"+((\\((\\w+|\\w+\\,\\w+)\\))|(\\(\\))|())?)";
@@ -220,7 +214,7 @@ abstract class BaseFieldParser implements FieldParser {
      */
     public static String[] getMethodParams(String methodStr) {
         String replaceForParamRegex = "(@" + getMethodNameRegexs() + ")|\\(|\\)";
-        String[] split = methodStr.replaceAll(replaceForParamRegex, "").split("\\,");
+        String[] split = methodStr.replaceAll(replaceForParamRegex, "").split("( *)\\,( *)");
         return Arrays.stream(split).map(s -> s.trim().replaceAll("['\"]", "")).filter(s -> s.length() > 0).toArray(String[]::new);
     }
 
@@ -275,12 +269,12 @@ abstract class BaseFieldParser implements FieldParser {
     private Invoker getIntegerMethodInvoker(Integer intIntervalMin , Integer intIntervalMax){
         //拼接出方法
         StringBuilder methodBuilder = new StringBuilder();
-        methodBuilder.append(INTEGER_METHOD_NAME);
-        methodBuilder.append("(");
-        methodBuilder.append(intIntervalMin);
-        methodBuilder.append(",");
-        methodBuilder.append(intIntervalMax);
-        methodBuilder.append(")");
+        methodBuilder.append(INTEGER_METHOD_NAME)
+                     .append("(")
+                     .append(intIntervalMin)
+                     .append(",")
+                     .append(intIntervalMax)
+                     .append(")");
 
         //获取方法字符串
         String methodStr = methodBuilder.toString();
@@ -312,12 +306,8 @@ abstract class BaseFieldParser implements FieldParser {
      */
     private Invoker getIntegerMethodInvoker(){
         //拼接出方法
-        StringBuilder methodBuilder = new StringBuilder();
-        methodBuilder.append(INTEGER_METHOD_NAME);
-        methodBuilder.append("()");
-
         //获取方法字符串
-        String methodStr = methodBuilder.toString();
+        String methodStr = INTEGER_METHOD_NAME + "()";
 
         //返回方法执行者
         return getOneMethodInvoker(methodStr);

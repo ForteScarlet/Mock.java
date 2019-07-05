@@ -71,7 +71,7 @@ import java.util.Random;
  * {@link MockUtil#date()}<em>获取随机日期 1990 - 现在</em>
  * </li>
  * <li>
- * {@link MockUtil#dateStr()}<em>返回一个日随机日期的字符串</em>
+ * {@link MockUtil#toDateStr()}<em>返回一个日随机日期的字符串</em>
  * </li>
  * <li>
  * {@link MockUtil#time(String)}<em>返回一个随机时间的字符串</em>
@@ -80,10 +80,10 @@ import java.util.Random;
  * {@link MockUtil#time()}<em>返回一个随机时间的字符串，格式为HH:mm:ss</em>
  * </li>
  * <li>
- * {@link MockUtil#dateTime(String)}<em>返回一个随机时间日期的字符串</em>
+ * {@link MockUtil#toDateTime(String)}<em>返回一个随机时间日期的字符串</em>
  * </li>
  * <li>
- * {@link MockUtil#dateTime()}<em>返回一个随机日期时间的字符串，格式为yyyy-dd-MM HH:mm:ss</em>
+ * {@link MockUtil#toDateTime()}<em>返回一个随机日期时间的字符串，格式为yyyy-dd-MM HH:mm:ss</em>
  * </li>
  * </ul>
  *
@@ -459,15 +459,15 @@ public class MockUtil {
      *
      * @param format
      */
-    public static String dateStr(String format) {
+    public static String toDateStr(String format) {
         return new SimpleDateFormat(format).format(date());
     }
 
     /**
      * 返回一个随机日期的字符串，格式为yyyy-dd-MM
      */
-    public static String dateStr() {
-        return dateStr(DATE_FORMAT);
+    public static String toDateStr() {
+        return toDateStr(DATE_FORMAT);
     }
 
     /**
@@ -491,15 +491,15 @@ public class MockUtil {
      *
      * @param format
      */
-    public static String dateTime(String format) {
+    public static String toDateTime(String format) {
         return new SimpleDateFormat(format).format(date());
     }
 
     /**
      * 返回一个随机日期时间的字符串，格式为yyyy-dd-MM HH:mm:ss
      */
-    public static String dateTime() {
-        return dateTime(DATETIME_FORMAT);
+    public static String toDateTime() {
+        return toDateTime(DATETIME_FORMAT);
     }
 
     /* —————————— number age —————————— */

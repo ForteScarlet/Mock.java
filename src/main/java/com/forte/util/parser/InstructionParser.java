@@ -3,9 +3,7 @@ package com.forte.util.parser;
 import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
-import com.forte.util.utils.RandomUtil;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -114,6 +112,7 @@ class InstructionParser extends BaseFieldParser {
             //解析出方法名
             String[] methods = getMethods(instructionStr);
             //如果有方法，解析方法，解析参数-由于做过判断，所以此处必然有方法
+
             //解析方法并获取方法执行者
             List<Invoker> invoker = getMethodInvoker(methods);
 
