@@ -13,6 +13,6 @@ public interface FieldValueGetter<T> {
      *
      * @return
      */
-    public T value();
+    T value();
 
 }

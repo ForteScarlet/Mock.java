@@ -258,7 +258,7 @@ public class Mock {
      * @param <T>
      * @return
      */
-    public static <T> MockMapObject get(String resultName) {
+    public static <T> MockObject<Map<String, Object>> get(String resultName) {
         return Optional.ofNullable(MOCK_MAP.get(resultName)).orElse(null);
     }
 

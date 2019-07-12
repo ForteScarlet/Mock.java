@@ -28,7 +28,7 @@ public class MockBean<T> {
 
         //先创建一个实例
         T instance;
-        //使用try抓取错误，若实例创建错误，直接返回null
+        //抓取错误，若实例创建错误，直接返回null
         try {
             instance = objectClass.newInstance();
         } catch (Exception e) {

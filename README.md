@@ -16,11 +16,11 @@
 >
 >  *工具类介绍：<a href="#工具类介绍">工具类介绍</a>
 >
-> 当前版本：v1.2
+> 当前版本：v1.3
 >
 > 最低JDK版本：JDK8
 >
-> 以下介绍的版本：v1.2 (第一版)
+> 以下介绍的版本：v1.3 (第一版)
 >
 > *※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>*
 >
@@ -29,13 +29,14 @@
 ## 使用方法
 ### 安装
 
-在maven项目下，从pom.xml中导入以下地址（仅以最新版本作为示例）：
+在maven项目下，从pom.xml中导入以下地址：
+> 最新版本以maven仓库中的地址为准。仓库地址：`https://mvnrepository.com/artifact/io.gitee.ForteScarlet/mock.java`
 
 ```xml
 <dependency>
     <groupId>io.gitee.ForteScarlet</groupId>
     <artifactId>mock.java</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
 </dependency>
 ```
 
@@ -313,6 +314,8 @@ MockMapObject mockMapObject = Mock.get("userMap");
 
     > 获取指定数量的多个结果，并根据给定规则转化为Map集合
 
+    **※ 自1.3版本之后，我优化了`MockObject`接口内部结构，并增加了大量parallel方法与collect方法，您现在可以在1.3版本中更加灵活的对数据进行转化，或者根据数据量的需求自行决定是否需要使用并行线程进行对象创建。**
+
 ## 自定义@函数
 
 > 有时候，我提供的MockUtil中的方法可能无法满足您的需求，那么这时候，就需要一个可以对@函数进行扩展、加强的窗口。在v1.1版本中，我添加了这个功能。(这个功能测数量很少，可能会存在很多bug)
@@ -403,6 +406,18 @@ int failNum = loadResults.failNums();//失败的个数
 
 ## 更新公告
 
+### v1.3(2019.7.12)
+
+优化`MockObject`接口内部接口，增加大量`parallel`(并行流)方法与`collect`方法。
+
+`parallel`相关方法将会在您创建对象的时候使用并行线程进行创建，当您需求的数据量较大的时候，此系列方法将会相对于原本的串行方法更加有效率。
+
+`collect`相关方法将会提供大量参照于`Stream`中的`collect`方法而制定的方法。加入您对于`Stream`中的`collect`方法十分的熟悉，那么此系列的方法将会使得您可以更加灵活的对数据列表进行操作。
+
+在接口结构更新后，接口中所有的方法全部基于`get()`方法而不需要其他实现。
+
+（虽然用户一般也不需要实现此接口。）
+
 ### v1.2 (2019.2.27)
 
 ※ 与上一版本不兼容点：将MockObject类变更为接口类型
@@ -422,6 +437,8 @@ int failNum = loadResults.failNums();//失败的个数
 
 
 ## 更新计划
+
+(大概会咕很久)
 
 * ~~支持生成Map键值对对象而非指定JavaBean对象~~( √ )
 * 添加注解式的映射
