@@ -18,11 +18,11 @@
 >
 >  *工具类介绍：<a href="#工具类介绍">工具类介绍</a>
 >
-> 当前版本：v1.3
+> 当前版本：v1.4
 >
 > 最低JDK版本：JDK8
 >
-> 以下介绍的版本：v1.3 (第一版)
+> 以下介绍的版本：v1.4 (第一版)
 >
 > *※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>*
 >
@@ -38,7 +38,7 @@
 <dependency>
     <groupId>io.gitee.ForteScarlet</groupId>
     <artifactId>mock.java</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
 </dependency>
 ```
 
@@ -574,9 +574,9 @@ public class User {
 
 ## 更新公告
 
-## v1.4(2019.8.26) (暂未部署至maven)
+## v1.4(2019.8.26)
 
-实现注解形式的映射。(测试量较少不知道有没有bug)
+提供两个注解以实现注解形式的映射。(测试量较少不知道有没有bug)
 
 
 
