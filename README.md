@@ -9,6 +9,8 @@
 > 这是一个仿照Mock.js语法的Java语言使用的假数据生成工具框架。
 > 部分方法与类介绍详细可查看JavaDoc文档(推荐先下载下来再看)：[JavaDoc文档](helpDoc/index.html)
 >
+> 码云生成的在线javaDoc文档：[在线文档](https://apidoc.gitee.com/ForteScarlet/Mock.java/)
+>
 > 如果存在BUG或者有什么意见、建议，可以通过邮箱`ForteScarlet@163.com`进行反馈或者联系QQ`1149159218`.
 > (记得注明身份哦~)
 >
