@@ -31,6 +31,35 @@ public interface MockObject<T> {
         return get().orElse(null);
     }
 
+    /**
+     * 获取一个无限流
+     */
+    default Stream<T> getStream(){
+        return Stream.iterate(getOne(), i -> getOne());
+    }
+
+    /**
+     * 获取一个指定长度的流，等同于 <code>getStream().limit(limit)</code>
+     * @param limit
+     * @return
+     */
+    default Stream<T> getStream(int limit){
+        return getStream().limit(limit);
+    }
+
+    /**
+     * 获取一个并行无限流
+     */
+    default Stream<T> getParallelStream(){
+        return getStream().parallel();
+    }
+
+    /**
+     * 获取一个并行流
+     */
+    default Stream<T> getParallelStream(int limit){
+        return getParallelStream().limit(limit);
+    }
 
     /**
      * 获取多个实例对象，作为list集合返回
@@ -142,42 +171,42 @@ public interface MockObject<T> {
      * 串行collect
      */
     default <R, A> R collect(int num, Collector<? super T, A, R> collector){
-        return Stream.iterate(getOne(), i -> getOne()).limit(num).collect(collector);
+        return getStream(num).collect(collector);
     }
 
     /**
      * 带转化的串行collect
      */
     default <R, A, N> N collect(int num, Function<? super T, ? extends R> mapper, Collector<? super R, A, N> collector){
-        return Stream.iterate(getOne(), i -> getOne()).limit(num).map(mapper).collect(collector);
+        return getStream(num).map(mapper).collect(collector);
     }
 
     /**
      * 串行collect toMap
      */
     default <A, K, V> Map<K, V> collectToMap(int num, Collector<? super T, A, Map<K, V>> collector){
-        return Stream.iterate(getOne(), i -> getOne()).limit(num).collect(collector);
+        return getStream(num).collect(collector);
     }
 
     /**
      * 串行collect toMap
      */
     default <A, K, V> Map<K, V> collectToMap(int num, Function<T, K> keyFunction, Function<T, V> valueFunction){
-        return Stream.iterate(getOne(), i -> getOne()).limit(num).collect(Collectors.toMap(keyFunction, valueFunction));
+        return getStream(num).collect(Collectors.toMap(keyFunction, valueFunction));
     }
 
     /**
      * 带转化的串行collect toMap
      */
     default <A, R, K, V> Map<K, V> collectToMap(int num, Function<T, R> mapper, Collector<? super R, A, Map<K, V>> collector){
-        return Stream.iterate(getOne(), i -> getOne()).limit(num).map(mapper).collect(collector);
+        return getStream(num).map(mapper).collect(collector);
     }
 
     /**
      * 带转化的串行collect toMap
      */
     default <A, R, K, V> Map<K, V> collectToMap(int num, Function<T, R> mapper, Function<R, K> keyFunction, Function<R, V> valueFunction){
-        return Stream.iterate(getOne(), i -> getOne()).limit(num).map(mapper).collect(Collectors.toMap(keyFunction, valueFunction));
+        return getStream(num).map(mapper).collect(Collectors.toMap(keyFunction, valueFunction));
     }
 
 

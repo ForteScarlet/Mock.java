@@ -38,3 +38,4 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 
 .idea/
+/mock.java.iml
