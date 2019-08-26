@@ -1,4 +1,4 @@
-package com.forte.util.anno;
+package com.forte.util.mapper;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,29 +6,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 应用于注解映射, 使用在字段上
+ * 映射值为字符串类型
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
- * @date Created in 2019/1/4 18:45
  * @since JDK1.8
  **/
-@Mock
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD) //字段、枚举的常量
-public @interface MockStr {
+@Target(ElementType.FIELD) //字段
+public @interface MockValue {
 
     /**
-     * 映射参数
-     * @return
+     * 映射值，如果为空则视为无效
      */
     String value();
-
-
-    /**
-     * 区间参数，例如：
-     * 5-6|2-3
-     * 3-8|3
-     * 4-6
-     * @return
-     */
-    String interval();
 
 }

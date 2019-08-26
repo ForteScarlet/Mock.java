@@ -2,6 +2,7 @@ package com.forte.util;
 
 
 import com.forte.util.exception.MockException;
+import com.forte.util.factory.MockMapperFactory;
 import com.forte.util.factory.MockObjectFactory;
 import com.forte.util.loader.DefaultMockMethodLoader;
 import com.forte.util.loader.MethodLoader;
@@ -56,9 +57,9 @@ public class Mock {
 
     /* 静态代码块加载资源 */
     static {
-        //创建线程安全的map集合,保存全部映射记录，初始容量为10
-        MOCK_OBJECT = new ConcurrentHashMap<>(10);
-        MOCK_MAP = new ConcurrentHashMap<>(10);
+        //创建线程安全的map集合,保存全部映射记录
+        MOCK_OBJECT = new ConcurrentHashMap<>(32);
+        MOCK_MAP = new ConcurrentHashMap<>(32);
 
         //创建map，这里的map理论上不需要线程同步
         Map<String, Method> mockUtilMethods;
@@ -69,7 +70,6 @@ public class Mock {
         //只获取公共方法
         Method[] methods = mockUtilClass.getMethods();
         /*
-            使用lambda表达式与stream流操作：
             过滤Object中的方法、
             将MockUtil中的全部方法名格式化 格式：方法名(参数类型class地址，参数类型class地址.....)、
             转化为<方法名：方法>的map集合
@@ -102,7 +102,8 @@ public class Mock {
     private static final Map<Class, MockNormalObject> MOCK_OBJECT;
 
     /**
-//     * Map类型假对象
+     * Map类型假对象
+     * TODO 后期考虑合并MOCK_OBJECT 和 MOCK_MAP两个字段
      */
     private static final Map<String, MockMapObject> MOCK_MAP;
 
@@ -116,10 +117,9 @@ public class Mock {
 
     /**
      * 添加一个数据映射
-     * @param objClass
-     * @param map
-     * @param <T>
-     * @return
+     * @param objClass  映射类型
+     * @param map       映射对应值
+     * @return          映射结果表
      */
     public static <T> MockBean<T> setResult(Class<T> objClass, Map<String, Object> map, boolean reset) {
         //如果不是重新设置且此映射已经存在，并且objClass对象存在，将会抛出异常
@@ -143,10 +143,9 @@ public class Mock {
 
     /**
      * 添加一个map类型的映射
-     * @param resultName
-     * @param map
-     * @param reset
-     * @return
+     * @param resultName    映射名
+     * @param map           映射值
+     * @param reset         是否覆盖
      */
     public static MockMapBean setResult(String resultName, Map<String, Object> map, boolean reset){
         //如果不是重新设置且此映射已经存在，并且objClass对象存在，将会抛出异常
@@ -205,12 +204,31 @@ public class Mock {
     }
 
     /**
+     * 通过注解来获取映射
+     */
+    public static <T> void set(Class<T> objClass){
+        //获取映射Map
+        Map<String, Object> mapper = MockMapperFactory.getMapper(objClass);
+        setResult(objClass, mapper, false);
+    }
+
+    /**
+     * 通过注解来获取映射, 并提供额外的、难以用注解进行表达的映射参数
+     */
+    public static <T> void setWithOther(Class<T> objClass, Map<String, Object> other){
+        //获取映射Map
+        Map<String, Object> mapper = MockMapperFactory.getMapper(objClass, other);
+        setResult(objClass, mapper, false);
+    }
+
+
+    /**
      * 添加数据记录，如果要添加的映射已存在，则会抛出异常
      * @param resultName
      * @param map
      * @param <T>
      */
-    public static <T> void set(String resultName, Map<String, Object> map) {
+    public static void set(String resultName, Map<String, Object> map) {
         //设置并保存映射，不可覆盖
         setResult(resultName, map, false);
     }
@@ -226,6 +244,25 @@ public class Mock {
         //设置并保存映射
         setResult(objClass, map, true);
     }
+
+    /**
+     * 通过注解来获取映射
+     */
+    public static <T> void reset(Class<T> objClass){
+        //获取映射Map
+        Map<String, Object> mapper = MockMapperFactory.getMapper(objClass);
+        setResult(objClass, mapper, true);
+    }
+
+    /**
+     * 通过注解来获取映射, 并提供额外的、难以用注解进行表达的映射参数
+     */
+    public static <T> void resetWithOther(Class<T> objClass, Map<String, Object> other){
+        //获取映射Map
+        Map<String, Object> mapper = MockMapperFactory.getMapper(objClass, other);
+        setResult(objClass, mapper, true);
+    }
+
 
     /**
      * 添加数据记录，如果要添加的映射已存在，则会覆盖
@@ -277,7 +314,8 @@ public class Mock {
      * 全部已被加载的映射方法
      */
     public static Map<String, Method> _getMockMethod() {
-        return MOCK_METHOD;
+        //为了保护原本的字段，使用流对Map进行复制
+        return MOCK_METHOD.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 

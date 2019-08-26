@@ -368,6 +368,172 @@ int failNum = loadResults.failNums();//失败的个数
 
 
 
+# 注解形式映射
+
+1.4版本之后我提供了两个可以使用在字段上的注解：`@MockValue` 和 `@MockArray`
+
+## @MockValue
+
+使用在类的字段上，仅有一个参数：
+
+```java
+    /**
+     * 映射值，如果为空则视为无效
+     */
+    String value();
+```
+
+
+
+用来指定此字段的映射值。例如：
+
+```java
+public class User {
+    @MockValue("@name")
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+```
+
+
+
+
+
+## @MockArray
+
+使用在类的字段上，有连个参数，必填参数仅有一个：
+
+```java
+	/**
+     * 数组参数, 必填参数
+     */
+    String[] value();
+
+    /**
+     * 类型转化器实现类，需要存在无参构造
+     * 默认不变
+     */
+    Class<? extends ArrayMapper> mapper() default ArrayMapperType.ToString.class;
+```
+
+其中，`mapper()`参数可选，其类型为`ArrayMapper`接口的的实现类，用于指定将字符串数组，也就是`value()`中的值进行转化的规则。此参数默认为不进行转化，即转化为字符串类型。
+
+`ArrayMapper`接口中有两个抽象方法：
+
+```java
+	/**
+     * 给你一个数组长度，返回一个数组实例的function，用于数组的实例化获取
+     * @return 数组实例获取函数，例如：Integer[]::new; 或者 size -> new Integer[size];
+     */
+    IntFunction<T[]> getArrayParseFunction();
+
+	/**
+	 * 将字符串转化为指定类型
+	 */
+	T apply(String t);
+
+```
+
+在对`ArrayMapper`接口进行实现的时候，请务必保留下无参构造用于其实例化。
+
+
+
+对于一些比较常见的类型转化，我提供了几个已经实现好的实现类。这些实现类以内部类的形式存在于`ArrayMapperType`接口中。
+
+- `ArrayMapperType.ToString.class` 
+
+  转化为字符串类型，即不进行转化
+
+- `ArrayMapperType.ToInt.class`
+
+  转化为Integer类型
+
+- `ArrayMapperType.ToLong.class`
+
+  转化为Long类型
+
+- `ArrayMapperType.ToDouble.class`
+
+  转化为Double类型
+
+例如：
+
+```java
+public class User {
+    @MockArray(value = {"1", "2", "3"}, mapper = ArrayMapperType.ToInt.class)
+    private int age;
+
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+
+
+
+
+## 使用
+
+使用也很简单，我在`Mock`中增加了4个方法，2个`se`t方法 2个`reset`方法。
+
+```java
+	/**
+     * 通过注解来获取映射
+     */
+    public static <T> void set(Class<T> objClass);
+
+
+	/**
+     * 通过注解来获取映射, 并提供额外的、难以用注解进行表达的映射参数
+     */
+    public static <T> void setWithOther(Class<T> objClass, Map<String, Object> other);	
+
+	/**
+     * 通过注解来获取映射
+     */
+    public static <T> void reset(Class<T> objClass);
+
+	/**
+     * 通过注解来获取映射, 并提供额外的、难以用注解进行表达的映射参数
+     */
+    public static <T> void resetWithOther(Class<T> objClass, Map<String, Object> other);
+
+
+```
+
+
+
+
+
+## 注意事项
+
+### 注解优先级
+
+假如你在同一个字段上同时使用了两个注解，则会优先使用`@MockValue`;
+
+
+
+### 额外映射
+
+可以发现，4个方法中各有一个方法需要提供额外参数，他会在注解映射创建完毕后进行添加，也就是假如额外参数和字段中有冲突的键，则额外参数的值将会覆盖注解映射值。
+
+
+
+
+
 
 
 # 工具类介绍
@@ -408,6 +574,12 @@ int failNum = loadResults.failNums();//失败的个数
 
 ## 更新公告
 
+## v1.4(2019.8.26) (暂未部署至maven)
+
+实现注解形式的映射。(测试量较少不知道有没有bug)
+
+
+
 ### v1.3(2019.7.12)
 
 优化`MockObject`接口内部接口，增加大量`parallel`(并行流)方法与`collect`方法。
@@ -443,7 +615,7 @@ int failNum = loadResults.failNums();//失败的个数
 (大概会咕很久)
 
 * ~~支持生成Map键值对对象而非指定JavaBean对象~~( √ )
-* 添加注解式的映射
+* ~~添加注解式的映射~~（√）
 * ~~使@函数支持自定义~~( √ )
 * ~~部分需要字符串的参数可支持中文~~( √ )
 
