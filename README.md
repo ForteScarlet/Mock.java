@@ -14,6 +14,9 @@
 > 如果存在BUG或者有什么意见、建议，可以通过邮箱`ForteScarlet@163.com`进行反馈或者联系QQ`1149159218`.
 > (记得注明身份哦~)
 >
+> github: [github](https://github.com/ForteScarlet/Mock.java)
+> gitee : [码云地址](https://gitee.com/ForteScarlet/Mock.java)
+>
 > 此框架中不仅仅只可以作为假数据获取用，还有一些比较实用的工具类可以拿来单独使用。
 >
 >  *工具类介绍：<a href="#工具类介绍">工具类介绍</a>
