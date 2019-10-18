@@ -14,7 +14,7 @@
     <artifactId>mock.java</artifactId>
 
     <!-- 版本号 -->
-    <version>1.4.2</version>
+    <version>1.4.3</version>
     <packaging>jar</packaging>
     <name>Mock.java</name>
     <url>https://github.com/ForteScarlet/Mock.java.git</url>
@@ -34,18 +34,7 @@
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.3</version>
         </dependency>
-
-
-        <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.62</version>
-        </dependency>
-
-
     </dependencies>
-
     <build>
         <!--<pluginManagement>-->
         <plugins>
