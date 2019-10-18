@@ -14,7 +14,7 @@
     <artifactId>mock.java</artifactId>
 
     <!-- 版本号 -->
-    <version>1.4</version>
+    <version>1.4.2</version>
     <packaging>jar</packaging>
     <name>Mock.java</name>
     <url>https://github.com/ForteScarlet/Mock.java.git</url>
