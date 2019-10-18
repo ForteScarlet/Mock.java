@@ -81,16 +81,22 @@ public class ParameterParser {
      */
     public static <T> MockMapBean parser(Map<String, Object> paramMap) {
         //使用线程安全list集合
-        List<MockField> fields = Collections.synchronizedList(new ArrayList<>());
+
+//        List<MockField> fields = Collections.synchronizedList(new ArrayList<>());
+
+        List<MockField> fields = new ArrayList<>();
         //遍历并解析-（多线程同步）
         //如果是.entrySet().parallelStream().forEach的话，似乎会出现一个迷之bug
         //如果结果没有任何输出语句打印控制台，会报NullPointer的错
         //已解决，需要使fields这个集合成为线程安全的集合
-        paramMap.entrySet().parallelStream().forEach(e -> {
+         /*
+            2019/10/18
+            不是干什么都是多线程是好的的，所以遍历不在使用多线程遍历了~
+         */
+        paramMap.forEach((key, value) -> {
             //解析
-            Object value = e.getValue();
             //切割名称，检测是否有区间函数
-            String[] split = e.getKey().split("\\|");
+            String[] split = key.split("\\|");
             //字段名
             String fieldName = split[0];
             //区间参数字符串

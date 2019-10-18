@@ -5,7 +5,6 @@ import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +17,7 @@ class ListParser extends BaseFieldParser {
 
 
     /** 参数传入的数组 */
-    private final List defaultList;
+    private final List<?> defaultList;
 
     /**
      * 字段类型既不是list集合也不是数组的时候
@@ -120,11 +119,10 @@ class ListParser extends BaseFieldParser {
      * @param fieldName
      * @param intervalStr
      */
-    public ListParser(Class objectClass, String fieldName, String intervalStr, List defaultList) {
+    public ListParser(Class objectClass, String fieldName, String intervalStr, List<?> defaultList) {
         super(objectClass, fieldName, intervalStr);
         //参数集合，复制一份而并非使用原来的 ->浅拷贝
-        this.defaultList = new ArrayList();
-        Collections.addAll(defaultList);
+        this.defaultList = new ArrayList<>(defaultList);
     }
 
 }

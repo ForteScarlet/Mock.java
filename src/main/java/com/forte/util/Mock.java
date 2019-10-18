@@ -226,7 +226,6 @@ public class Mock {
      * 添加数据记录，如果要添加的映射已存在，则会抛出异常
      * @param resultName
      * @param map
-     * @param <T>
      */
     public static void set(String resultName, Map<String, Object> map) {
         //设置并保存映射，不可覆盖

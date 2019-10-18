@@ -1,5 +1,6 @@
 package com.forte.util.mockbean;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,12 +24,18 @@ public class MockMapBean extends MockBean<Map> {
         MockField[] fields = this.getFields();
 
         //使用多线程执行
-        return Arrays.stream(fields).parallel().flatMap(f -> {
-            //保存字段映射
-            HashMap<String, Object> map = new HashMap<>(1);
-            map.put(f.getFieldName(), f.getValue());
-            return map.entrySet().stream();
-        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        /*
+            2019/10/18
+            还是那句话，不是什么都用多线程就是好的，考虑优化，不在使用多线程
+         */
+//        return Arrays.stream(fields).parallel().flatMap(f -> {
+        //保存字段映射
+//            HashMap<String, Object> map = new HashMap<>(1);
+//            map.put(f.getFieldName(), f.getValue());
+//            return map.entrySet().stream();
+        return Arrays.stream(fields)
+                .map(f -> new AbstractMap.SimpleEntry<>(f.getFieldName(), f.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
 

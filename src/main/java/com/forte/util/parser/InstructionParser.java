@@ -101,6 +101,16 @@ class InstructionParser extends BaseFieldParser {
      */
     @Override
     public FieldValueGetter parserForNotListOrArrayFieldValueGetter() {
+        /*
+            假如字段类型为Object类型且存在区间参数，则认为这是一个需要转化为数组的类型，即认为字段类型为List类型，直接使用List字段值生成器
+            区间参数只要存在左参数即为存在
+         */
+        boolean isObjectToList = this.fieldClass.equals(Object.class) && (intervalMin != null);
+        if(isObjectToList){
+            return this.parserForListFieldValueGetter();
+        }
+
+
         //字段值获取器
         FieldValueGetter fieldValueGetter;
         //解析指令,查找指令中的@方法

@@ -4,6 +4,9 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
+ *
+ * Map类型的结果集合
+ *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date 2019/2/27 14:39
  */

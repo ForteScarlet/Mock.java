@@ -3,6 +3,7 @@ package com.forte.util.utils;
 import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
@@ -296,24 +297,22 @@ public class RandomUtil {
 
     /**
      * 从数组中返回一个随机元素
-     *
-     * @param trr
-     * @param <T>
-     * @return
+     * @param trr   数组
+     * @return      随机元素
      */
     public static <T> T getRandomElement(T[] trr) {
-        return trr[new Random().nextInt(trr.length)];
+        Objects.requireNonNull(trr);
+        return trr.length == 0 ? null : trr[new Random().nextInt(trr.length)];
     }
 
     /**
-     * 从集合中返回一个随机元素
-     *
-     * @param trr
-     * @param <T>
-     * @return
+     * 从集合中返回一个随机元素, ru如果数组为空则返回null
+     * @param trr   集合
+     * @return     随机元素
      */
     public static <T> T getRandomElement(List<T> trr) {
-        return trr.get(new Random().nextInt(trr.size()));
+        Objects.requireNonNull(trr);
+        return trr.size() == 0 ? null : trr.get(new Random().nextInt(trr.size()));
     }
 
 

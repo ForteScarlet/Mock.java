@@ -798,7 +798,7 @@ abstract class BaseFieldParser implements FieldParser {
      * @param fieldName
      * @param intervalStr
      */
-    public BaseFieldParser(Class objectClass, String fieldName,  String intervalStr) {
+    public BaseFieldParser(Class objectClass, String fieldName, String intervalStr) {
         //保存数据
         this.objectClass = objectClass;
         this.fieldName = fieldName;

@@ -13,6 +13,8 @@ public class Test {
         MockObject<User> userMockObject = Mock.get(User.class);
         userMockObject.getStream(20).forEach(System.out::println);
 
+
+
     }
 
 }
