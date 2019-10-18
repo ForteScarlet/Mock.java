@@ -19,7 +19,13 @@ class ObjectParser extends BaseFieldParser {
      */
     @Override
     public FieldValueGetter parserForNotListOrArrayFieldValueGetter() {
-       //直接获取一个额默认值参数获取器 - 使用Lambda表达式创建
+        // 如果字段类型为Object且存在左区间参数，则认为这是一个List类型
+        boolean isList = this.fieldClass.equals(Object.class) && (intervalMin != null);
+
+        if(isList){
+            return parserForListFieldValueGetter();
+        }
+        //直接获取一个默认值参数获取器
         return () -> defaultValue;
     }
 
