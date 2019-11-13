@@ -15,7 +15,7 @@
 
     <!-- 版本号 -->
     <!-- 下次部署应该大于1.4.2 例如1.4.3， -->
-    <version>1.4.2</version>
+    <version>1.4.3</version>
     <packaging>jar</packaging>
     <name>Mock.java</name>
     <url>https://github.com/ForteScarlet/Mock.java.git</url>

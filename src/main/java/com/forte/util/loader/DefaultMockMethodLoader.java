@@ -308,7 +308,7 @@ public class DefaultMockMethodLoader implements MethodLoader {
     private LoadResults load(Set<Method> methods){
         //遍历要加载的方法并添加，并获取结果返回值
         Set<BranchResult<Method>> collect = methods.stream().flatMap(m -> {
-            Map<String, Method> methodMap = new HashMap<>(5);
+            Map<String, Method> methodMap = new HashMap<>(8);
             //格式化方法名，并作为key
             String key = m.getName() + "("
                     + Arrays.stream(m.getParameterTypes())
