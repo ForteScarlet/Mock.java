@@ -253,8 +253,7 @@ public class MockUtil {
     static {
         //加载定义域名合集
         String domainStr = "top,xyz,xin,vip,win,red,net,org,wang,gov,edu,mil,biz,name,info,mobi,pro,travel,club,museum,int,aero,post,rec,asia";
-        String[] split = domainStr.split("\\,");
-        DOMAINS = split;
+        DOMAINS = domainStr.split("\\,");
     }
 
     /* —————————— 默认参数 ———————————— */
@@ -554,7 +553,7 @@ public class MockUtil {
         Integer integer = integer(a, b);
         //获取小数位数值
         int end = RandomUtil.getNumber$right(endL, endR);
-        Double dou = Double.parseDouble(RandomUtil.toFixed(new Random().nextDouble(), end));
+        Double dou = Double.parseDouble(RandomUtil.toFixed(RandomUtil.getRandom().nextDouble(), end));
         Double e = integer + dou;
         return e;
     }
@@ -757,7 +756,7 @@ public class MockUtil {
      * 返回一个随机布尔值
      */
     public static Boolean bool() {
-        return new Random().nextBoolean();
+        return RandomUtil.getRandom().nextBoolean();
     }
 
     /**
@@ -932,13 +931,13 @@ public class MockUtil {
      */
     public static String ip() {
         StringBuilder sb = new StringBuilder();
-        sb.append(new Random().nextInt(255) + 1)
+        sb.append(RandomUtil.getRandom().nextInt(255) + 1)
                 .append(".")
-                .append(new Random().nextInt(255) + 1)
+                .append(RandomUtil.getRandom().nextInt(255) + 1)
                 .append(".")
-                .append(new Random().nextInt(255) + 1)
+                .append(RandomUtil.getRandom().nextInt(255) + 1)
                 .append(".")
-                .append(new Random().nextInt(255) + 1);
+                .append(RandomUtil.getRandom().nextInt(255) + 1);
         return sb.toString();
     }
 
@@ -984,7 +983,7 @@ public class MockUtil {
      * @param tid 指定顶级域名
      */
     public static String domain(String tid) {
-        if (new Random().nextBoolean()) {
+        if (RandomUtil.getRandom().nextBoolean()) {
             return "www." + word() + "." + tid;
         }
         return word() + "." + tid;

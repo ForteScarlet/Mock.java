@@ -53,7 +53,7 @@ public class ChineseUtil {
      * @return
      */
     public static String getName(String charsetName) {
-        Random random = new Random();
+        Random random = RandomUtil.getRandom();
 
         // 获得一个随机的姓氏
         String name = getFamilyName();
@@ -77,7 +77,7 @@ public class ChineseUtil {
 
         for (int i = 0; i < nums; i++) {
             // 获得一个随机的姓氏
-            int index = new Random().nextInt(Surname.length - 1);
+            int index = RandomUtil.getRandom().nextInt(Surname.length - 1);
             String name = Surname[index];
             names[i] = name;
         }
@@ -113,10 +113,10 @@ public class ChineseUtil {
         String str = null;
         String str2 = null;
         int highPos, lowPos;
-        Random random = new Random();
+        Random random = RandomUtil.getRandom();
         //区码，0xA0打头，从第16区开始，即0xB0=11*16=176,16~55一级汉字，56~87二级汉字
         highPos = (176 + Math.abs(random.nextInt(39)));
-        random = new Random();
+        random = RandomUtil.getRandom();
         //位码，0xA0打头，范围第1~94列
         lowPos = 161 + Math.abs(random.nextInt(93));
 
