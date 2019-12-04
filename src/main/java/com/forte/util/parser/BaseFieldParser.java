@@ -60,7 +60,7 @@ abstract class BaseFieldParser implements FieldParser {
 
         //创建一个MockField对象并返回
         return new MockField(fieldName, fieldValueGetter);
-    };
+    }
 
     /**
      * 进行解析，判断需要产生的字段类型
