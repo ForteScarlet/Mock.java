@@ -16,6 +16,10 @@ import java.util.stream.Stream;
  */
 public interface MockObject<T> {
 
+    /**
+     * 获取一个MockBean对象
+     */
+    MockBean<T> getMockBean();
 
     /**
      * 返回获取结果的Optional封装类

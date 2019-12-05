@@ -10,9 +10,14 @@ import java.util.Optional;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date 2019/2/27 14:39
  */
-public class MockMapObject implements MockObject<Map<String, Object>> {
+public class MockMapObject implements MockObject<Map> {
 
     private final MockMapBean mockMapBean;
+
+    @Override
+    public MockBean<Map> getMockBean() {
+        return mockMapBean;
+    }
 
     /**
      * 返回获取结果的Optional封装类
@@ -20,7 +25,7 @@ public class MockMapObject implements MockObject<Map<String, Object>> {
      * @return
      */
     @Override
-    public Optional<Map<String, Object>> get() {
+    public Optional<Map> get() {
         return Optional.ofNullable(mockMapBean.getObject());
     }
 

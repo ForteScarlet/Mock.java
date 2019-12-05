@@ -13,6 +13,11 @@ public class MockNormalObject<T> implements MockObject<T> {
 
     private final MockBean<T> mockBean;
 
+    @Override
+    public MockBean<T> getMockBean() {
+        return mockBean;
+    }
+
     /**
      * 返回获取结果的Optional封装类
      * @return

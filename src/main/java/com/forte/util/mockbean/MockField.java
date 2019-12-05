@@ -31,6 +31,11 @@ public class MockField {
      */
     private final String fieldName;
 
+    /**
+     * 字段类型
+     */
+    private final Class fieldType;
+
 
     /**
      * 为传入的对象的对应的参数赋值
@@ -61,15 +66,19 @@ public class MockField {
         return this.fieldName;
     }
 
+    public Class getFieldType(){
+        return this.fieldType;
+    }
 
     /**
      * 构造
      */
-    public MockField(String fieldName, FieldValueGetter fieldValueGetter) {
+    public MockField(String fieldName, FieldValueGetter fieldValueGetter, Class fieldType) {
         //考虑是否要加上匹配的class对象
         //似乎不需要
         this.fieldName = fieldName;
         this.valueGetter = fieldValueGetter;
+        this.fieldType = fieldType;
     }
 
     @Override

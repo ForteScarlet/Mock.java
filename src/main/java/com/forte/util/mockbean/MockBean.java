@@ -49,10 +49,13 @@ public class MockBean<T> {
 
     /**
      * 获取假字段集
-     * @return
      */
-    protected MockField[] getFields(){
-        return fields;
+    public MockField[] getFields(){
+        return Arrays.copyOf(fields, fields.length);
+    }
+
+    public Class<T> getObjectClass(){
+        return objectClass;
     }
 
     /**

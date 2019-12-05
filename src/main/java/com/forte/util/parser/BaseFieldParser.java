@@ -59,7 +59,14 @@ abstract class BaseFieldParser implements FieldParser {
         FieldValueGetter fieldValueGetter = parserForFieldValueGetter();
 
         //创建一个MockField对象并返回
-        return new MockField(fieldName, fieldValueGetter);
+        return new MockField(fieldName, fieldValueGetter, getFieldClass());
+    }
+
+    /**
+     * 获取字段类型值
+     */
+    protected Class<?> getFieldClass(){
+        return fieldClass;
     }
 
     /**
