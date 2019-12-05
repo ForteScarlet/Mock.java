@@ -602,6 +602,13 @@ public class User {
 
 ## 更新公告
 
+
+### v1.5.0(2019.12.5)
+变更MockMapObject的获取值类型为Map（原本是Map<String, Object>）
+本质上依旧获取的是Map<String, Object> 类型。
+内部增加一些参数以适应扩展开发。
+
+
 ### v1.4.4(2019.12.4)
 优化内部Random操作，现在理论上Random相关操作的效率会高一些了。
 
