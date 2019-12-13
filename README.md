@@ -22,11 +22,11 @@
 >
 >  *工具类介绍：<a href="#工具类介绍">工具类介绍</a>
 >
-> 当前版本：v1.4.4 (部署时间：2019/12/4 22:51)
+> 当前版本：v1.5.1 (部署时间：2019/12/13 18.10)
 >
 > 最低JDK版本：JDK8
 >
-> 以下介绍的版本：v1.4.4 (第一版)
+> 以下介绍的版本：v1.5.1 (第一版)
 >
 > *※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>*
 >
@@ -55,8 +55,9 @@
 <dependency>
     <groupId>io.gitee.ForteScarlet</groupId>
     <artifactId>mock.java</artifactId>
-    <version>1.4.3</version>
+    <version>1.5.1</version>
 </dependency>
+
 ```
 
 
