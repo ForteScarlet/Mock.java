@@ -313,8 +313,8 @@ public class Mock {
      * 全部已被加载的映射方法
      */
     public static Map<String, Method> _getMockMethod() {
-        //为了保护原本的字段，使用流对Map进行复制
-        return MOCK_METHOD.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//        return MOCK_METHOD.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return MOCK_METHOD;
     }
 
 

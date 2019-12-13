@@ -602,6 +602,8 @@ public class User {
 
 ## 更新公告
 
+### v1.5.1(2019.12.13)
+
 
 ### v1.5.0(2019.12.5)
 变更MockMapObject的获取值类型为Map（原本是Map<String, Object>）
