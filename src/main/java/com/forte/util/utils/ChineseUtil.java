@@ -1,8 +1,8 @@
 package com.forte.util.utils;
 
 
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 /**
@@ -11,6 +11,63 @@ import java.util.Random;
  * @author ForteScarlet
  */
 public class ChineseUtil {
+
+    public static void main(String[] args) throws IOException {
+
+//        BufferedWriter writer = new BufferedWriter(new FileWriter(new File("F:\\studyArea\\javaWebSpace\\idea\\mockUtil\\src\\main\\resources\\mock\\surnames")));
+//
+//        for (String name : Surname) {
+//            byte[] bytes = name.getBytes();
+//            String bytesString = Arrays.toString(bytes);
+//            bytesString = bytesString.substring(1, bytesString.length() - 1);
+//            bytesString = bytesString.replace(", ", ",") + ";";
+//            writer.write(bytesString);
+//            writer.newLine();
+//            writer.flush();
+//        }
+//        writer.close();
+
+        // 获取字节文件输入流
+        InputStream inStream = ChineseUtil.class.getClassLoader().getResourceAsStream("mock/surnames");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+
+        reader.lines().filter(l -> l.trim().length() > 0).forEach(l -> {
+            String[] split = l.split(",");
+            byte[] bytes = new byte[split.length];
+            for (int i = 0; i < split.length; i++) {
+                bytes[i] = Byte.parseByte(split[i]);
+            }
+            String s = new String(bytes, StandardCharsets.UTF_8);
+            System.out.println(s);
+        });
+    }
+
+    // 初始化百家姓数据
+    static {
+        // 获取字节文件输入流
+        InputStream inStream = ChineseUtil.class.getClassLoader().getResourceAsStream("mock/surnames");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+        // 转化为byte数组
+        String[] lines = reader.lines().filter(l -> l.trim().length() > 0).toArray(String[]::new);
+        byte[][] surnameBytes = new byte[lines.length][];
+        for (int index = 0; index < lines.length; index++) {
+            String l = lines[index];
+            String[] split = l.replace(";", "").split(",");
+            byte[] bytes = new byte[split.length];
+            for (int i = 0; i < split.length; i++) {
+                bytes[i] = Byte.parseByte(split[i]);
+            }
+            surnameBytes[index] = bytes;
+            String s = new String(bytes, StandardCharsets.UTF_8);
+            System.out.println(s);
+        }
+        SURNAME_BYTES = surnameBytes;
+    }
+
+    /**
+     * 百家姓对应的字节
+     */
+    private static final byte[][] SURNAME_BYTES;
 
     /**
      * 百家姓
@@ -66,7 +123,7 @@ public class ChineseUtil {
         }
         return name;
     }
-    
+
     /**
      * 获得多个随机姓氏
      *
