@@ -55,9 +55,7 @@
 <dependency>
     <groupId>io.gitee.ForteScarlet</groupId>
     <artifactId>mock.java</artifactId>
-    <version>1.5.0</version>
-<!-- 1.5.1版本部署发生闪退，是否成功暂时未知 -->
-<!--    <version>1.5.1</version>-->
+    <version>1.5.1</version>
 </dependency>
 
 ```
