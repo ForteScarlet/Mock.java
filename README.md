@@ -22,7 +22,7 @@
 >
 >  *工具类介绍：<a href="#工具类介绍">工具类介绍</a>
 >
-> 当前版本：![](https://img.shields.io/maven-central/v/io.gitee.ForteScarlet/mock.java)
+> 当前版本：![[](https://search.maven.org/artifact/io.gitee.ForteScarlet/mock.java)](https://img.shields.io/maven-central/v/io.gitee.ForteScarlet/mock.java)
 >
 > 最低JDK版本：JDK8
 >
