@@ -12,56 +12,32 @@ import java.util.Random;
  */
 public class ChineseUtil {
 
-    public static void main(String[] args) throws IOException {
-
-//        BufferedWriter writer = new BufferedWriter(new FileWriter(new File("F:\\studyArea\\javaWebSpace\\idea\\mockUtil\\src\\main\\resources\\mock\\surnames")));
-//
-//        for (String name : Surname) {
-//            byte[] bytes = name.getBytes();
-//            String bytesString = Arrays.toString(bytes);
-//            bytesString = bytesString.substring(1, bytesString.length() - 1);
-//            bytesString = bytesString.replace(", ", ",") + ";";
-//            writer.write(bytesString);
-//            writer.newLine();
-//            writer.flush();
-//        }
-//        writer.close();
-
-        // 获取字节文件输入流
-        InputStream inStream = ChineseUtil.class.getClassLoader().getResourceAsStream("mock/surnames");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
-
-        reader.lines().filter(l -> l.trim().length() > 0).forEach(l -> {
-            String[] split = l.split(",");
-            byte[] bytes = new byte[split.length];
-            for (int i = 0; i < split.length; i++) {
-                bytes[i] = Byte.parseByte(split[i]);
-            }
-            String s = new String(bytes, StandardCharsets.UTF_8);
-            System.out.println(s);
-        });
-    }
-
     // 初始化百家姓数据
     static {
-        // 获取字节文件输入流
-        InputStream inStream = ChineseUtil.class.getClassLoader().getResourceAsStream("mock/surnames");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
-        // 转化为byte数组
-        String[] lines = reader.lines().filter(l -> l.trim().length() > 0).toArray(String[]::new);
-        byte[][] surnameBytes = new byte[lines.length][];
-        for (int index = 0; index < lines.length; index++) {
-            String l = lines[index];
-            String[] split = l.replace(";", "").split(",");
-            byte[] bytes = new byte[split.length];
-            for (int i = 0; i < split.length; i++) {
-                bytes[i] = Byte.parseByte(split[i]);
+        byte[][] end;
+        try {
+            // 获取字节文件输入流
+            InputStream inStream = ChineseUtil.class.getClassLoader().getResourceAsStream("mock/surnames");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+            // 转化为byte数组
+            String[] lines = reader.lines().filter(l -> l.trim().length() > 0).toArray(String[]::new);
+            byte[][] surnameBytes = new byte[lines.length][];
+            for (int index = 0; index < lines.length; index++) {
+                String l = lines[index];
+                String[] split = l.replace(";", "").split(",");
+                byte[] bytes = new byte[split.length];
+                for (int i = 0; i < split.length; i++) {
+                    bytes[i] = Byte.parseByte(split[i]);
+                }
+                surnameBytes[index] = bytes;
+                String s = new String(bytes, StandardCharsets.UTF_8);
             }
-            surnameBytes[index] = bytes;
-            String s = new String(bytes, StandardCharsets.UTF_8);
-            System.out.println(s);
+            end = surnameBytes;
+        }catch (Exception ignored){
+            end = null;
         }
-        SURNAME_BYTES = surnameBytes;
+
+        SURNAME_BYTES = end;
     }
 
     /**
@@ -72,7 +48,7 @@ public class ChineseUtil {
     /**
      * 百家姓
      */
-    private static final String[] Surname = {"赵", "钱", "孙", "李", "周", "吴", "郑", "王", "冯", "陈", "褚", "卫", "蒋", "沈", "韩", "杨",
+    private static String[] Surname = {"赵", "钱", "孙", "李", "周", "吴", "郑", "王", "冯", "陈", "褚", "卫", "蒋", "沈", "韩", "杨",
             "朱", "秦", "尤", "许", "何", "吕", "施", "张", "孔", "曹", "严", "华", "金", "魏", "陶", "姜", "戚", "谢", "邹", "喻", "柏",
             "水", "窦", "章", "云", "苏", "潘", "葛", "奚", "范", "彭", "郎", "鲁", "韦", "昌", "马", "苗", "凤", "花", "方", "俞", "任",
             "袁", "柳", "酆", "鲍", "史", "唐", "费", "廉", "岑", "薛", "雷", "贺", "倪", "汤", "滕", "殷", "罗", "毕", "郝", "邬", "安",
