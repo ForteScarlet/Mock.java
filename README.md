@@ -514,7 +514,7 @@ public class User {
 
 ## 使用
 
-使用也很简单，我在`Mock`中增加了4个方法，2个`se`t方法 2个`reset`方法。
+使用也很简单，我在`Mock`中增加了4个方法，2个`set`方法 2个`reset`方法。
 
 ```java
 	/**
