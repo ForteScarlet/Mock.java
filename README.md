@@ -32,7 +32,7 @@
 >
 >
 
-**wiki文档：[github wiki](https://github.com/ForteScarlet/Mock.java/wiki)**
+**wiki文档：[github wiki](https://github.com/ForteScarlet/Mock.java/wiki) or [gitee wiki](https://gitee.com/ForteScarlet/Mock.java/wikis) **
 
 ## 注意
 未来2.x版本将会使用与1.x版本不同的包路径。如果迭代版本请注意包路径的修改。
