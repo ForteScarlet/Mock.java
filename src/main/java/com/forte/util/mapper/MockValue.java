@@ -20,4 +20,17 @@ public @interface MockValue {
      */
     String value();
 
+    /**
+     * 区间参数，如果有值，则代表了字段之前的区间参数。默认没有值
+     * 例如当字段{@code age} 的注解参数为 {@code param = "10-20"} 的时候, 相当于字段值为{@code "age|10-20"}。参数中的那个竖线不需要写。写了也会被去除的。
+     * @since  1.6.0
+     */
+    String param() default "";
+
+    /**
+     * 参数value的最终类型，在转化的时候会使用beanutils中的工具类{@link org.apache.commons.beanutils.ConvertUtils}进行类型转化, 默认为String类型。
+     * @return
+     */
+    Class<?> valueType() default String.class;
+
 }

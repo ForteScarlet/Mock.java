@@ -19,7 +19,7 @@
     <packaging>jar</packaging>
     <name>Mock.java</name>
     <url>https://github.com/ForteScarlet/Mock.java.git</url>
-    <description>Mock For Java</description>
+    <description>Mock For Java like mock.js</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

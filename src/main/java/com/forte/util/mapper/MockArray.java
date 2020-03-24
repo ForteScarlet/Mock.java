@@ -29,4 +29,10 @@ public @interface MockArray {
     Class<? extends ArrayMapper> mapper() default ArrayMapperType.ToString.class;
 
 
+    /**
+     * 区间参数，如果有值，则代表了字段之前的区间参数。默认没有值
+     * 例如当字段{@code age} 的注解参数为 {@code param = "10-20"} 的时候, 相当于字段值为{@code "age|10-20"}。参数中的那个竖线不需要写。写了也会被去除的。
+     * @since  1.6.0
+     */
+    String param() default "";
 }

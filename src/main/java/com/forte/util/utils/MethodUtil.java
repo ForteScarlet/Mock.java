@@ -150,37 +150,6 @@ public class MethodUtil {
         return new ElementInvoker(list);
     }
 
-
-    /* ———————— 内部类 ———————— */
-
-}
-
-/**
- * TODO 完成此工具类的优化工作 - 实现此内部类
- * 内部类，用于记录曾经读取过的Method对象，用做缓存，优化此工具的执行效率
- */
-class CacheMethod {
-
-    /**
-     * 方法名称
-     */
-    private String methodName;
-
-    /**
-     * 此方法存在于的类的class对象
-     */
-    private Class objectClass;
-
-    /**
-     * 此方法的参数列表
-     */
-    private Parameter[] parameters;
-
-
-    CacheMethod() {
-
-    }
-
 }
 
 

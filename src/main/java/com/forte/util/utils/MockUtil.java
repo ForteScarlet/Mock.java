@@ -151,7 +151,7 @@ import java.util.Random;
  * {@link MockUtil#word(Integer)}<em>返回一个随机的假单词,指定长度区间[min,max]</em>
  * </li>
  * <li>
- * {@link MockUtil#word(Integer)}<em>返回一个随机的假单词,指定长度</em>
+ * {@link MockUtil#word(Integer, Integer)}<em>返回一个随机的假单词,指定长度</em>
  * </li>
  * <li>
  * {@link MockUtil#word()}<em>返回一个随机的假单词</em>

@@ -22,10 +22,14 @@ import java.util.stream.Collectors;
 public class DefaultMockMethodLoader implements MethodLoader {
 
     /** 获取mock方法集，此时的方法集已经通过静态代码块初始化完毕 */
-    private final static Map<String, Method> MOCK_METHOD = Mock._getMockMethod();
+    private final Map<String, Method> MOCK_METHOD;
 
     /** 要加载的方法，方法不能重复，使用set */
     private Set<Method> waitingMethods = new HashSet<>(10);
+
+    public DefaultMockMethodLoader(Map<String, Method> mockMethod){
+        this.MOCK_METHOD = mockMethod;
+    }
 
     /**
      * 根据方法名加载一个方法，如果方法名对应了多个方法，则会全部进行判断，因此可能会有多个方法

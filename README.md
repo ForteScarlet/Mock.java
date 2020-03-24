@@ -34,13 +34,14 @@
 ## 注意
 未来2.x版本将会使用与1.x版本不同的包路径。如果迭代版本请注意包路径的修改。
 仅为修改包路径，其余内容不变。
+如果有2.x的话
 
 <br>
 
 ## 友情链接
 |项目名称|项目介绍|项目地址|
 |---|---|---|
-|Mock.JDBC|基于Mock.java与JDBC向数据库插入假数据|https://github.com/ForteScarlet/Mock.JDBC|
+|Mock.JDBC|基于Mock.java与JDBC向数据库插入假数据（暂时停工）|https://github.com/ForteScarlet/Mock.JDBC|
 
 
 <br>
@@ -74,31 +75,6 @@
 >
 > 或许感觉上比JSON格式的使用要麻烦一些，但是这也是没有办法的事情嘛！假如您有更好的代替方式，希望您能告诉我 :) 
 
-
-
-## 框架中的一些常见"角色"
-
-#### 	参数解析器/任务分配器(ParameterParser)
-
-> ​	负责对用户传入的字段映射(Map集合)进行解析并分配解析任务。
->
-> ​	也可以将其理解为 **任务分配器** 。
-
-#### 	字段解析器(FieldParser)
-
-> ​	接收任务分配器分配的任务并对字段和其映射进行解析，并取得字段值获取器(FieldValueGetter)。
-
-#### 	字段值获取器(FieldValueGetter)
-
-> ​	使用字段值的setter方法和字段值获取方法执行者(Invoker)对某个字段进行赋值。
-
-#### 	字段值获取方法执行者(Invoker)
-
-> ​	通过执行一个某种方法得到一个结果。用于获取字段的值。
-
-#### 	假对象(MockObject)
-
-> ​	通过Mock.get(Class<T> clz)方法获取到的返回值，用于获取假对象数据。
 
 ### 设置字段映射的方式：
 
@@ -345,7 +321,7 @@ MockMapObject mockMapObject = Mock.get("userMap");
 
     **※ 自1.3版本之后，我优化了`MockObject`接口内部结构，并增加了大量parallel方法与collect方法，您现在可以在1.3版本中更加灵活的对数据进行转化，或者根据数据量的需求自行决定是否需要使用并行线程进行对象创建。**
 
-## 自定义@函数
+## **自定义@函数**
 
 > 有时候，我提供的MockUtil中的方法可能无法满足您的需求，那么这时候，就需要一个可以对@函数进行扩展、加强的窗口。在v1.1版本中，我添加了这个功能。(这个功能测数量很少，可能会存在很多bug)
 
@@ -395,7 +371,7 @@ int failNum = loadResults.failNums();//失败的个数
 
 
 
-# 注解形式映射
+# **注解形式映射**
 
 1.4版本之后我提供了两个可以使用在字段上的注解：`@MockValue` 和 `@MockArray`
 
@@ -512,7 +488,7 @@ public class User {
 
 
 
-## 使用
+## **使用**
 
 使用也很简单，我在`Mock`中增加了4个方法，2个`set`方法 2个`reset`方法。
 
@@ -541,8 +517,7 @@ public class User {
 
 
 
-
-## 注意事项
+## **注意事项**
 
 ### 注解优先级
 
@@ -554,7 +529,36 @@ public class User {
 可以发现，4个方法中各有一个方法需要提供额外参数，他会在注解映射创建完毕后进行添加，也就是假如额外参数和字段中有冲突的键，则额外参数的值将会覆盖注解映射值。
 
 
+## **映射扫描**
+
+
+
+
+
+## 使用依赖列表
+```xml
+<dependency>
+   <groupId>commons-beanutils</groupId>
+   <artifactId>commons-beanutils</artifactId>
+   <version>1.9.3</version>
+</dependency>
+```
+
 ## 更新公告
+
+### v1.6.0(2020/3/25)
+删除某些无用代码
+删除文档开始的一些废话
+简单改善部分代码
+增加一个注解`@MockBean`, 使用在类上，当使用包扫描功能的时候，只会扫描被标记了此注解的类。配合两个注解映射使用。
+注解`@MockValue`增加参数：`String param() default ""`、`Class<?> valueType() default String.class`
+注解`@MockArray`增加参数：`String param() default ""`
+`Mock`中增加了一个方法`scan(Function<Class<?>, Map<String, Object>> withOther, boolean reset, String... packages)`以及部分重载方法，用来根据`@MockBean`注解来进行扫描与批量的注解映射注册。返回值为加载后的class列表
+
+增加一个注解`@MockProxy` 标记接口代理中，一些需要特殊处理的抽象方法，例如返回值为Map或者忽略参数等。
+`Mock`中增加了一个方法
+
+着手准备编写wiki
 
 ### v1.5.2(2020/2/22)
 修复在使用ChineseUtil的时候会在控制台打印所有的姓氏的问题
