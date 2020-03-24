@@ -31,6 +31,9 @@
 > *※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>*
 >
 >
+
+**wiki文档：[github wiki](https://github.com/ForteScarlet/Mock.java/wiki)**
+
 ## 注意
 未来2.x版本将会使用与1.x版本不同的包路径。如果迭代版本请注意包路径的修改。
 仅为修改包路径，其余内容不变。
