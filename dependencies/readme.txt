@@ -1,1 +1,0 @@
-这些是maven依赖：commons-beanutils.commons-beanutils:1.9.3所包含的jar包。如果你不使用maven，可以下载这些jar包。rar文件为打包好的压缩文件。
