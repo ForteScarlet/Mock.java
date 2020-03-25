@@ -24,7 +24,7 @@ gitee : [码云地址](https://gitee.com/ForteScarlet/Mock.java)
 
 最低JDK版本：JDK8
 
-※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>*
+※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>
 
 # **WIKI**
 
