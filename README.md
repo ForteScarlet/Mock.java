@@ -385,13 +385,38 @@ int failNum = loadResults.failNums();//失败的个数
 
 ## @MockValue
 
-使用在类的字段上，仅有一个参数：
+使用在类的字段上，参数：
 
 ```java
     /**
      * 映射值，如果为空则视为无效
      */
     String value();
+
+	/* --- 1.6.0后增加 --- */
+
+    /**
+     * 区间参数，如果有值，则代表了字段之前的区间参数。默认没有值
+     * 例如当字段{@code age} 的注解参数为 {@code param = "10-20"} 的时候, 相当于字段值为
+     {@code "age|10-20"}。参数中的那个竖线不需要写。写了也会被去除的。
+     * @since  1.6.0
+     */
+    String param() default "";
+
+    /**
+     * 参数value的最终类型，在转化的时候会使用beanutils中的工具类
+     {@link org.apache.commons.beanutils.ConvertUtils}进行类型转化, 默认为String类型。
+     * @return
+     */
+    Class<?> valueType() default String.class;
+```
+
+也就是说，假设这个字段叫做：`field_A`，则映射结果大致相当于：
+
+```java
+// 其中，${value()} 的最终结果值为通过ConvertUtils进行转化的结果。
+// 其中，[|${param()}]的存在与否取决于param()里有没有值
+xxxMap.put("${field_A}[|${param()}]", (${valueType()}) ${value()})
 ```
 
 
@@ -400,16 +425,17 @@ int failNum = loadResults.failNums();//失败的个数
 
 ```java
 public class User {
+    
+    // 相当于 ("name", "@cname")
     @MockValue("@name")
     private String name;
+    
+    // 相当于 ("age|20-40", 0)
+    @MockValue(value = "0", param = "20-40", valueType = Integer.class)
+    private Integer age;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+   // 省略 getter & setter
+    
 }
 ```
 
@@ -419,7 +445,7 @@ public class User {
 
 ## @MockArray
 
-使用在类的字段上，有连个参数，必填参数仅有一个：
+使用在类的字段上，参数：
 
 ```java
 	/**
@@ -429,14 +455,24 @@ public class User {
 
     /**
      * 类型转化器实现类，需要存在无参构造
-     * 默认不变
+     * 默认转化为字符串，即默认不变
      */
     Class<? extends ArrayMapper> mapper() default ArrayMapperType.ToString.class;
+
+	/* --- 1.6.0后增加 --- */
+
+    /**
+     * 区间参数，如果有值，则代表了字段之前的区间参数。默认没有值
+     * 例如当字段{@code age} 的注解参数为 {@code param = "10-20"} 的时候, 相当于字段值为
+     {@code "age|10-20"}。参数中的那个竖线不需要写。写了也会被去除的。
+     * @since  1.6.0
+     */
+    String param() default "";
 ```
 
 其中，`mapper()`参数可选，其类型为`ArrayMapper`接口的的实现类，用于指定将字符串数组，也就是`value()`中的值进行转化的规则。此参数默认为不进行转化，即转化为字符串类型。
 
-`ArrayMapper`接口中有两个抽象方法：
+`ArrayMapper`接口中的抽象方法：
 
 ```java
 	/**
@@ -481,14 +517,7 @@ public class User {
     @MockArray(value = {"1", "2", "3"}, mapper = ArrayMapperType.ToInt.class)
     private int age;
 
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
+   // 省略 getter & setter
 }
 ```
 
@@ -501,6 +530,8 @@ public class User {
 使用也很简单，我在`Mock`中增加了4个方法，2个`set`方法 2个`reset`方法。
 
 ```java
+	/* --- 1.4版本之后增加 --- */	
+
 	/**
      * 通过注解来获取映射
      */
@@ -541,17 +572,245 @@ public class User {
 
 1.6.0版本后，我更新了**映射扫描**与**映射代理**功能。感谢提出建议的朋友。[Issue#I1CCMT](https://gitee.com/ForteScarlet/Mock.java/issues/I1CCMT)
 
+在您使用注解形式映射的时候，是否有感觉到每个类都需要使用`Mock.set(...)`进行设置很麻烦？希望能够通过包扫描一键批量set？现在我增加了一个注解：`@MockBean`，将其标注在您的类上，此时再配合使用`Mock.scan(...)`方法即可扫描指定的一个或多个包路径中所有标注了`@MockBean`的javaBean。
 
+对于`Mock.scan(...)`的方法定义如下：
 
+```java
+    /**
+     * 扫描包路径，加载标记了{@link com.forte.util.mapper.MockBean}注解的类。
+     *
+     * @param classLoader nullable, 类加载器, null则默认为当前类加载器
+     * @param withOther   nullable, 假如扫描的类中存在某些类，你想要为它提供一些额外的参数，此函数用于获取对应class所需要添加的额外参数。可以为null
+     * @param reset       加载注解映射的时候是否使用reset
+     * @param packages    emptyable, 要扫描的包路径列表, 为空则直接返回空set
+     * @return 扫描并加载成功的类
+     */
+    public static Set<Class<?>> scan(ClassLoader classLoader, Function<Class<?>, Map<String, Object>> withOther, boolean reset, String... packages) throws Exception;
 
+```
+
+这么多参数？先别怕，我先简单介绍下这些参数：
+
+- classLoader：包扫描使用的类加载器。**可以为null。**
+- withOther：一个Function函数，这个参数接收一个`Class`参数，返回一个`Map<String, Object>`结果，即获取一个对应类的额外参数。类似于注解映射中set方法的额外映射。**可以为null。**
+- reset：即如果扫描到了已经被添加的映射，是否覆盖。
+- packages：需要扫描的包路径列表。
+
+除了这个方法，我还提供了一些重载方法：
+
+```java
+    /**
+     * {@link #scan(ClassLoader, Function, boolean, String...)}的重载方法
+     * @see #scan(ClassLoader, Function, boolean, String...)
+     */
+    public static Set<Class<?>> scan(Function<Class<?>, Map<String, Object>> withOther, boolean reset, String... packages) throws Exception;
+
+    /**
+     * {@link #scan(ClassLoader, Function, boolean, String...)}的重载方法
+     * @see #scan(ClassLoader, Function, boolean, String...)
+     */
+    public static Set<Class<?>> scan(boolean reset, String... packages) throws Exception;
+
+    /**
+     * {@link #scan(ClassLoader, Function, boolean, String...)}的重载方法, reset默认为false
+     * @see #scan(ClassLoader, Function, boolean, String...)
+     */
+    public static Set<Class<?>> scan(String... packages) throws Exception;
+```
+
+所以一般情况下，你可以直接这么使用：
+
+```java
+// 扫描两个包
+Mock.scan("forte.test2.beans", "forte.test1.beans");
+// 然后直接获取
+Mock.get(Xxxx.class);
+// 使用 
+```
 
 # **映射代理**
 
 1.6.0版本后，我更新了**映射扫描**与**映射代理**功能。感谢提出建议的朋友。[Issue#I1CCMT](https://gitee.com/ForteScarlet/Mock.java/issues/I1CCMT)
 
+首先看一下Issue上提出的模拟场景：
+
+```java
+// interface 
+public interface ServiceA{
+    VoA methodA();
+}
+// bean, can with @MockBean
+public class VoA{
+    @MockValue("@cname")
+    private String p1;
+}
+```
 
 
 
+此时，接口中的`methodA()`方法的返回值`VoA`恰好是一个MockBean，这时候，我想要得到`ServiceA`的一个代理对象，使其能够通过`methodA()`得到`VoA`的实例对象。
+
+ok，因此我添加了方法`Mock.proxy(...)`及其重载。方法定义如下：
+
+```java
+    /**
+     * <pre> 为一个接口提供一个代理对象。此接口中，所有的 抽象方法 都会被扫描，假如他的返回值存在与Mock中，则为其创建代理。
+     * <pre> 此方法默认不会为使用者保存单例，每次代理都会代理一个新的对象，因此如果有需要，请保存一个单例对象而不是频繁代理。
+     * @param type    要代理的接口类型。
+     * @param factory 接口代理处理器的获取工厂。可自行实现。
+     * @param <T> 接口类型
+     * @return 代理结果
+     */
+    public static <T> T proxy(Class<T> type, MockProxyHandlerFactory factory);
+```
+
+此方法传入一个接口类型`Class<T> type` 和一个动态代理处理器`MockProxyHandlerFactory factory`，来获取一个代理对象。
+
+`MockProxyHandlerFactory`是一个接口类型，只存在一个抽象方法：
+
+```java
+    /**
+     * 获取代理处理接口{@link InvocationHandler}实例
+     * @param mockObjectFunction 传入一个类型和一个可能为null的name字符串，获取一个mockObject对象。如果存在name，则会尝试先用name获取
+     * @return JDK动态代理所需要的代理处理器示例。
+     * @see InvocationHandler
+     */
+    InvocationHandler getHandler(BiFunction<Class<?>, String, MockObject<?>> mockObjectFunction);
+
+```
+
+此接口定义了如何创建一个代理类。`InvocationHandler`是JDK为动态代理的创建所提供的一个接口，知道动态代理的人对他应该不会很陌生。
+
+但是如果不熟悉也没关系，我在内部提供了一个默认的实现`MockProxyHandlerFactoryImpl`，同时也为`Mock.proxy(...)`提供了一个重载方法：
+
+```java
+    /**
+     * <pre> 为一个接口提供一个代理对象。此接口中，所有的 抽象方法 都会被扫描，假如他的返回值存在与Mock中，则为其创建代理。
+     * <pre> 此方法默认不会为使用者保存单例，每次代理都会代理一个新的对象，因此如果有需要，请保存一个单例对象而不是频繁代理。
+     * <pre> 使用默认的接口代理处理器工厂{@link MockProxyHandlerFactoryImpl}。
+     * <pre> 默认处理工厂中，代理接口时，被代理的方法需要：
+     * <pre> 不是default方法。default方法会根据其自己的逻辑执行。
+     * <pre> 没有参数
+     * <pre> 没有标注{@code @MockProxy(ignore=true) ignore=true的时候代表忽略}
+     * <pre>
+     * @see MockProxyHandlerFactoryImpl
+     * @param type    要代理的接口类型。
+     * @return 接口代理
+     */
+    public static <T> T proxy(Class<T> type);
+```
+
+因此，一般情况下，你可以直接这么使用：
+
+```java
+MockTestInterface proxy = Mock.proxy(MockInterface.class);
+```
+
+让我们来创建一个示例接口来看看：
+
+```java
+public interface MockTestInterface {
+
+    /**
+     * 指定List的泛型类型为User类型，长度为2-4之间
+     */
+    @MockProxy(size = {2, 4}, genericType = User.class)
+    List<User> list();
+
+    /**
+     * 默认情况下，长度为1
+     */
+    Teacher[] array();
+
+    /**
+     * 直接获取，不用注解。
+     */
+    Admin admin();
+    
+    /**
+     * 获取name为{@code mock_map}的mockObject, 基本上返回值都是Map类型。
+     */
+    @MockProxy(name = "mock_map")
+    Map<String, String> map();
+
+    /**
+     * 忽略, 返回值会默认为null
+     * @return null
+     */
+    @MockProxy(ignore = true)
+    Admin justNullAdmin();
+}
+```
+
+
+
+可以看到，上面的这些抽象方法中，有一部分方法标注了注解`@MockProxy`。此注解参数如下：
+
+```java
+
+    /**
+     * <pre> 是否忽略此方法。如果为是，则接口的最终代理结果为返回一个null。
+     * <pre> 当然，如果获取不到对应的Mock类型，无论是否忽略都会返回null或者默认值。
+     * <pre> 如果是基础数据类型相关，数字类型，返回{@code 0 或 0.0}。
+     * <pre> 如果是基础数据类型相关，char类型，返回{@code ' '}。
+     * <pre> 如果是基础数据类型相关，boolean类型，返回{@code false}。
+     */
+    boolean ignore() default false;
+
+    /**
+     * 如果此参数存在值，则会优先尝试通过name获取MockObject对象。一般应用在返回值为Map类型的时候。
+     */
+    String name() default "";
+
+    /**
+     * <pre> 当接口返回值为数组或者集合的时候，此方法标记其返回值数量大小区间{@link [min, max], 即 max >= size >= min}。是数学上的闭区间。
+     * <pre> 如果此参数长度为0，则返回值为1。
+     * <pre> 如果参数长度为1，则相当于不是随机长度。
+     * <pre> 如果参数长度大于2，只取前两位。
+     */
+    int[] size() default {1,1};
+
+    /**
+     * <pre> 指定返回值类型，三种可能类型：list类型，array类型，Object其他任意类型。默认值为Unknown类型。当为Unknown类型的时候，会根据返回值类型自动判断。
+     * <pre> 当类型为list与array类型的时候，需要通过{@link #genericType()}方法指定泛型的类型，获取mock类型的时候将会通过此方法得到的类型来获取。
+     */
+    MockProxyType proxyType() default MockProxyType.UNKNOWN;
+
+
+    /**
+     * 假如类型为List或者数组类型，此处代表泛型的实际类型。
+     */
+    Class<?> genericType() default Object.class;
+
+
+```
+
+
+
+简单汇总一下此注解的参数：
+
+- ignore：忽略这个方法。
+
+- name：指定mockObject的name。一般在返回值为Map类型的时候使用。
+
+- size：指定大小区间。只有在返回值为array或者List类型的时候才有用。
+
+- proxyType：指定返回值类型。一般情况下可以自动推断。
+
+- genericType：当返回值为List类型的时候，此参数指定他的泛型类型。array类型可以进行推断。
+
+  
+
+`@MockProxy`并不是必须的，但也不是可能完全省略的，需要根据实际情况来。一般来讲，如果返回值是一个任意的bean类型，则基本上可以省略，而数组类型如果没有长度要求的话也可以省略，但是例如list、map类型基本上是需要配置部分参数的。
+
+
+
+## **注意事项**
+
+- 尽可能别用泛型。
+
+- 每次使用`Mock.proxy(...)`都会去生成动态代理对象，会影响性能，所以尽可能保存成一个单例使用。
 
 
 
@@ -568,7 +827,7 @@ public class User {
 
 ## 更新公告
 
-### v1.6.0(2020/3/25)
+### **v1.6.0(2020/3/25)**
 删除某些无用代码
 删除文档开始的一些废话
 简单改善部分代码
@@ -583,25 +842,25 @@ public class User {
 着手准备编写wiki
 删除helpDoc文件夹
 
-### v1.5.2(2020/2/22)
+### **v1.5.2(2020/2/22)**
 修复在使用ChineseUtil的时候会在控制台打印所有的姓氏的问题
 
 
-### v1.5.1(2019.12.13)
+### **v1.5.1(2019.12.13)**
 修复自定义函数添加无效的bug
 
 
-### v1.5.0(2019.12.5)
+### **v1.5.0(2019.12.5)**
 变更MockMapObject的获取值类型为Map（原本是Map<String, Object>）
 本质上依旧获取的是Map<String, Object> 类型。
 内部增加一些参数以适应扩展开发。
 
 
-### v1.4.4(2019.12.4)
+### **v1.4.4(2019.12.4)**
 优化内部Random操作，现在理论上Random相关操作的效率会高一些了。
 
 
-### v1.4.3(2019.10.18)
+### **v1.4.3(2019.10.18)**
 
 在上一个版本的基础上又为Map类型的参数与Object类型参数增加了List值返回。
 现在可以更好的支持例如fastJson等Json工具了。
@@ -610,7 +869,7 @@ public class User {
 
 
 
-### v1.4.2(2019.10.18)
+### **v1.4.2(2019.10.18)**
 修复机制：当生成Map类型的值的时候，假如字段映射类似于这种格式：
 ```json
 {
@@ -632,13 +891,13 @@ public class User {
 
 
 
-### v1.4(2019.8.26)
+### **v1.4(2019.8.26)**
 
 提供两个注解以实现注解形式的映射。(测试量较少不知道有没有bug)
 
 
 
-### v1.3(2019.7.12)
+### **v1.3(2019.7.12)**
 
 优化`MockObject`接口内部接口，增加大量`parallel`(并行流)方法与`collect`方法。
 
@@ -650,7 +909,7 @@ public class User {
 
 （虽然用户一般也不需要实现此接口。）
 
-### v1.2 (2019.2.27)
+### **v1.2 (2019.2.27)**
 
 ※ 与上一版本不兼容点：将MockObject类变更为接口类型
 
@@ -658,30 +917,11 @@ public class User {
 
 @函数中的字符串参数可以支持中文了，但是中文请务必放在单引号或双引号之中才可以生效
 
-### v1.1  (2019.1.4)
+### **v1.1  (2019.1.4)**
 
 支持自定义方法的导入
 
-### v1.0  (2018.12.20)
+### **v1.0  (2018.12.20)**
 
 更新README.md文档。
 
-
-
-## 更新计划
-
-(工作持续繁忙，大概会咕很久很久)
-
-* ~~支持生成Map键值对对象而非指定JavaBean对象~~( √ )
-* ~~添加注解式的映射~~（√）
-* ~~使@函数支持自定义~~( √ )
-* ~~部分需要字符串的参数可支持中文~~( √ )
-- 除了@函数以外，增加一个#参数，例如：如果你添加了一个map类型映射，取名“map1”,当你在其他映射中使用“#map1”的时候，边可直接添加映射名为map1的map映射。
-  #参数 用于对映射进行嵌套，使得bean映射和map映射可以进行交互。目前两种映射还无法进行交互
-
-###2.x
-
-- 从区间参数后再追加一层参数以可以在特殊情况下指定生成的数据类型
-- 对于Map类型的对象生成，同时可以根据相同规则生成Key值
-- 优化或者说升级@函数结构与自定义方式。
-- 自定义@函数的时候，支持函数表达式(lambda)而不是仅单纯的方法(method)

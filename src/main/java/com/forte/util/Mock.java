@@ -314,6 +314,7 @@ public class Mock {
      * @param reset       加载注解映射的时候是否使用reset
      * @param packages    emptyable, 要扫描的包路径列表, 为空则直接返回空set
      * @return 扫描并加载成功的类
+     * @throws Exception 包扫描过程中可能会出现一些例如类找不到等各种异常。需要进行处理。
      */
     public static Set<Class<?>> scan(ClassLoader classLoader, Function<Class<?>, Map<String, Object>> withOther, boolean reset, String... packages) throws Exception {
         if (packages.length == 0) {
@@ -382,8 +383,8 @@ public class Mock {
      * <pre> 此方法默认不会为使用者保存单例，每次代理都会代理一个新的对象，因此如果有需要，请保存一个单例对象而不是频繁代理。
      * @param type    要代理的接口类型。
      * @param factory 接口代理处理器的获取工厂。可自行实现。
-     * @param <T>
-     * @return
+     * @param <T> 接口类型
+     * @return 代理结果
      */
     public static <T> T proxy(Class<T> type, MockProxyHandlerFactory factory) {
         // 验证是否为接口类型
@@ -410,17 +411,17 @@ public class Mock {
     /**
      * <pre> 为一个接口提供一个代理对象。此接口中，所有的 抽象方法 都会被扫描，假如他的返回值存在与Mock中，则为其创建代理。
      * <pre> 此方法默认不会为使用者保存单例，每次代理都会代理一个新的对象，因此如果有需要，请保存一个单例对象而不是频繁代理。
-     * <pre> 使用默认的接口代理处理器工厂。
+     * <pre> 使用默认的接口代理处理器工厂{@link MockProxyHandlerFactoryImpl}。
      * <pre> 默认处理工厂中，代理接口时，被代理的方法需要：
      * <pre> 不是default方法。default方法会根据其自己的逻辑执行。
      * <pre> 没有参数
      * <pre> 没有标注{@code @MockProxy(ignore=true) ignore=true的时候代表忽略}
      * <pre>
-     * @see com.forte.util.factory.MockProxyHandlerFactoryImpl
+     * @see MockProxyHandlerFactoryImpl
      * @param type    要代理的接口类型。
      * @return 接口代理
      */
-    public static <T> T proxy(Class<T> type) {
+    public static <T, C extends Class<T>> T proxy(C type) {
         return proxy(type, new MockProxyHandlerFactoryImpl());
     }
 

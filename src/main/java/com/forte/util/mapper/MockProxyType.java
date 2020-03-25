@@ -1,5 +1,6 @@
 package com.forte.util.mapper;
 
+import com.forte.util.exception.MockException;
 import com.forte.util.function.ExFunction;
 import com.forte.util.utils.RandomUtil;
 
@@ -16,6 +17,19 @@ import java.util.function.Function;
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
 public enum MockProxyType {
+
+    /**
+     * 未知类型。直接使用此类型将会抛出异常。
+     * 但是一般来讲，默认的代理工厂内部会进行判断。
+     */
+    UNKNOWN(
+            (mrt, grt) -> {
+                throw new MockException("unknown proxy type.");
+            },
+            (f, num, t) -> {
+                throw new MockException("unknown proxy type.");
+            }
+    ),
 
     /**
      * 其他任意Object

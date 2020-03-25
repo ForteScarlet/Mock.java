@@ -1,6 +1,5 @@
 package com.forte.util.factory;
 
-import com.forte.util.function.ExProxyHandler;
 import com.forte.util.mapper.MockProxy;
 import com.forte.util.mapper.MockProxyType;
 import com.forte.util.mockbean.MockObject;
@@ -9,16 +8,11 @@ import com.forte.util.utils.FieldUtils;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * {@link MockProxyHandlerFactory}的默认实现
@@ -26,6 +20,7 @@ import java.util.function.Supplier;
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
 public class MockProxyHandlerFactoryImpl implements MockProxyHandlerFactory {
+
     /**
      * 获取接口代理处理器实例
      * 首先，只扫描所有的抽象方法，default方法不会代理，而是执行它自己。
@@ -134,23 +129,27 @@ public class MockProxyHandlerFactoryImpl implements MockProxyHandlerFactory {
             }
 
             // 没有忽略，进行解析
-
-            // 准备参数
-            MockProxyType proxyType = mockProxyAnnotation == null ? MockProxyType.OBJECT : mockProxyAnnotation.proxyType();
-            if(proxyType == MockProxyType.OBJECT){
-                // 判断一下返回值的类型，如果是数组，转化为数组类型，如果是list，转化为list类型
-                if(returnType.isArray()){
-                    proxyType = MockProxyType.ARRAY;
-                }
-                if(FieldUtils.isChild(returnType, List.class)){
-                    proxyType = MockProxyType.LIST;
-                }
-            }
-
-
             Class<?> genericType = mockProxyAnnotation == null ? Object.class : mockProxyAnnotation.genericType();
             String name = mockProxyAnnotation == null ? null : mockProxyAnnotation.name().trim().length() == 0 ? null : mockProxyAnnotation.name().trim();
             int[] array = mockProxyAnnotation == null ? new int[]{1, 1} : mockProxyAnnotation.size();
+
+            // 准备参数
+            MockProxyType proxyType = mockProxyAnnotation == null ? MockProxyType.UNKNOWN : mockProxyAnnotation.proxyType();
+            // 如果是未知类型，根据返回值类型进行匹配。
+            if(proxyType == MockProxyType.UNKNOWN){
+                // 判断一下返回值的类型，如果是数组，转化为数组类型，如果是list，转化为list类型
+                if(returnType.isArray()){
+                    final Class<?> arrayComponentType = returnType.getComponentType();
+                    genericType = genericType.equals(Object.class) ? arrayComponentType : genericType;
+                    proxyType = MockProxyType.ARRAY;
+                }else if(FieldUtils.isChild(returnType, List.class)){
+                    proxyType = MockProxyType.LIST;
+                }else{
+                    // 其他类型，认定为Object类型
+                    proxyType = MockProxyType.OBJECT;
+                }
+            }
+
 
             if (array.length == 0) {
                 array = new int[]{1, 1};
@@ -165,6 +164,7 @@ public class MockProxyHandlerFactoryImpl implements MockProxyHandlerFactory {
 
             // 要获取的mock类型
             Class<?> mockGetType = proxyType.selectTypeUse(returnType, genericType);
+
 
             final MockObject<?> mockObject = mockObjectFunction.apply(mockGetType, name);
 

@@ -12,9 +12,10 @@ import java.util.function.BiFunction;
 public interface MockProxyHandlerFactory {
 
     /**
-     * 获取代理处理接口实例
-     * @param mockObjectFunction 传入一个类型，获取一个mockObject对象。如果存在name，则会尝试先用name获取
-     * @return
+     * 获取代理处理接口{@link InvocationHandler}实例
+     * @param mockObjectFunction 传入一个类型和一个可能为null的name字符串，获取一个mockObject对象。如果存在name，则会尝试先用name获取
+     * @return JDK动态代理所需要的代理处理器示例。
+     * @see InvocationHandler
      */
     InvocationHandler getHandler(BiFunction<Class<?>, String, MockObject<?>> mockObjectFunction);
 
