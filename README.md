@@ -69,7 +69,7 @@ compile group: 'io.gitee.ForteScarlet', name: 'mock.java', version: '${version}'
 
 **Jar**
 
-使用jar包导入的时候，记得同时把作为依赖的`commons-beanutils.commons-beanutils:1.9.3`中的jar包也导入进去。我上传了这些依赖在[]()
+使用jar包导入的时候，记得同时把作为依赖的`commons-beanutils.commons-beanutils:1.9.3`中的jar包也导入进去。我上传了这些依赖在 [dependencies文件夹](./dependencies) 中。
 
 
 
