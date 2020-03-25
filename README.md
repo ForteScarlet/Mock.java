@@ -30,9 +30,14 @@
 >
 > *※ 版本更新内容与预期更新计划详见于文档末尾 ： <a href="#更新公告">更新公告</a>*
 >
->
 
-**wiki文档：[github wiki](https://github.com/ForteScarlet/Mock.java/wiki) or [gitee wiki](https://gitee.com/ForteScarlet/Mock.java/wikis) **
+
+
+# **WIKI**
+
+文档将会开始转移至WIKI处，此处README中的说明性文档将不再更新并择日删除，替换为简单的介绍与demo示例。
+
+**wiki文档：[github wiki](https://github.com/ForteScarlet/Mock.java/wiki) or [gitee wiki](https://gitee.com/ForteScarlet/Mock.java/wikis)**
 
 ## 注意
 未来2.x版本将会使用与1.x版本不同的包路径。如果迭代版本请注意包路径的修改。
@@ -90,7 +95,7 @@
 
 #### 	2·添加字段映射 
 
-> 字段映射中，value值所用到的 @函数 可以从 [JavaDoc文档](helpDoc/index.html) 中查阅[**MockUtil**]类中的方法，MockUtil中的全部方法均可作为 @函数 出现在value值中。
+> 字段映射中，value值所用到的 @函数 可以从 [JavaDoc文档](https://apidoc.gitee.com/ForteScarlet/Mock.java/) 中查阅 [**MockUtil**](https://apidoc.gitee.com/ForteScarlet/Mock.java/com/forte/util/utils/MockUtil.html) 类中的方法，MockUtil中的全部方法均可作为 @函数 出现在value值中。
 >
 > **再次提醒，请务必注意对应好字段的字段类型**
 
@@ -532,13 +537,27 @@ public class User {
 可以发现，4个方法中各有一个方法需要提供额外参数，他会在注解映射创建完毕后进行添加，也就是假如额外参数和字段中有冲突的键，则额外参数的值将会覆盖注解映射值。
 
 
-## **映射扫描**
+# **映射扫描**
+
+1.6.0版本后，我更新了**映射扫描**与**映射代理**功能。感谢提出建议的朋友。[Issue#I1CCMT](https://gitee.com/ForteScarlet/Mock.java/issues/I1CCMT)
 
 
 
 
 
-## 使用依赖列表
+# **映射代理**
+
+1.6.0版本后，我更新了**映射扫描**与**映射代理**功能。感谢提出建议的朋友。[Issue#I1CCMT](https://gitee.com/ForteScarlet/Mock.java/issues/I1CCMT)
+
+
+
+
+
+
+
+
+
+# **使用依赖列表**
 ```xml
 <dependency>
    <groupId>commons-beanutils</groupId>
@@ -562,6 +581,7 @@ public class User {
 `Mock`中增加了一个方法
 
 着手准备编写wiki
+删除helpDoc文件夹
 
 ### v1.5.2(2020/2/22)
 修复在使用ChineseUtil的时候会在控制台打印所有的姓氏的问题
