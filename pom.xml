@@ -91,6 +91,8 @@
                     <checkModificationExcludes>
                         <checkModificationExclude>.idea/</checkModificationExclude>
                         <checkModificationExclude>.idea/*</checkModificationExclude>
+                        <checkModificationExclude>.dependencies/</checkModificationExclude>
+                        <checkModificationExclude>.dependencies/*</checkModificationExclude>
                         <checkModificationExclude>test/</checkModificationExclude>
                         <checkModificationExclude>test/*</checkModificationExclude>
                         <checkModificationExclude>.idea/libraries/*</checkModificationExclude>

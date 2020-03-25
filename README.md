@@ -888,6 +888,8 @@ public static void main(String[] args) throws Exception {
 增加一个注解`@MockProxy` 标记接口代理中，一些需要特殊处理的抽象方法，例如返回值为Map或者忽略参数等。
 `Mock`中增加了一个方法
 
+增加功能：映射扫描、映射代理
+
 着手准备编写wiki
 删除helpDoc文件夹
 
