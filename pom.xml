@@ -14,12 +14,12 @@
     <artifactId>mock.java</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署应该大于1.5.2 2020/02/21 -->
-    <version>1.5.2</version>
+    <!-- 下次部署应该大于1.6.0 2020/03/25 -->
+    <version>1.6.0</version>
     <packaging>jar</packaging>
     <name>Mock.java</name>
     <url>https://github.com/ForteScarlet/Mock.java.git</url>
-    <description>Mock For Java like mock.js</description>
+    <description>Mock For Java, like mock.js</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
