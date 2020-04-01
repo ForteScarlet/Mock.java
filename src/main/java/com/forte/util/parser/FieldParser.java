@@ -6,7 +6,7 @@ import com.forte.util.mockbean.MockField;
 /**
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
-interface FieldParser {
+public interface FieldParser {
 
     /**
      * 若字段不是List集合时的解析方法

@@ -838,6 +838,11 @@ public static void main(String[] args) throws Exception {
 }
 ```
 
+# #函数
+(参阅wiki)
+
+
+
 
 
 
@@ -862,6 +867,52 @@ public static void main(String[] args) throws Exception {
 ```
 
 ## 更新公告
+
+### **v1.7.0(未部署)**
+- 增加一个“#函数”, 其映射已经添加进Mock中的映射名称。例如: 
+```java
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "@name");
+        // set 'name_map'
+        Mock.set("name_map", map);
+
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("mapList", "#name_map");
+
+        //set 'user_map'
+        Mock.set("user_map", userMap);
+        MockObject<Map> userMapMock = Mock.get("user_map");
+
+        // show 
+        System.out.println(userMapMock.getOne());
+```
+- 增加对于`Map`中，value类型为`Class`类型的参数的解析。类似于上述的“#函数”，只不过参数不是`'#xxx'`而是一个指定的`Class`对象。
+例如：
+```java
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "@name");
+        map.put("user", User.class);           // will get User from Mock
+        map.put("userList|1-2.0", User.class); // will get User list from Mock
+```
+- 增加针对于`List`类型参数的规则修改。
+以前版本，假如一个字段叫做`users`, 是一个List类型，此时，我填入的参数为：
+```java
+map.put("users|1-2.3-4", otherMap);
+```
+这个时候，区间参数中的`3-4`将会被忽略不计。
+当前版本，由于加入了`Class解析`与`#函数`，使得各种不同类之间的嵌套成为可能（甚至是自己嵌套自己）
+此时，我修改了`List`类型的字段的区间参数规定，以上述例子为例，现在`3-4`并不会被忽略了，List结果的最终输出长度，会从`1-2`这个区间和`3-4`这个区间中随机选择一个。
+也就是说，假如你写了：
+```java
+map.put("users|1000.0", User.class);
+```
+那么最终的结果里，`users`字段的长度，要么是1000，要么是0。
+而如果你写了：
+```java
+map.put("users|5-10.200-300", User.class);
+```
+那么最终的结果里，`users`字段的长度，要么在5-10之间，要么在200-300之间。
+
 
 ### **v1.6.0(2020/3/25)**
 

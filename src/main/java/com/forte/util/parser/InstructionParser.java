@@ -1,10 +1,13 @@
 package com.forte.util.parser;
 
+import com.forte.util.Mock;
 import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.invoker.Invoker;
+import com.forte.util.mockbean.MockObject;
 import com.forte.util.utils.MethodUtil;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 指令字段解析器
@@ -21,13 +24,21 @@ class InstructionParser extends BaseFieldParser {
 
     /**
      * 当字段是数组的时候，进行解析
-     * @return
      */
     @Override
     public FieldValueGetter parserForArrayFieldValueGetter() {
         //字段是数组类型时的解析方法
         //字段值获取器
         FieldValueGetter fieldValueGetter;
+
+        // 如果指令参数开头为井号'#'，则先判断其为一个已经存在的类型名称
+        if(instructionStr.startsWith("#")){
+            final MockObject<Map> mockObject = Mock.get(instructionStr.substring(1));
+            if(mockObject != null){
+                fieldValueGetter = getArrayFieldValueGetter(new Invoker[]{mockObject::getOne});
+                return fieldValueGetter;
+            }
+        }
 
         //解析指令,查找指令中的@方法
         //先判断是否有匹配的方法
@@ -58,13 +69,22 @@ class InstructionParser extends BaseFieldParser {
 
     /**
      * 当字段是list集合的时候进行解析
-     * @return
      */
     @Override
     public FieldValueGetter parserForListFieldValueGetter() {
         //字段是数组类型时的解析方法
         //字段值获取器
         FieldValueGetter fieldValueGetter;
+
+        // 如果指令参数开头为井号'#'，则先判断其为一个已经存在的类型名称
+        if(instructionStr.startsWith("#")){
+            final MockObject<Map> mockObject = Mock.get(instructionStr.substring(1));
+            if(mockObject != null){
+                fieldValueGetter = getListFieldValueGetter(new Invoker[]{mockObject::getOne});
+                return fieldValueGetter;
+            }
+        }
+
         //解析指令,查找指令中的@方法
         //先判断是否有匹配的方法
         boolean match = match(instructionStr);
@@ -102,7 +122,7 @@ class InstructionParser extends BaseFieldParser {
     @Override
     public FieldValueGetter parserForNotListOrArrayFieldValueGetter() {
         /*
-            假如字段类型为Object类型且存在区间参数，则认为这是一个需要转化为数组的类型，即认为字段类型为List类型，直接使用List字段值生成器
+            假如字段类型为Object类型且存在区间参数，则认为这是一个需要转化为集合的类型，即认为字段类型为List类型，直接使用List字段值生成器
             区间参数只要存在左参数即为存在
          */
         boolean isObjectToList = this.fieldClass.equals(Object.class) && (intervalMin != null);
@@ -113,10 +133,19 @@ class InstructionParser extends BaseFieldParser {
 
         //字段值获取器
         FieldValueGetter fieldValueGetter;
+
+        // 如果指令参数开头为井号'#'，则先判断其为一个已经存在的类型名称
+        if(instructionStr.startsWith("#")){
+            final MockObject<Map> mockObject = Mock.get(instructionStr.substring(1));
+            if(mockObject != null){
+                fieldValueGetter = mockObject::getOne;
+                return fieldValueGetter;
+            }
+        }
+
         //解析指令,查找指令中的@方法
         //先判断是否有匹配的方法
         boolean match = match(instructionStr);
-
         if (match) {
             //如果存在指令方法
             //解析出方法名

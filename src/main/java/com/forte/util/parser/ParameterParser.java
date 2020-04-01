@@ -5,14 +5,17 @@ import com.forte.util.factory.MockBeanFactory;
 import com.forte.util.fieldvaluegetter.ArrayFieldValueGetter;
 import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.fieldvaluegetter.ListFieldValueGetter;
+import com.forte.util.function.TypeParse;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.mockbean.MockBean;
 import com.forte.util.mockbean.MockMapBean;
+import com.forte.util.mockbean.MockObject;
 import com.forte.util.utils.FieldUtils;
 import com.forte.util.mockbean.MockField;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 参数解析器，用于解析用户填入的参数语法
@@ -25,11 +28,17 @@ public class ParameterParser {
     /**
      * MockUtil的方法集
      */
+    @Deprecated
     private static final Map<String, Method> MOCK_METHOD = Mock._getMockMethod();
 
     /* ———— 目前预期类型 ————
      * String / Double / Integer / Map / Object / array&list
      */
+
+    /**
+     * TODO 注册各种解析器，不再使用switch分配解析器
+     */
+    private static final Map<Class<?>, TypeParse> TYPE_PARSE_MAP = new HashMap<>(4);
 
     /* 内部使用的各类型的常量，用于switch语句，为参数分配解析器 */
 
@@ -41,6 +50,8 @@ public class ParameterParser {
     private static final int TYPE_LIST = 5;
     private static final int TYPE_ARRAY = 6;
 
+    private static final int TYPE_CLASS = 7;
+
 
     /**
      * 对参数进行解析-普通类型
@@ -50,16 +61,15 @@ public class ParameterParser {
      */
     public static <T> MockBean<T> parser(Class<T> objectClass, Map<String, Object> paramMap) {
         //使用线程安全list集合
-        List<MockField> fields = Collections.synchronizedList(new ArrayList<>());
-        //遍历并解析-（多线程同步）
-        //如果是.entrySet().parallelStream().forEach的话，似乎会出现一个迷之bug
-        //如果结果没有任何输出语句打印控制台，会报NullPointer的错
-        //已解决，需要使fields这个集合成为线程安全的集合
-        paramMap.entrySet().parallelStream().forEach(e -> {
+        List<MockField> fields = new ArrayList<>();
+
+        Map<String, Object> copyParamsMap = new HashMap<>(paramMap);
+
+        //单程遍历并解析
+        copyParamsMap.forEach((key, value) -> {
             //解析
-            Object value = e.getValue();
             //切割名称，检测是否有区间函数
-            String[] split = e.getKey().split("\\|");
+            String[] split = key.split("\\|");
             //字段名
             String fieldName = split[0];
             //区间参数字符串
@@ -81,7 +91,6 @@ public class ParameterParser {
      * @param paramMap 参数集合
      */
     public static MockMapBean parser(Map<String, Object> paramMap) {
-        //使用线程安全list集合
         List<MockField> fields = new ArrayList<>();
 
         //遍历并解析-（多线程同步）
@@ -156,12 +165,17 @@ public class ParameterParser {
                 mockField = mapTypeParse(objectClass, fieldName, intervalStr, value);
                 break;
             case TYPE_ARRAY:
-                //如果字段是数组类型，使用数组类型解析器进行解析
+                //如果value是数组类型，使用数组类型解析器进行解析
                 mockField = arrayTypeParse(objectClass, fieldName, intervalStr, value);
                 break;
             case TYPE_LIST:
-                //如果字段是list集合类型，使用集合类型解析器解析
+                //如果value是list集合类型，使用集合类型解析器解析
                 mockField = listTypeParse(objectClass, fieldName, intervalStr, value);
+                break;
+
+            case TYPE_CLASS:
+                // 如果value是class类型的
+                mockField = classTypeParse(objectClass, fieldName, intervalStr, value);
                 break;
             default:
                 System.out.println("无法解析映射类[ " + objectClass + " ]中的字段：" + fieldName);
@@ -399,6 +413,24 @@ public class ParameterParser {
         return fieldParser.getMockField();
     }
 
+    /**
+     * 集合类型参数解析
+     *
+     * @param objectClass
+     * @param fieldName
+     * @param intervalStr
+     * @param value
+     * @return
+     */
+    private static MockField classTypeParse(Class objectClass, String fieldName, String intervalStr, Object value) {
+        //准备字段解析器
+        FieldParser fieldParser;
+        //如果参数是list集合类型的，使用list参数解析器
+        fieldParser = new MockObjectParser(objectClass, fieldName, intervalStr, () -> Mock.get((Class<?>) value));
+        //获取假字段封装类
+        return fieldParser.getMockField();
+    }
+
 
     /**
      * 获取一个默认值假字段
@@ -579,6 +611,10 @@ public class ParameterParser {
         //数组类型，属于数组类
         if (object.getClass().isArray()) {
             return TYPE_ARRAY;
+        }
+        //Class类型，属于直接解析类型，除非解析不到
+        if(object.getClass().equals(Class.class)){
+            return TYPE_CLASS;
         }
         //其他情况，为一个未知的Object类型
         return TYPE_OBJECT;

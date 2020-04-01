@@ -8,7 +8,10 @@ import com.forte.util.utils.RandomUtil;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 
 /**
  * List集合的字段值获取器
@@ -30,8 +33,10 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
     /**
      * 区间参数,重复最终输出,参数期望中长度为2，0索引为最小值，1为最大值
      * 默认值为[1,1],即为不重复
+     *
+     * @since 1.7.0 当前版本替换为获取函数
      */
-    private final Integer[] integerInterval;
+    private final Supplier<Integer[]> integerIntervalSupplier;
 
     /**
      * 多余字符
@@ -42,11 +47,10 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
 
     /**
      * 获取字段值
-     *
-     * @return
      */
     @Override
     public List value() {
+        Integer[] integerInterval = integerIntervalSupplier.get();
         //创建一个Object类型的List集合，用于保存数据
         List list = new ArrayList();
         //获取执行次数
@@ -126,7 +130,6 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
      * @param list
      */
     private void getValueWhenInvokerIs1(int num, List list) {
-
         //执行者数量不大于1，即只有一个
         Invoker invoker = invokers[0];
         //尽管只有一个方法执行者，但是仍然可能存在多余字符
@@ -184,6 +187,40 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
     }
 
 
+
+    /**
+     * 获取一个固定值的区间获取函数
+     * @param a 固定区间 a
+     * @param b 固定区间 b
+     */
+    static Supplier<Integer[]> normalIntegerIntervalSupplier(int a, int b){
+        Integer[] intervalsNew = new Integer[]{a, b};
+        return () -> intervalsNew;
+    }
+
+    /**
+     * 获取一个固定值的区间获取函数
+     * @param intervals 固定区间
+     */
+    static Supplier<Integer[]> normalIntegerIntervalSupplier(Integer[] intervals){
+        Integer[] intervalsNew = Arrays.copyOf(intervals, intervals.length);
+        return () -> intervalsNew;
+    }
+
+    /**
+     * 根据两个区间来随机获取其中一个区间的函数
+     * @param intervals1 第一个区间
+     * @param intervals2 第二个区间
+     * @return 获取函数
+     */
+    static Supplier<Integer[]> normalIntegerIntervalSupplier(Integer[] intervals1, Integer[] intervals2){
+        Integer[] intervals1New = Arrays.copyOf(intervals1, intervals1.length);
+        Integer[] intervals2New = Arrays.copyOf(intervals2, intervals2.length);
+        return () -> ThreadLocalRandom.current().nextBoolean() ? intervals1New : intervals2New;
+    }
+
+
+
     /**
      * 构造方法
      *
@@ -191,17 +228,39 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
      * @param integerInterval 区间参数
      * @param moreStrs        多余字符
      */
-    public ListFieldValueGetter(Invoker[] invokers,  Integer[] integerInterval,  String[] moreStrs) {
+    public ListFieldValueGetter(Invoker[] invokers,  Integer[] integerInterval, String[] moreStrs) {
         this.invokers = invokers;
         //如果多余字符长度为0，则赋值为null
         this.moreStrs = moreStrs.length == 0 ? null : moreStrs;
         //如果为true，则使用默认的数组
         boolean isNull = integerInterval == null || integerInterval.length > 2 || integerInterval[0] == null || integerInterval[1] == null;
         if (isNull) {
-            this.integerInterval = new Integer[]{1, 1};
+            this.integerIntervalSupplier = normalIntegerIntervalSupplier(1, 1);
         } else {
-            this.integerInterval = integerInterval;
+            this.integerIntervalSupplier = normalIntegerIntervalSupplier(integerInterval);
         }
+    }
+
+    /**
+     * 构造方法
+     *
+     * @param invokers        方法执行者
+     * @param integerInterval1 区间参数
+     * @param integerInterval2 区间参数
+     * @param moreStrs        多余字符
+     */
+    public ListFieldValueGetter(Invoker[] invokers, Integer[] integerInterval1, Integer[] integerInterval2, String[] moreStrs) {
+        this.invokers = invokers;
+        //如果多余字符长度为0，则赋值为null
+        this.moreStrs = moreStrs.length == 0 ? null : moreStrs;
+        //如果为true，则使用默认的数组
+        boolean isNull1 = integerInterval1 == null || integerInterval1.length > 2 || integerInterval1[0] == null || integerInterval1[1] == null;
+        boolean isNull2 = integerInterval2 == null || integerInterval2.length > 2 || integerInterval2[0] == null || integerInterval2[1] == null;
+
+        Integer[] integerInterval1New = isNull1 ? new Integer[]{1, 1} : integerInterval1;
+        Integer[] integerInterval2New = isNull2 ? integerInterval1New : integerInterval2;
+
+        this.integerIntervalSupplier = normalIntegerIntervalSupplier(integerInterval1New, integerInterval2New);
     }
 
     /**
@@ -212,11 +271,10 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
      */
     public ListFieldValueGetter(Invoker[] invokers,  String[] moreStrs) {
         this.invokers = invokers;
-        this.integerInterval = new Integer[]{1, 1};
+        this.integerIntervalSupplier = normalIntegerIntervalSupplier(1, 1);
         //如果多余字符长度为0，则赋值为null
         this.moreStrs = moreStrs.length == 0 ? null : moreStrs;
     }
-
 
     /**
      * 构造方法，没有多余字符
@@ -230,10 +288,33 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
         //如果为true，则使用默认的数组
         boolean isNull = integerInterval == null || integerInterval.length > 2 || integerInterval[0] == null || integerInterval[1] == null;
         if (isNull) {
-            this.integerInterval = new Integer[]{1, 1};
+            this.integerIntervalSupplier = normalIntegerIntervalSupplier(1, 1);
         } else {
-            this.integerInterval = integerInterval;
+            this.integerIntervalSupplier = normalIntegerIntervalSupplier(integerInterval);
         }
+        //多余字符赋值为null
+        this.moreStrs = null;
+    }
+
+    /**
+     * 构造方法，没有多余字符
+     *
+     * @param invokers        方法执行者
+     * @param integerInterval1 区间参数1
+     * @param integerInterval2 区间参数2
+     */
+    public ListFieldValueGetter(Invoker[] invokers, Integer[] integerInterval1, Integer[] integerInterval2) {
+        this.invokers = invokers;
+        //判断：数组为null || 长度大于2 || 左参数为null || 左右参数都为null
+        //如果为true，则使用默认的数组
+        boolean isNull1 = integerInterval1 == null || integerInterval1.length > 2 || integerInterval1[0] == null || integerInterval1[1] == null;
+        boolean isNull2 = integerInterval2 == null || integerInterval2.length > 2 || integerInterval2[0] == null || integerInterval2[1] == null;
+
+        Integer[] integerInterval1New = isNull1 ? new Integer[]{1, 1} : integerInterval1;
+        Integer[] integerInterval2New = isNull2 ? integerInterval1New : integerInterval2;
+
+        this.integerIntervalSupplier = normalIntegerIntervalSupplier(integerInterval1New, integerInterval2New);
+
         //多余字符赋值为null
         this.moreStrs = null;
     }
@@ -245,7 +326,7 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
      */
     public ListFieldValueGetter(Invoker[] invokers) {
         this.invokers = invokers;
-        this.integerInterval = new Integer[]{1, 1};
+        this.integerIntervalSupplier = normalIntegerIntervalSupplier(1, 1);
         //多余字符赋值为null
         this.moreStrs = null;
     }

@@ -12,6 +12,6 @@ public interface Invoker {
      * @return
      * @throws Exception
      */
-    public Object invoke() throws Exception;
+    Object invoke() throws Exception;
 }
 

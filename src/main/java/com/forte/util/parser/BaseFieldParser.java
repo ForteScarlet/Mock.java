@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
-abstract class BaseFieldParser implements FieldParser {
+public abstract class BaseFieldParser implements FieldParser {
 
     /**
      * 类的class对象
@@ -606,6 +606,24 @@ abstract class BaseFieldParser implements FieldParser {
      * 获取一个List类型字段值获取器
      *
      * @param invokers        方法执行者
+     * @param integerInterval1 区间参数
+     * @param integerInterval2 区间参数
+     * @param moreStrs        多余字符
+     */
+    protected FieldValueGetter getListFieldValueGetter(Invoker[] invokers, Integer[] integerInterval1, Integer[] integerInterval2, String[] moreStrs) {
+        if (integerInterval1 == null && integerInterval2 == null) {
+            //创建对象并返回
+            return new ListFieldValueGetter(invokers, moreStrs);
+        } else {
+            //创建对象并返回
+            return new ListFieldValueGetter(invokers, integerInterval1, integerInterval2, moreStrs);
+        }
+    }
+
+    /**
+     * 获取一个List类型字段值获取器
+     *
+     * @param invokers        方法执行者
      * @param integerInterval 区间参数
      */
     protected FieldValueGetter getListFieldValueGetter(Invoker[] invokers, Integer[] integerInterval) {
@@ -615,6 +633,23 @@ abstract class BaseFieldParser implements FieldParser {
         } else {
             //创建对象并返回
             return new ListFieldValueGetter(invokers, integerInterval);
+        }
+    }
+
+    /**
+     * 获取一个List类型字段值获取器
+     *
+     * @param invokers        方法执行者
+     * @param integerInterval1 区间参数
+     * @param integerInterval2 区间参数
+     */
+    protected FieldValueGetter getListFieldValueGetter(Invoker[] invokers, Integer[] integerInterval1, Integer[] integerInterval2) {
+        if (integerInterval1 == null && integerInterval2 == null) {
+            //创建对象并返回
+            return new ListFieldValueGetter(invokers);
+        } else {
+            //创建对象并返回
+            return new ListFieldValueGetter(invokers, integerInterval1, integerInterval2);
         }
     }
 

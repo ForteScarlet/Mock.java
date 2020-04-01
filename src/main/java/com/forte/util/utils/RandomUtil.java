@@ -21,7 +21,7 @@ public class RandomUtil {
 
     /**
      * 获取一个Random实例。
-     * 可以是一个Random单例对象，也可以是一个线程ThreadLocalRandom对象。
+     * 是一个线程ThreadLocalRandom对象。
      */
     public static Random getRandom() {
         return ThreadLocalRandom.current();
