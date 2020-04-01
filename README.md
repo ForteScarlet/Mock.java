@@ -839,7 +839,7 @@ public static void main(String[] args) throws Exception {
 ```
 
 # #函数
-(参阅wiki)
+(v1.7.0更新，参阅wiki `#function`)
 
 
 
