@@ -839,11 +839,12 @@ public static void main(String[] args) throws Exception {
 ```
 
 # #函数
-(v1.7.0更新，参阅wiki `#function`)
+(v1.7.0更新，参阅wiki `8_#function&class parse`)
 
 
 
-
+# List区间(v1.7.0)
+(v1.7.0更新，参阅wiki `9_List interval parameter(v1.7.0)`)
 
 
 
