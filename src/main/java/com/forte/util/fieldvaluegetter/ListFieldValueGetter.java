@@ -4,8 +4,6 @@ import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
 import com.forte.util.utils.RandomUtil;
 
-
-
 import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.Arrays;

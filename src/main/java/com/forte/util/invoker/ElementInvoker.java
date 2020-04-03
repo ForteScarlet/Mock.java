@@ -2,9 +2,7 @@ package com.forte.util.invoker;
 
 import com.forte.util.utils.RandomUtil;
 
-
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 随机元素值执行者

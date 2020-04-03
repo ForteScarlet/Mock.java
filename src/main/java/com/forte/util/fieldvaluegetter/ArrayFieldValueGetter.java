@@ -4,11 +4,7 @@ import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
 import com.forte.util.utils.RandomUtil;
 
-
-
 import javax.script.ScriptException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 数组类型的字段值获取器，与{@link ListFieldValueGetter}十分相似，基本可是说是只有参数类似不同了

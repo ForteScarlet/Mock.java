@@ -8,14 +8,15 @@ import com.forte.util.fieldvaluegetter.ListFieldValueGetter;
 import com.forte.util.function.TypeParse;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.mockbean.MockBean;
-import com.forte.util.mockbean.MockMapBean;
-import com.forte.util.mockbean.MockObject;
-import com.forte.util.utils.FieldUtils;
 import com.forte.util.mockbean.MockField;
+import com.forte.util.mockbean.MockMapBean;
+import com.forte.util.utils.FieldUtils;
 
 import java.lang.reflect.Method;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 参数解析器，用于解析用户填入的参数语法
