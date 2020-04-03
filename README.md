@@ -869,7 +869,7 @@ public static void main(String[] args) throws Exception {
 
 ## 更新公告
 
-### **v1.7.0(未部署)**
+### **v1.7.0(2020/04/01)**
 - 增加一个“#函数”, 其映射已经添加进Mock中的映射名称。例如: 
 ```java
         Map<String, Object> map = new HashMap<>();
