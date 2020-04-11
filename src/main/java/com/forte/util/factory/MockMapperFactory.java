@@ -9,6 +9,7 @@ import org.apache.commons.beanutils.ConvertUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -34,8 +35,12 @@ public class MockMapperFactory {
             if (valueAndParam == null) {
                 valueAndParam = getValue(f.getAnnotation(MockArray.class));
             }
+            // 无注解，返回null并由后续过滤
+            if(valueAndParam == null){
+                return null;
+            }
             return new AbstractMap.SimpleEntry<>(f.getName() + valueAndParam.getValue(), valueAndParam.getKey().get());
-        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }).filter(Objects::nonNull).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         if(other != null){
             mapper.putAll(other);

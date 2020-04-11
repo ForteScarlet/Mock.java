@@ -869,6 +869,11 @@ public static void main(String[] args) throws Exception {
 
 ## 更新公告
 
+### **v1.7.1(2020/04/11)**
+修复由于我的疏忽，导致在使用注解创建映射而映射类中存在没有注解的字段的时候，会出现空指针异常的问题。
+fix gitee issue [#I1E46D](https://gitee.com/ForteScarlet/Mock.java/issues/I1E46D)
+
+
 ### **v1.7.0(2020/04/01)**
 - 增加一个“#函数”, 其映射已经添加进Mock中的映射名称。例如: 
 ```java
