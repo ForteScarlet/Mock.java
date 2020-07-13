@@ -871,11 +871,11 @@ public static void main(String[] args) throws Exception {
 
 ### **v1.8.0(2020/07/13)**
 增加对某个类的父类字段的处理 
-[#I1NLT4](https://gitee.com/ForteScarlet/Mock.java/issues/I1NLT4)
+fix [#I1NLT4](https://gitee.com/ForteScarlet/Mock.java/issues/I1NLT4)
 
 优化mock值的获取效率（大概提升了30倍），但是当值为字符串的时候，默认情况下不会再尝试将其视为JS脚本执行了。
 如果想要开启JS脚本尝试功能，请使用静态配置类`MockConfiguration.setEnableJsScriptEngine(true)`
-[#I1NLWA](https://gitee.com/ForteScarlet/Mock.java/issues/I1NLWA)
+fix [#I1NLWA](https://gitee.com/ForteScarlet/Mock.java/issues/I1NLWA)
 
 
 `Mock`中增加三个`setAndGet(...)`方法，故名思意，整合先set后get的流程。
