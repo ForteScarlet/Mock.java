@@ -206,12 +206,28 @@ public class Mock {
     }
 
     /**
+     * {@link #set(Class, Map)} and {@link #get(Class)}
+     */
+    public static <T> MockObject<T> setAndGet(Class<T> objClass, Map<String, Object> map){
+        set(objClass, map);
+        return get(objClass);
+    }
+
+    /**
      * 通过注解来获取映射
      */
     public static <T> void set(Class<T> objClass) {
         //获取映射Map
         Map<String, Object> mapper = MockMapperFactory.getMapper(objClass);
         setResult(objClass, mapper, false);
+    }
+
+    /**
+     * {@link #set(Class, Map)} and {@link #get(Class)}
+     */
+    public static <T> MockObject<T> setAndGet(Class<T> objClass){
+        set(objClass);
+        return get(objClass);
     }
 
     /**
@@ -233,6 +249,15 @@ public class Mock {
     public static void set(String resultName, Map<String, Object> map) {
         //设置并保存映射，不可覆盖
         setResult(resultName, map, false);
+    }
+
+
+    /**
+     * {@link #set(Class, Map)} and {@link #get(Class)}
+     */
+    public static MockObject<Map> setAndGet(String resultName, Map<String, Object> map){
+        set(resultName, map);
+        return get(resultName);
     }
 
 

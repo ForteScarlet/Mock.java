@@ -70,8 +70,8 @@ public interface MockObject<T> {
         for (int i = 0; i < num; i++) {
             list.add(getOne());
         }
-//        return collect(num, Collectors.toList());
         return list;
+//        return collect(num, Collectors.toList());
     }
 
 
@@ -91,7 +91,12 @@ public interface MockObject<T> {
      * @return
      */
     default <R> List<R> getList(int num , Function<T, R> mapper){
-        return collect(num, mapper, Collectors.toList());
+        ArrayList<R> list = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            list.add(mapper.apply(getOne()));
+        }
+        return list;
+//        return collect(num, mapper, Collectors.toList());
     }
 
 
@@ -113,7 +118,12 @@ public interface MockObject<T> {
      * @return
      */
     default Set<T> getSet(int num){
-        return collect(num, Collectors.toSet());
+        Set<T> set = new HashSet<>();
+        for (int i = 0; i < num; i++) {
+            set.add(getOne());
+        }
+        return set;
+//        return collect(num, Collectors.toSet());
     }
 
 
@@ -131,7 +141,12 @@ public interface MockObject<T> {
      * 获取多个实例对象，根据转化规则转化后作为Set返回
      */
     default <R> Set<R> getSet(int num , Function<T, R> mapper){
-        return collectParallel(num, mapper, Collectors.toSet());
+        Set<R> set = new HashSet<>();
+        for (int i = 0; i < num; i++) {
+            set.add(mapper.apply(getOne()));
+        }
+        return set;
+//        return collectParallel(num, mapper, Collectors.toSet());
     }
 
 
@@ -147,7 +162,15 @@ public interface MockObject<T> {
      * 获取多个实例对象，作为Map返回，需要指定Map的转化方式
      */
     default <K, V> Map<K, V> getMap(int num , Function<T,K> keyMapper , Function <T,V> valueMapper){
-        return collectToMap(num, keyMapper, valueMapper);
+        Map<K, V> map = new HashMap<>();
+        for (int i = 0; i < num; i++) {
+            final T value = getOne();
+            final K k = keyMapper.apply(value);
+            final V v = valueMapper.apply(value);
+            map.put(k, v);
+        }
+        return map;
+//        return collectToMap(num, keyMapper, valueMapper);
     }
 
     /**

@@ -870,9 +870,16 @@ public static void main(String[] args) throws Exception {
 ## 更新公告
 
 ### **v1.8.0(2020/07/13)**
-增加对某个类的父类字段的处理
+增加对某个类的父类字段的处理 
+[#I1NLT4](https://gitee.com/ForteScarlet/Mock.java/issues/I1NLT4)
+
 优化mock值的获取效率（大概提升了30倍），但是当值为字符串的时候，默认情况下不会再尝试将其视为JS脚本执行了。
 如果想要开启JS脚本尝试功能，请使用静态配置类`MockConfiguration.setEnableJsScriptEngine(true)`
+[#I1NLWA](https://gitee.com/ForteScarlet/Mock.java/issues/I1NLWA)
+
+
+`Mock`中增加三个`setAndGet(...)`方法，故名思意，整合先set后get的流程。
+
 
 ### **v1.7.1(2020/04/11)**
 修复由于我的疏忽，导致在使用注解创建映射而映射类中存在没有注解的字段的时候，会出现空指针异常的问题。
