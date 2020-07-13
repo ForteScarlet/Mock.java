@@ -24,7 +24,7 @@ public class MockNormalObject<T> implements MockObject<T> {
      */
     @Override
     public Optional<T> get(){
-        return Optional.ofNullable(mockBean.getObject());
+       return Optional.ofNullable(mockBean.getObject());
     }
 
 

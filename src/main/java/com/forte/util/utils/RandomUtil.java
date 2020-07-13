@@ -57,9 +57,9 @@ public class RandomUtil {
             //参照算法：random.nextInt(9000)+1000;
             //(9 * pow)
             int nextInt = (pow << 3) + pow;
-            return (RandomUtil.getRandom().nextInt(nextInt) + pow);
+            return (getRandom().nextInt(nextInt) + pow);
         } else {
-            return RandomUtil.getRandom().nextInt(10);
+            return getRandom().nextInt(10);
         }
     }
 
@@ -78,7 +78,7 @@ public class RandomUtil {
      * @return
      */
     public static int getNumber(int a, int b) {
-        return RandomUtil.getRandom().nextInt(b - a) + a;
+        return getRandom().nextInt(b - a) + a;
     }
 
 
@@ -92,7 +92,7 @@ public class RandomUtil {
     public static int getNumber$right(int a, int b) {
         //计算差值
         int bound = a > b ? a - b : b - a;
-        return RandomUtil.getRandom().nextInt(bound + 1) + a;
+        return getRandom().nextInt(bound + 1) + a;
     }
 
 
@@ -108,7 +108,7 @@ public class RandomUtil {
     public static String getCode(int length) {
         StringBuilder s = new StringBuilder();
         for (int i = 1; i <= length; i++) {
-            if (RandomUtil.getRandom().nextBoolean()) {
+            if (getRandom().nextBoolean()) {
                 //0.5的概率为0-9的数字
                 s.append(RandomUtil.getRandom().nextInt());
             } else {

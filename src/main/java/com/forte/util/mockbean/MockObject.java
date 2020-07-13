@@ -1,9 +1,6 @@
 package com.forte.util.mockbean;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -69,7 +66,12 @@ public interface MockObject<T> {
      * 获取多个实例对象，作为list集合返回
      */
     default List<T> getList(int num){
-        return collect(num, Collectors.toList());
+        ArrayList<T> list = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            list.add(getOne());
+        }
+//        return collect(num, Collectors.toList());
+        return list;
     }
 
 

@@ -3,7 +3,8 @@ package com.forte.util.mockbean;
 import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.utils.FieldUtils;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * 假字段值的字段封装对象的抽象类
@@ -19,7 +20,9 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
-public class MockField {
+public class MockField<T> {
+
+    private final Class<T> objType;
 
     /**
      * 字段值获取器
@@ -37,6 +40,13 @@ public class MockField {
     private final Class fieldType;
 
 
+    private final Field field;
+
+
+    private final Method setterMethod;
+
+
+
     /**
      * 为传入的对象的对应的参数赋值
      * 通过FieldUtils工具类使用setter方法赋值
@@ -44,7 +54,15 @@ public class MockField {
      *
      * @param
      */
-    public void setValue(Object bean) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public void setValue(Object bean) throws Exception {
+//        Object value = getValue();
+//        if(setterMethod == null){
+//            if(value.getClass().equals(fieldType)){
+//                field.set(bean, value);
+//            }else{
+//                field.set(bean, ConvertUtils.convert(value, fieldType));
+//            }
+//        }
         FieldUtils.objectSetter(bean, fieldName, getValue());
     }
 
@@ -66,6 +84,7 @@ public class MockField {
         return this.fieldName;
     }
 
+
     public Class getFieldType(){
         return this.fieldType;
     }
@@ -73,12 +92,21 @@ public class MockField {
     /**
      * 构造
      */
-    public MockField(String fieldName, FieldValueGetter fieldValueGetter, Class fieldType) {
-        //考虑是否要加上匹配的class对象
-        //似乎不需要
+    public MockField(Class<T> objType, String fieldName, FieldValueGetter fieldValueGetter, Class fieldType) {
+        this.objType = objType;
         this.fieldName = fieldName;
         this.valueGetter = fieldValueGetter;
         this.fieldType = fieldType;
+
+        // 获取field
+        this.field = FieldUtils.getField(objType, fieldName);
+        this.field.setAccessible(true);
+
+
+        this.setterMethod = null;
+
+
+
     }
 
     @Override

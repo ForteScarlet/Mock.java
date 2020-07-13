@@ -1,5 +1,6 @@
 package com.forte.util.utils;
 
+import com.forte.util.MockConfiguration;
 import com.forte.util.exception.ParameterSizeException;
 import com.forte.util.invoker.ElementInvoker;
 import com.forte.util.invoker.Invoker;
@@ -48,7 +49,13 @@ public class MethodUtil {
         for (int i = 0; i < parameters.length; i++) {
             //使用BeanUtils的数据类型器对参数的数据类型进行转化
             //保存至新的参数集
-            newArr[i] = ConvertUtils.convert(args[i], parameters[i].getType());
+            Class<?> paramType = parameters[i].getType();
+            Object arg = args[i];
+            if(arg.getClass().equals(paramType)){
+                newArr[i] = arg;
+            }else{
+                newArr[i] = ConvertUtils.convert(arg, paramType);
+            }
         }
 
         //返回方法的执行结果
@@ -98,6 +105,10 @@ public class MethodUtil {
     }
 
 
+    //创建一个js脚本执行器
+    private static ScriptEngineManager manager = new ScriptEngineManager();
+    private static ScriptEngine se = manager.getEngineByName("js");
+
     /**
      * js中的eval函数，应该是只能进行简单的计算
      * 利用js脚本完成
@@ -106,12 +117,13 @@ public class MethodUtil {
      * @return 执行后的结果
      */
     public static Object eval(String str) throws ScriptException {
-        //创建一个js脚本执行器
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine se = manager.getEngineByName("js");
         //脚本执行并返回结果
-        Object eval = se.eval(str);
-        return eval;
+        if(MockConfiguration.isEnableJsScriptEngine()){
+            return se.eval(str);
+        }else{
+            // 未开启脚本执行，直接返回
+            return str;
+        }
     }
 
     /**

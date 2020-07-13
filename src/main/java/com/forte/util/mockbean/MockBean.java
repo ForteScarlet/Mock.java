@@ -1,6 +1,5 @@
 package com.forte.util.mockbean;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 /**
@@ -25,24 +24,24 @@ public class MockBean<T> {
      * @return
      */
     public T getObject() {
-
         //先创建一个实例
         T instance;
-        //抓取错误，若实例创建错误，直接返回null
         try {
             instance = objectClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException e) {
             return null;
         }
+        //抓取错误，若实例创建错误，直接返回null
         //使用多线程执行
-        Arrays.stream(fields).parallel().forEach(f -> {
+        // 2020/7/13 多线程个p
+        for (MockField field : fields) {
             try {
-                f.setValue(instance);
-            } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException ignore) {
-                //如果出现异常，不做处理，保持原有的null状态
+                field.setValue(instance);
+            } catch (Exception e) {
+                // ignored ?
+                throw new RuntimeException(e);
             }
-        });
+        }
         //返回这个实例
         return instance;
     }

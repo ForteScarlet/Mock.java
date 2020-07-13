@@ -318,13 +318,15 @@ public class FieldUtils {
 
         try {
             //获取这个字段的Field对象
-            Field field = whereIn.getDeclaredField(fieldName);
+            Field field = getField(whereIn, fieldName);
+            // whereIn.getDeclaredField(fieldName);
             Method setter = whereIn.getMethod("set" + headUpper(fieldName), field.getType());
             //计入缓存
             saveSingleCacheFieldSetter(whereIn , fieldName , setter);
             //返回
             return setter;
-        } catch (NoSuchFieldException | NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
+//            e.printStackTrace();
             //如果出现异常，返回null
             return null;
         }
@@ -550,33 +552,21 @@ public class FieldUtils {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    public static void objectSetter(Object t, String fieldName, Object value) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
+    public static void objectSetter(Object t, String fieldName, Object value) throws Exception {
         //判断是否有用“.”分割
         String[] split = fieldName.split("\\.");
         //如果分割后只有一个字段值，直接进行赋值
         if (split.length == 1) {
-
-//            //先查询缓存
-//            Method cacheFieldSetter = getCacheFieldSetter(t.getClass() , fieldName);
-//            if(cacheFieldSetter != null){
-//                //如果缓存中有这个setter，直接使用
-//                //赋值
-//                MethodUtil.invoke(t , new Object[]{value} , cacheFieldSetter);
-//            }
-
             //获取其set方法,返回执行结果
             String setterName = "set" + FieldUtils.headUpper(fieldName);
             //获取字段的setter方法
             Method setter = getFieldSetter(t , fieldName);
-
             //如果没有setter,展示异常提醒
             // 直接抛出异常
             if(setter == null){
-                String error = "没有找到["+ t.getClass() +"]中的字段["+ fieldName +"]的setter方法，无法进行赋值";
-                throw new NoSuchFieldError(error);
+                String error = "没有找到["+ t.getClass() +"]中的字段["+ fieldName +"]的setter["+ setterName +"]方法，无法进行赋值";
+                throw new RuntimeException(new NoSuchFieldException(error));
             }else{
-                //计入缓存-当前
-                saveSingleCacheFieldSetter(t.getClass() , fieldName , setter);
                 //赋值
                 MethodUtil.invoke(t , new Object[]{value} , setter);
             }
@@ -616,7 +606,7 @@ public class FieldUtils {
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    public static void objectSetter2(Object t, String fieldName, Object param) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public static void objectSetter2(Object t, String fieldName, Object param) throws Exception {
         // TODO 发现bug，此方法会导致缓存无法储存
         objectSetter(t , t , fieldName , fieldName , 1 , param);
     }
@@ -633,7 +623,7 @@ public class FieldUtils {
      * @param level
      * @param param
      */
-    private static void objectSetter(Object t, Object root, String fieldName, String realFieldName, int level, Object param) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+    private static void objectSetter(Object t, Object root, String fieldName, String realFieldName, int level, Object param) throws Exception {
         // TODO 实现缓存的setter方法
         // TODO 存在严重bug，此方法会导致缓存无法储存和获取，导致getter效率大幅度下降
         //先查询缓存
@@ -748,6 +738,14 @@ public class FieldUtils {
                 break;
             }
         }
+
+        if(field == null){
+            Class parent = objectClass.getSuperclass();
+            if(parent != null && !parent.equals(Object.class)){
+                field = getField(parent, fieldName);
+            }
+        }
+
         return field;
     }
 
@@ -786,11 +784,12 @@ public class FieldUtils {
         String[] split = field.split("\\.");
         if (split.length == 1) {
             //如果只有一个，直接获取
-            Field getField = null;
-            try {
-                getField = tClass.getDeclaredField(field);
-            } catch (NoSuchFieldException ignored) {
-            }
+            Field getField = getField(tClass, field);
+//            try {
+//                getField = ;
+//                getField = tClass.getDeclaredField(field);
+//            } catch (NoSuchFieldException ignored) {
+//            }
             //如果存在，返回true，否则返回false
             return getField != null;
         } else {
@@ -1275,7 +1274,7 @@ public class FieldUtils {
     /**
      * 单层字段缓存对象
      * 内部类，实现字段缓存，优化此工具类的效率
-     * 字段的缓存，其中储存所在类的Clss对象、字段名称、字段对象、字段类型、getter、setter
+     * 字段的缓存，其中储存所在类的Class对象、字段名称、字段对象、字段类型、getter、setter
      * *虽然为公共权限，但仅仅为了使其内部类可被外部访问而设*
      */
     private static class SingleCacheField<T> implements CacheField<T> {
