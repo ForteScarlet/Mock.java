@@ -1,10 +1,7 @@
 package com.forte.util.utils;
 
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
@@ -15,38 +12,39 @@ import java.util.Random;
  */
 public class ChineseUtil {
 
-    // 初始化百家姓数据
-    static {
-        byte[][] end;
-        try {
-            // 获取字节文件输入流
-            InputStream inStream = ChineseUtil.class.getClassLoader().getResourceAsStream("mock/surnames");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
-            // 转化为byte数组
-            String[] lines = reader.lines().filter(l -> l.trim().length() > 0).toArray(String[]::new);
-            byte[][] surnameBytes = new byte[lines.length][];
-            for (int index = 0; index < lines.length; index++) {
-                String l = lines[index];
-                String[] split = l.replace(";", "").split(",");
-                byte[] bytes = new byte[split.length];
-                for (int i = 0; i < split.length; i++) {
-                    bytes[i] = Byte.parseByte(split[i]);
-                }
-                surnameBytes[index] = bytes;
-                String s = new String(bytes, StandardCharsets.UTF_8);
-            }
-            end = surnameBytes;
-        }catch (Exception ignored){
-            end = null;
-        }
+//    // 初始化百家姓数据
+//    static {
+//        byte[][] end;
+//        try {
+//            // 获取字节文件输入流
+//            InputStream inStream = ChineseUtil.class.getClassLoader().getResourceAsStream("mock/surnames");
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+//            // 转化为byte数组
+//            String[] lines = reader.lines().filter(l -> l.trim().length() > 0).toArray(String[]::new);
+//            byte[][] surnameBytes = new byte[lines.length][];
+//            for (int index = 0; index < lines.length; index++) {
+//                String l = lines[index];
+//                String[] split = l.replace(";", "").split(",");
+//                byte[] bytes = new byte[split.length];
+//                for (int i = 0; i < split.length; i++) {
+//                    bytes[i] = Byte.parseByte(split[i]);
+//                }
+//                surnameBytes[index] = bytes;
+//                String s = new String(bytes, StandardCharsets.UTF_8);
+//            }
+//            end = surnameBytes;
+//        } catch (Exception ignored) {
+//            end = null;
+//        }
+//
+//        SURNAME_BYTES = end;
+//    }
+//    /**
+//     * 百家姓对应的字节
+//     */
+//    private static final byte[][] SURNAME_BYTES;
 
-        SURNAME_BYTES = end;
-    }
-
-    /**
-     * 百家姓对应的字节
-     */
-    private static final byte[][] SURNAME_BYTES;
+    public static final Charset gbk = Charset.forName("GBK");
 
     /**
      * 百家姓
@@ -82,6 +80,8 @@ public class ChineseUtil {
             "西门", "南宫", "第五", "公仪", "公乘", "太史", "仲长", "叔孙", "屈突", "尔朱", "东乡", "相里", "胡母", "司城", "张廖", "雍门", "毋丘", "贺兰",
             "綦毋", "屋庐", "独孤", "南郭", "北宫", "王孙"};
 
+
+
     /**
      * 获取一个随机姓名
      *
@@ -89,18 +89,27 @@ public class ChineseUtil {
      * @return
      */
     public static String getName(String charsetName) {
+        return getName(Charset.forName(charsetName));
+    }
+    /**
+     * 获取一个随机姓名
+     *
+     * @param charset 字符编码
+     * @return
+     */
+    public static String getName(Charset charset) {
         Random random = RandomUtil.getRandom();
 
         // 获得一个随机的姓氏
-        String name = getFamilyName();
-
+        boolean two = random.nextBoolean();
+        StringBuilder nameBuilder = new StringBuilder(1 + (two ? 2 : 1)).append(getFamilyName());
         /* 从常用字中选取一个或两个字作为名 */
-        if (random.nextBoolean()) {
-            name += getChinese(charsetName) + getChinese(charsetName);
+        if (two) {
+            nameBuilder.append(getChinese(charset)).append(getChinese(charset));
         } else {
-            name += getChinese(charsetName);
+            nameBuilder.append(getChinese(charset));
         }
-        return name;
+        return nameBuilder.toString();
     }
 
     /**
@@ -111,11 +120,11 @@ public class ChineseUtil {
     public static String[] getFamilyName(int nums) {
         String[] names = new String[nums];
 
+        int index;
         for (int i = 0; i < nums; i++) {
             // 获得一个随机的姓氏
-            int index = RandomUtil.getRandom().nextInt(Surname.length - 1);
-            String name = Surname[index];
-            names[i] = name;
+            index = RandomUtil.getRandom().nextInt(Surname.length);
+            names[i] = Surname[index];
         }
 
         return names;
@@ -127,7 +136,7 @@ public class ChineseUtil {
      * @return
      */
     public static String getFamilyName() {
-        return getFamilyName(1)[0];
+        return Surname[RandomUtil.getRandom().nextInt(Surname.length)];
     }
 
     /**
@@ -136,18 +145,22 @@ public class ChineseUtil {
      * @return
      */
     public static String getName() {
-        return getName("UTF-8");
+        return getName(StandardCharsets.UTF_8);
+    }
+
+
+    public static String getChinese(String encoding) {
+        return getChinese(Charset.forName(encoding));
     }
 
     /**
      * 获取一个汉字
      *
-     * @param encoding 编码格式
+     * @param charset 编码格式
      * @return
      */
-    public static String getChinese(String encoding) {
-        String str = null;
-        String str2 = null;
+    public static String getChinese(Charset charset) {
+        String str;
         int highPos, lowPos;
         Random random = RandomUtil.getRandom();
         //区码，0xA0打头，从第16区开始，即0xB0=11*16=176,16~55一级汉字，56~87二级汉字
@@ -157,17 +170,15 @@ public class ChineseUtil {
         lowPos = 161 + Math.abs(random.nextInt(93));
 
         byte[] bArr = new byte[2];
-        bArr[0] = (new Integer(highPos)).byteValue();
-        bArr[1] = (new Integer(lowPos)).byteValue();
-        try {
-            // 区位码组合成汉字
-            str = new String(bArr, "GBK");
-            str2 = new String(str.getBytes(), encoding);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        bArr[0] = (byte) highPos;
+        bArr[1] = (byte) lowPos;
+        // 区位码组合成汉字
+        str = new String(bArr, gbk);
+        if(charset.name().equals(gbk.name())){
+            return str;
+        }else{
+            return new String(str.getBytes(), charset);
         }
-
-        return str2;
     }
 
     /**
@@ -176,7 +187,7 @@ public class ChineseUtil {
      * @return
      */
     public static String getChinese() {
-        return getChinese("UTF-8");
+        return getChinese(StandardCharsets.UTF_8);
     }
 
     /**
@@ -185,7 +196,7 @@ public class ChineseUtil {
      * @return
      */
     public static String getChinese(int num) {
-        return getChinese(num, "UTF-8");
+        return getChinese(num, StandardCharsets.UTF_8);
     }
 
     /**
@@ -194,9 +205,17 @@ public class ChineseUtil {
      * @return
      */
     public static String getChinese(int num, String encoding) {
-        StringBuilder sb = new StringBuilder();
+        return getChinese(num, Charset.forName(encoding));
+    }
+    /**
+     * 获取一个随机汉字
+     *
+     * @return
+     */
+    public static String getChinese(int num, Charset charset) {
+        StringBuilder sb = new StringBuilder(num);
         for (int i = 0; i < num; i++) {
-            sb.append(getChinese(encoding));
+            sb.append(getChinese(charset));
         }
         return sb.toString();
     }
@@ -204,7 +223,5 @@ public class ChineseUtil {
     /**
      * 构造私有化 构造方法
      */
-    private ChineseUtil() {
-        super();
-    }
+    private ChineseUtil() { }
 }

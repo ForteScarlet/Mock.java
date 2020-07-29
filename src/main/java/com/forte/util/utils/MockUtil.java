@@ -382,8 +382,7 @@ public class MockUtil {
      * @param max 最大数量
      */
     public static String ctitle(Integer min, Integer max) {
-        Integer num = RandomUtil.getNumber$right(min, max);
-        return ChineseUtil.getChinese(num);
+        return ChineseUtil.getChinese(RandomUtil.getNumber$right(min, max));
     }
 
 
@@ -410,10 +409,10 @@ public class MockUtil {
      * @param max 最大长度
      */
     public static String title(Integer min, Integer max) {
-        Integer num = RandomUtil.getNumber$right(min, max);
-        String title = RandomUtil.getRandomString(num);
+        int num = RandomUtil.getNumber$right(min, max);
+        String title = RandomUtil.getRandomString(num, false);
         //全部小写，开头大写
-        return FieldUtils.headUpper(title.toLowerCase());
+        return FieldUtils.headUpper(title);
     }
 
     /**

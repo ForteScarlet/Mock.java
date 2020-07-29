@@ -69,7 +69,7 @@ public class RandomUtil {
      * @return
      */
     public static int getInteger() {
-        return getNumber(1);
+        return getRandom().nextInt(10);
     }
 
     /**
@@ -106,19 +106,20 @@ public class RandomUtil {
      * @return
      */
     public static String getCode(int length) {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder(length);
+        Random r = getRandom();
         for (int i = 1; i <= length; i++) {
-            if (getRandom().nextBoolean()) {
+            if (r.nextBoolean()) {
                 //0.5的概率为0-9的数字
-                s.append(RandomUtil.getRandom().nextInt());
+                s.append(r.nextInt());
             } else {
                 //0.5的概率为字母，其中大写0.25，小写0.25
-                if (RandomUtil.getRandom().nextBoolean()) {
+                if (r.nextBoolean()) {
                     //小写
                     s.append(getRandomChar());
                 } else {
                     //大写
-                    s.append((getRandomChar() + "").toUpperCase());
+                    s.append(Character.toUpperCase(getRandomChar()));
                 }
             }
         }
@@ -139,7 +140,7 @@ public class RandomUtil {
 
 
     /**
-     * 获取长度为32的UUID
+     * 获取UUID.toString
      *
      * @return
      */
@@ -152,8 +153,6 @@ public class RandomUtil {
 
     /**
      * 获取一个随机英文字符，小写
-     *
-     * @return
      */
     public static char getRandomChar() {
         return (char) (RandomUtil.getRandom().nextInt(26) + 97);
@@ -171,37 +170,35 @@ public class RandomUtil {
      */
     public static String getRandomString(int length, boolean randomCase) {
         char[] crr = new char[length];
+        char randomChar;
         for (int i = 0; i < length; i++) {
-            Character randomChar = getRandomChar();
+            randomChar = getRandomChar();
             //如果开启了随机大写，则有概率将字符转为大写 1/2
-
             if (randomCase) {
                 crr[i] = RandomUtil.getRandom().nextBoolean() ? randomChar : Character.toUpperCase(randomChar);
             } else {
                 crr[i] = randomChar;
             }
         }
-        return new String(crr);
+        return String.valueOf(crr);
     }
 
     /**
-     * 获取一串指定长度的随机字符串，默认大小写随机
+     * 获取一串指定长度的随机字符串，默认小写
      *
      * @param length 字符串长度
      * @return
      */
     public static String getRandomString(int length) {
-        return getRandomString(length, true);
+        return getRandomString(length, false);
     }
 
 
     /**
-     * 获取一串长度为32的字符串，默认大小写随机
-     *
-     * @return
+     * 获取一串长度为32的字符串，默认小写
      */
     public static String getRandomString() {
-        return getRandomString(32, true);
+        return getRandomString(32, false);
     }
 
     /**
@@ -212,19 +209,22 @@ public class RandomUtil {
      * @return
      */
     public static String toFixed(Number dnum, int length) {
-        StringBuilder sb = new StringBuilder("#.");
+        StringBuilder sb = new StringBuilder(2 + length).append("#.");
         //遍历并设置位数
         for (int i = 0; i < length; i++) {
-            sb.append("0");
+            sb.append('0');
         }
 
         //返回结果
-        String douStr = numFormat(dnum, sb.toString());
+        String formatStr = sb.toString();
+        sb = new StringBuilder();
+        String douStr = numFormat(dnum, formatStr);
+        sb.append(douStr);
         if(douStr.startsWith(".")){
             //如果开头是点，说明首位是0，补位
-            douStr = "0" + douStr;
+            sb.append('0').append(douStr);
         }
-        return douStr;
+        return sb.toString();
     }
 
 
@@ -258,9 +258,10 @@ public class RandomUtil {
      */
     public static int[] randomColor$intArr() {
         final int[] arr = new int[3];
-        arr[0] = RandomUtil.getRandom().nextInt(256);
-        arr[1] = RandomUtil.getRandom().nextInt(256);
-        arr[2] = RandomUtil.getRandom().nextInt(256);
+        Random random = RandomUtil.getRandom();
+        arr[0] = random.nextInt(256);
+        arr[1] = random.nextInt(256);
+        arr[2] = random.nextInt(256);
         return arr;
     }
 

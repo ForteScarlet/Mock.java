@@ -992,11 +992,7 @@ public class FieldUtils {
      * @author ForteScarlet
      */
     public static String headUpper(String str) {
-        //拿到第一个字母
-        String head = (str.charAt(0) + "").toUpperCase();
-        //拿到其他
-        String body = str.substring(1);
-        return head + body;
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 
     /**
