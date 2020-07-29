@@ -1,7 +1,5 @@
 package com.forte.util.mockbean;
 
-import java.util.Optional;
-
 /**
  * 将{@link MockBean}封装并返回
  *
@@ -18,15 +16,19 @@ public class MockNormalObject<T> implements MockObject<T> {
         return mockBean;
     }
 
-    /**
-     * 返回获取结果的Optional封装类
-     * @return
-     */
-    @Override
-    public Optional<T> get(){
-       return Optional.ofNullable(mockBean.getObject());
-    }
+//    /**
+//     * 返回获取结果的Optional封装类
+//     * @return
+//     */
+//    @Override
+//    public Optional<T> get(){
+//       return Optional.ofNullable(mockBean.getObject());
+//    }
 
+    @Override
+    public T getOne() {
+        return mockBean.getObject();
+    }
 
     /**
      * 唯一构造

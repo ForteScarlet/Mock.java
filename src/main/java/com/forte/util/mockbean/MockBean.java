@@ -12,12 +12,12 @@ public class MockBean<T> {
     /**
      * 需要封装假数据的对象
      */
-    private Class<T> objectClass;
+    protected Class<T> objectClass;
 
     /**
      * 假对象的全部字段
      */
-    private MockField[] fields;
+    protected MockField[] fields;
 
     /**
      * 获取对象一个对象
@@ -27,13 +27,10 @@ public class MockBean<T> {
         //先创建一个实例
         T instance;
         try {
-            instance = objectClass.newInstance();
+            instance = getObjectClass().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             return null;
         }
-        //抓取错误，若实例创建错误，直接返回null
-        //使用多线程执行
-        // 2020/7/13 多线程个p
         for (MockField field : fields) {
             try {
                 field.setValue(instance);
@@ -53,9 +50,23 @@ public class MockBean<T> {
         return Arrays.copyOf(fields, fields.length);
     }
 
+
     public Class<T> getObjectClass(){
         return objectClass;
     }
+
+
+    public MockBean<T> parallel(){
+        return new ParallelMockBean<>(objectClass, Arrays.copyOf(fields, fields.length));
+    }
+
+
+    public MockBean<T> sequential(){
+        return this;
+    }
+
+
+
 
     /**
      * 构造方法

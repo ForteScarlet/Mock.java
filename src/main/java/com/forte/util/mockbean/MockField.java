@@ -27,7 +27,7 @@ public class MockField<T> {
     /**
      * 字段值获取器
      */
-    private final FieldValueGetter valueGetter;
+    private FieldValueGetter valueGetter;
 
     /**
      * 字段名称
@@ -87,6 +87,26 @@ public class MockField<T> {
 
     public Class getFieldType(){
         return this.fieldType;
+    }
+
+    public Class<T> getObjType() {
+        return objType;
+    }
+
+    public FieldValueGetter getValueGetter() {
+        return valueGetter;
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public Method getSetterMethod() {
+        return setterMethod;
+    }
+
+    public void setValueGetter(FieldValueGetter valueGetter) {
+        this.valueGetter = valueGetter;
     }
 
     /**

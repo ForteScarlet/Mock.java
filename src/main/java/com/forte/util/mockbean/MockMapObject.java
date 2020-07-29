@@ -1,7 +1,6 @@
 package com.forte.util.mockbean;
 
 import java.util.Map;
-import java.util.Optional;
 
 /**
  *
@@ -19,16 +18,24 @@ public class MockMapObject implements MockObject<Map> {
         return mockMapBean;
     }
 
+//    /**
+//     * 返回获取结果的Optional封装类
+//     *
+//     * @return
+//     */
+//    @Override
+//    public Optional<Map> get() {
+//        return Optional.ofNullable(mockMapBean.getObject());
+//    }
+
     /**
-     * 返回获取结果的Optional封装类
      *
      * @return
      */
     @Override
-    public Optional<Map> get() {
-        return Optional.ofNullable(mockMapBean.getObject());
+    public Map getOne() {
+        return mockMapBean.getObject();
     }
-
 
     /**
      * 唯一构造
