@@ -23,7 +23,7 @@ public class RandomUtil {
      * 获取一个Random实例。
      * 是一个线程ThreadLocalRandom对象。
      */
-    public static Random getRandom() {
+    public static ThreadLocalRandom getRandom() {
         return ThreadLocalRandom.current();
     }
 
@@ -53,13 +53,14 @@ public class RandomUtil {
     public static int getNumber(int length) {
         length--;
         int pow = (int) Math.pow(10, length);
+        ThreadLocalRandom random = getRandom();
         if (length >= 1) {
             //参照算法：random.nextInt(9000)+1000;
             //(9 * pow)
             int nextInt = (pow << 3) + pow;
-            return (getRandom().nextInt(nextInt) + pow);
+            return (random.nextInt(nextInt) + pow);
         } else {
-            return getRandom().nextInt(10);
+            return random.nextInt(10);
         }
     }
 
@@ -78,21 +79,18 @@ public class RandomUtil {
      * @return
      */
     public static int getNumber(int a, int b) {
-        return getRandom().nextInt(b - a) + a;
+        return getRandom().nextInt(a, b);
     }
 
 
     /**
      * 获取某个区间中的随机数[a,b]
      *
-     * @param a
-     * @param b
-     * @return
+     * @param a min number
+     * @param b max number
      */
     public static int getNumber$right(int a, int b) {
-        //计算差值
-        int bound = a > b ? a - b : b - a;
-        return getRandom().nextInt(bound + 1) + a;
+        return getNumber(a, b+1);
     }
 
 

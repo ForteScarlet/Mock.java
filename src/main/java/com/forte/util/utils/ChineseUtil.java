@@ -2,8 +2,7 @@ package com.forte.util.utils;
 
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 获取一个随机中文姓名 代码灵感来源于网络 讲道理，效果不是特别好 而且关于字符编码的转换也不确定处理的好
@@ -44,7 +43,9 @@ public class ChineseUtil {
 //     */
 //    private static final byte[][] SURNAME_BYTES;
 
-    public static final Charset gbk = Charset.forName("GBK");
+    private static final Charset GBK = Charset.forName("GBK");
+
+//    public static final Charset UTF_8 = StandardCharsets.UTF_8;
 
     /**
      * 百家姓
@@ -84,38 +85,23 @@ public class ChineseUtil {
 
     /**
      * 获取一个随机姓名
-     *
-     * @param charsetName 字符编码
-     * @return
+     * @see #getName()
      */
+    @Deprecated
     public static String getName(String charsetName) {
         return getName(Charset.forName(charsetName));
     }
     /**
      * 获取一个随机姓名
-     *
-     * @param charset 字符编码
-     * @return
+     * @see #getName()
      */
+    @Deprecated
     public static String getName(Charset charset) {
-        Random random = RandomUtil.getRandom();
-
-        // 获得一个随机的姓氏
-        boolean two = random.nextBoolean();
-        StringBuilder nameBuilder = new StringBuilder(1 + (two ? 2 : 1)).append(getFamilyName());
-        /* 从常用字中选取一个或两个字作为名 */
-        if (two) {
-            nameBuilder.append(getChinese(charset)).append(getChinese(charset));
-        } else {
-            nameBuilder.append(getChinese(charset));
-        }
-        return nameBuilder.toString();
+        return getName();
     }
 
     /**
      * 获得多个随机姓氏
-     *
-     * @return
      */
     public static String[] getFamilyName(int nums) {
         String[] names = new String[nums];
@@ -132,8 +118,6 @@ public class ChineseUtil {
 
     /**
      * 获得一个随机姓氏
-     *
-     * @return
      */
     public static String getFamilyName() {
         return Surname[RandomUtil.getRandom().nextInt(Surname.length)];
@@ -141,83 +125,86 @@ public class ChineseUtil {
 
     /**
      * 获取一个随机姓名
-     *
-     * @return
      */
     public static String getName() {
-        return getName(StandardCharsets.UTF_8);
+        ThreadLocalRandom random = RandomUtil.getRandom();
+
+        // 获得一个随机的姓氏
+        boolean two = random.nextBoolean();
+        StringBuilder nameBuilder = new StringBuilder(1 + (two ? 2 : 1)).append(getFamilyName());
+        /* 从常用字中选取一个或两个字作为名 */
+        if (two) {
+            nameBuilder.append(getChinese()).append(getChinese());
+        } else {
+            nameBuilder.append(getChinese());
+        }
+        return nameBuilder.toString();
     }
 
 
+    /**
+     * 获取一个随机汉字
+     * 指定编码已失效，理论上应该不需要指定编码
+     * @see #getName()
+     */
+    @Deprecated
     public static String getChinese(String encoding) {
         return getChinese(Charset.forName(encoding));
     }
 
     /**
      * 获取一个汉字
+     * 理论上应该不需要指定编码
+     * @see #getName()
      *
-     * @param charset 编码格式
-     * @return
      */
+    @Deprecated
     public static String getChinese(Charset charset) {
-        String str;
-        int highPos, lowPos;
-        Random random = RandomUtil.getRandom();
-        //区码，0xA0打头，从第16区开始，即0xB0=11*16=176,16~55一级汉字，56~87二级汉字
-        highPos = (176 + Math.abs(random.nextInt(39)));
-        random = RandomUtil.getRandom();
-        //位码，0xA0打头，范围第1~94列
-        lowPos = 161 + Math.abs(random.nextInt(93));
-
-        byte[] bArr = new byte[2];
-        bArr[0] = (byte) highPos;
-        bArr[1] = (byte) lowPos;
-        // 区位码组合成汉字
-        str = new String(bArr, gbk);
-        if(charset.name().equals(gbk.name())){
-            return str;
-        }else{
-            return new String(str.getBytes(), charset);
-        }
+        return getChinese();
     }
 
     /**
      * 获取一个随机汉字
-     *
-     * @return
      */
     public static String getChinese() {
-        return getChinese(StandardCharsets.UTF_8);
+        ThreadLocalRandom random = RandomUtil.getRandom();
+        byte[] bArr = new byte[2];
+        //区码，0xA0打头，从第16区开始，即0xB0=11*16=176,16~55一级汉字，56~87二级汉字
+        // 176 ~ random(0~39)
+        bArr[0] = (byte) random.nextInt(176, 176 + 39);
+        //位码，0xA0打头，范围第1~94列
+        // 161 ~ random(0~92)
+        bArr[1] = (byte) random.nextInt(161, 161 + 93);
+        // 区位码组合成汉字
+        return new String(bArr, GBK);
     }
 
     /**
      * 获取一个随机汉字
-     *
-     * @return
      */
     public static String getChinese(int num) {
-        return getChinese(num, StandardCharsets.UTF_8);
+        StringBuilder sb = new StringBuilder(num);
+        for (int i = 0; i < num; i++) {
+            sb.append(getChinese());
+        }
+        return sb.toString();
     }
 
     /**
      * 获取一个随机汉字
-     *
-     * @return
+     * @see #getChinese(int)
      */
+    @Deprecated
     public static String getChinese(int num, String encoding) {
-        return getChinese(num, Charset.forName(encoding));
+        return getChinese(num);
     }
     /**
      * 获取一个随机汉字
-     *
-     * @return
+     * @see #getChinese(int)
      */
+    @Deprecated
     public static String getChinese(int num, Charset charset) {
-        StringBuilder sb = new StringBuilder(num);
-        for (int i = 0; i < num; i++) {
-            sb.append(getChinese(charset));
-        }
-        return sb.toString();
+        return getChinese(num);
     }
 
     /**

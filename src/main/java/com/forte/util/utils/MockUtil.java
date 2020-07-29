@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * <p>
@@ -245,36 +246,57 @@ import java.util.Date;
  *
  * @author ForteScarlet
  */
+@SuppressWarnings({"unused", "SpellCheckingInspection"})
 public class MockUtil {
 
 
-    //静态代码块加载资源
-    static {
-        //加载定义域名合集
-        String domainStr = "top,xyz,xin,vip,win,red,net,org,wang,gov,edu,mil,biz,name,info,mobi,pro,travel,club,museum,int,aero,post,rec,asia";
-        DOMAINS = domainStr.split("\\,");
-    }
-
     /* —————————— 默认参数 ———————————— */
     /**
-     * date()默认使用的格式化参数
+     * {@link #date()}默认使用的格式化参数
      */
-    private static final String DATE_FORMAT = "yyyy-dd-MM";
+    private static final String DATE_FORMAT;
+
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT;
+
 
     /**
-     * time()默认使用的格式化参数
+     * {@link #time()}默认使用的格式化参数
      */
-    private static final String TIME_FORMAT = "HH:mm:ss";
+    private static final String TIME_FORMAT;
+
+    private static final SimpleDateFormat SIMPLE_DATETIME_FORMAT;
 
     /**
-     * datetime()默认使用的格式化参数
+     * {@link #toDateTime()}默认使用的格式化参数
      */
-    private static final String DATETIME_FORMAT = "yyyy-dd-MM HH:mm:ss";
+    private static final String DATETIME_FORMAT;
+
+    private static final SimpleDateFormat SIMPLE_TIME_FORMAT;
 
     /**
      * 顶级域名合集
      */
     private static final String[] DOMAINS;
+
+
+    //静态代码块加载资源
+    static {
+        // 加载定义域名合集
+        String domainStr = "top,xyz,xin,vip,win,red,net,org,wang,gov,edu,mil,biz,name,info,mobi,pro,travel,club,museum,int,aero,post,rec,asia";
+        DOMAINS = domainStr.split(",");
+
+        // 日期格式化
+        DATE_FORMAT = "yyyy-dd-MM";
+        SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
+
+        DATETIME_FORMAT = "yyyy-dd-MM HH:mm:ss";
+        SIMPLE_DATETIME_FORMAT = new SimpleDateFormat(DATE_FORMAT);
+
+        TIME_FORMAT = "HH:mm:ss";
+        SIMPLE_TIME_FORMAT = new SimpleDateFormat(DATE_FORMAT);
+
+    }
+
 
     /* —————————— name/chinese/cname —————————— */
 
@@ -372,7 +394,7 @@ public class MockUtil {
      * @param num
      */
     public static String ctitle(Integer num) {
-        return ctitle(num, num);
+        return ChineseUtil.getChinese(num);
     }
 
     /**
@@ -433,8 +455,8 @@ public class MockUtil {
     public static Date date() {
         Calendar calendar = Calendar.getInstance();
         //设置年份等参数
-        Integer nowYear = calendar.get(Calendar.YEAR);
-        Integer nowDay = calendar.get(Calendar.DAY_OF_YEAR);
+        int nowYear = calendar.get(Calendar.YEAR);
+        int nowDay = calendar.get(Calendar.DAY_OF_YEAR);
 
         //设置随机年份
         calendar.set(Calendar.YEAR, RandomUtil.getNumber$right(1990, nowYear));
@@ -464,7 +486,7 @@ public class MockUtil {
      * 返回一个随机日期的字符串，格式为yyyy-dd-MM
      */
     public static String toDateStr() {
-        return toDateStr(DATE_FORMAT);
+        return SIMPLE_DATE_FORMAT.format(date());
     }
 
     /**
@@ -480,7 +502,7 @@ public class MockUtil {
      * 返回一个随机时间的字符串，格式为HH:mm:ss
      */
     public static String time() {
-        return time(TIME_FORMAT);
+        return SIMPLE_TIME_FORMAT.format(date());
     }
 
     /**
@@ -496,7 +518,7 @@ public class MockUtil {
      * 返回一个随机日期时间的字符串，格式为yyyy-dd-MM HH:mm:ss
      */
     public static String toDateTime() {
-        return toDateTime(DATETIME_FORMAT);
+        return SIMPLE_DATETIME_FORMAT.format(date());
     }
 
     /* —————————— number age —————————— */
@@ -548,12 +570,11 @@ public class MockUtil {
      * @return
      */
     public static Double doubles(Integer a, Integer b, Integer endL, Integer endR) {
-        Integer integer = integer(a, b);
+        int integer = integer(a, b);
         //获取小数位数值
         int end = RandomUtil.getNumber$right(endL, endR);
-        Double dou = Double.parseDouble(RandomUtil.toFixed(RandomUtil.getRandom().nextDouble(), end));
-        Double e = integer + dou;
-        return e;
+        double dou = Double.parseDouble(RandomUtil.toFixed(RandomUtil.getRandom().nextDouble(), end));
+        return integer + dou;
     }
 
     /**
@@ -594,9 +615,9 @@ public class MockUtil {
      * 获取一个32位的随机数字
      */
     public static String UUNUM() {
-        StringBuilder sb = new StringBuilder();
-        Integer length = 32;
-        for (Integer i = 0; i < length; i++) {
+        int length = 32;
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
             sb.append(integer());
         }
         return sb.toString();
@@ -618,10 +639,10 @@ public class MockUtil {
      * @param max 最大长度
      */
     public static String getNumber(Integer min, Integer max) {
-        StringBuilder sb = new StringBuilder();
         //获取长度
-        Integer length = RandomUtil.getNumber$right(min, max);
-        for (Integer i = 0; i < length; i++) {
+        int length = RandomUtil.getNumber$right(min, max);
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
             sb.append(integer());
         }
         return sb.toString();
@@ -648,12 +669,10 @@ public class MockUtil {
      * @param douMaxLength 保留小数位数最大值
      */
     public static String getDouble(Integer intMinLength, Integer intMaxLength, Integer douMinLength, Integer douMaxLength) {
-        StringBuilder sb = new StringBuilder();
         //先获取整数位
-        sb.append(getNumber(intMinLength, intMaxLength))
-                .append(".")
-                .append(getNumber(douMinLength, douMaxLength));
-        return sb.toString();
+        return getNumber(intMinLength, intMaxLength) +
+                "." +
+                getNumber(douMinLength, douMaxLength);
     }
 
 
@@ -682,7 +701,7 @@ public class MockUtil {
      */
     public static Character character(Character[]... dic) {
         //合并集合
-        Character[] characters = Arrays.stream(dic).flatMap(d -> Arrays.stream(d)).toArray(Character[]::new);
+        Character[] characters = Arrays.stream(dic).flatMap(Arrays::stream).toArray(Character[]::new);
         return characters[RandomUtil.getNumber(characters.length)];
     }
 
@@ -690,7 +709,7 @@ public class MockUtil {
      * 返回一个随机的假单词
      */
     public static String word() {
-        return title(3, 12).toLowerCase();
+        return word(3, 12);
     }
 
     /**
@@ -699,7 +718,7 @@ public class MockUtil {
      * @param length 指定长度
      */
     public static String word(Integer length) {
-        return title(length).toLowerCase();
+        return RandomUtil.getRandomString(length, false);
     }
 
     /**
@@ -709,7 +728,8 @@ public class MockUtil {
      * @param max 最大长度
      */
     public static String word(Integer min, Integer max) {
-        return title(min, max).toLowerCase();
+        int num = RandomUtil.getNumber$right(min, max);
+        return RandomUtil.getRandomString(num, false);
     }
 
     /**
@@ -719,7 +739,7 @@ public class MockUtil {
      * @param max 最大长度
      */
     public static String cword(Integer min, Integer max) {
-        return ctitle(min, max).toLowerCase();
+        return ctitle(min, max);
     }
 
     /**
@@ -728,14 +748,14 @@ public class MockUtil {
      * @param length 单词长度
      */
     public static String cword(Integer length) {
-        return ctitle(length).toLowerCase();
+        return ctitle(length);
     }
 
     /**
      * 返回一个随机的假中文词语,长度2-4
      */
     public static String cword() {
-        return ctitle(2, 4).toLowerCase();
+        return ctitle(2, 4);
     }
 
 
@@ -775,13 +795,13 @@ public class MockUtil {
      * @param max 单词最多数量
      */
     public static String sentence(Integer min, Integer max) {
-        StringBuilder sb = new StringBuilder();
-        Integer num = RandomUtil.getNumber$right(min, max);
-        for (Integer i = 1; i <= num; i++) {
+        int num = RandomUtil.getNumber$right(min, max);
+        StringBuilder sb = new StringBuilder(num);
+        for (int i = 1; i <= num; i++) {
             //首句子字母大写
             sb.append(i == 0 ? FieldUtils.headUpper(word()) : word());
             if (i != num) {
-                sb.append(" ");
+                sb.append(' ');
             } else {
                 //30%概率为！结尾
                 if (RandomUtil.getProbability(0.3)) {
@@ -822,8 +842,8 @@ public class MockUtil {
      */
     public static String csentence(Integer min, Integer max) {
         StringBuilder sb = new StringBuilder();
-        Integer num = RandomUtil.getNumber$right(min, max);
-        for (Integer i = 1; i <= num; i++) {
+        int num = RandomUtil.getNumber$right(min, max);
+        for (int i = 1; i <= num; i++) {
             //首句子字母大写
             sb.append(cword());
             if (i == num) {
@@ -866,9 +886,9 @@ public class MockUtil {
      * @param max
      */
     public static String paragraph(Integer min, Integer max) {
-        StringBuilder sb = new StringBuilder();
-        Integer num = RandomUtil.getNumber$right(min, max);
-        for (Integer i = 1; i <= num; i++) {
+        int num = RandomUtil.getNumber$right(min, max);
+        StringBuilder sb = new StringBuilder(num);
+        for (int i = 1; i <= num; i++) {
             sb.append(sentence());
         }
         return sb.toString();
@@ -897,9 +917,9 @@ public class MockUtil {
      * @param max 最大数量
      */
     public static String cparagraph(Integer min, Integer max) {
-        StringBuilder sb = new StringBuilder();
-        Integer num = RandomUtil.getNumber$right(min, max);
-        for (Integer i = 1; i <= num; i++) {
+        int num = RandomUtil.getNumber$right(min, max);
+        StringBuilder sb = new StringBuilder(num);
+        for (int i = 1; i <= num; i++) {
             sb.append(csentence());
         }
         return sb.toString();
@@ -928,15 +948,14 @@ public class MockUtil {
      * 获取一个随机IP
      */
     public static String ip() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(RandomUtil.getRandom().nextInt(255) + 1)
-                .append(".")
-                .append(RandomUtil.getRandom().nextInt(255) + 1)
-                .append(".")
-                .append(RandomUtil.getRandom().nextInt(255) + 1)
-                .append(".")
-                .append(RandomUtil.getRandom().nextInt(255) + 1);
-        return sb.toString();
+        Random random = RandomUtil.getRandom();
+        return (random.nextInt(255) + 1) +
+                "." +
+                (random.nextInt(255) + 1) +
+                '.' +
+                (random.nextInt(255) + 1) +
+                '.' +
+                (random.nextInt(255) + 1);
     }
 
     /**
@@ -950,15 +969,12 @@ public class MockUtil {
      * 返回一个随机邮箱,可以指定邮箱的名称（@后面的名字）和顶级域名
      */
     public static String email(String emailName, String tid) {
-        StringBuilder sb = new StringBuilder();
 
-        sb.append(word())
-                .append("@")
-                .append(emailName)
-                .append(".")
-                .append(tid);
-
-        return sb.toString();
+        return word() +
+                '@' +
+                emailName +
+                '.' +
+                tid;
     }
 
     /**
@@ -984,7 +1000,7 @@ public class MockUtil {
         if (RandomUtil.getRandom().nextBoolean()) {
             return "www." + word() + "." + tid;
         }
-        return word() + "." + tid;
+        return word() + '.' + tid;
     }
 
     /**
@@ -1000,12 +1016,12 @@ public class MockUtil {
      * @param domainName 指定域名
      */
     public static String url(String domainName) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(32);
         //url前半部分
-        sb.append("http://").append(domainName).append("/").append(word());
+        sb.append("http://").append(domainName).append('/').append(word());
         //每次有0.2的概率再追加一层路径
         while (RandomUtil.getProbability(0.2)) {
-            sb.append("/").append(word());
+            sb.append('/').append(word());
         }
         return sb.toString();
     }
@@ -1023,8 +1039,7 @@ public class MockUtil {
     /**
      * 构造私有化
      */
-    private MockUtil() {
-    }
+    private MockUtil() { }
 
 
 }
