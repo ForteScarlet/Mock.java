@@ -869,6 +869,12 @@ public static void main(String[] args) throws Exception {
 
 ## 更新公告
 
+### **v1.9.0(2020/07/30)**
+优化实例的获取效率（尤其是以获取中文内容为主的时候）
+效率提升约3~4倍左右。
+测试参考：100w条实例获取，getList(100w)约16s, getListParallel(100w)约7s
+
+
 ### **v1.8.0(2020/07/13)**
 增加对某个类的父类字段的处理 
 fix [#I1NLT4](https://gitee.com/ForteScarlet/Mock.java/issues/I1NLT4)
