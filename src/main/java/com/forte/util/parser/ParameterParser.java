@@ -5,14 +5,12 @@ import com.forte.util.factory.MockBeanFactory;
 import com.forte.util.fieldvaluegetter.ArrayFieldValueGetter;
 import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.fieldvaluegetter.ListFieldValueGetter;
-import com.forte.util.function.TypeParse;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.mockbean.MockBean;
 import com.forte.util.mockbean.MockField;
 import com.forte.util.mockbean.MockMapBean;
 import com.forte.util.utils.FieldUtils;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -23,11 +21,11 @@ import java.util.*;
  */
 public class ParameterParser {
 
-    /**
-     * MockUtil的方法集
-     */
-    @Deprecated
-    private static final Map<String, Method> MOCK_METHOD = Mock._getMockMethod();
+//    /**
+//     * MockUtil的方法集
+//     */
+//    @Deprecated
+//    private static final Map<String, Method> MOCK_METHOD = Mock._getMockMethod();
 
     /* ———— 目前预期类型 ————
      * String / Double / Integer / Map / Object / array&list
@@ -36,7 +34,7 @@ public class ParameterParser {
     /**
      * TODO 注册各种解析器，不再使用switch分配解析器
      */
-    private static final Map<Class<?>, TypeParse> TYPE_PARSE_MAP = new HashMap<>(4);
+    // private static final Map<Class<?>, TypeParse> TYPE_PARSE_MAP = new HashMap<>(4);
 
     /* 内部使用的各类型的常量，用于switch语句，为参数分配解析器 */
 
@@ -266,10 +264,9 @@ public class ParameterParser {
      * @return
      */
     private static MockField objectTypeParse(Class objectClass, String fieldName, String intervalStr, Object value) {
-        ObjectParser objectParser = new ObjectParser(objectClass, fieldName, intervalStr, value);
-
+//        ObjectParser objectParser = new ObjectParser(objectClass, fieldName, intervalStr, value);
         //返回假字段对象
-        return objectParser.getMockField();
+        return new ObjectParser(objectClass, fieldName, intervalStr, value).getMockField();
     }
 
 
@@ -299,7 +296,7 @@ public class ParameterParser {
             integerInterval[0] = intervalMin;
             integerInterval[1] = intervalMax == null ? intervalMin : intervalMax;
         } else {
-            intervalMin = intervalMax = null;
+//            intervalMin = intervalMax = null;
             integerInterval = null;
         }
 
@@ -365,7 +362,7 @@ public class ParameterParser {
                 if (objectClass == null) {
                     //如果为null，说明此为map类型对象的解析，则此处同样使用map类型的解析, result的名称使用""
                     MockMapBean parser = Mock.setResult("", fieldMap, true);
-                    return objectToField(objectClass, fieldName, parser);
+                    return objectToField(null, fieldName, parser);
                 } else {
                     MockBean parser = Mock.setResult(fieldClass, fieldMap, true);
                     return objectToField(objectClass, fieldName, parser);

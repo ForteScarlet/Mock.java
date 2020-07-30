@@ -20,6 +20,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -472,6 +473,19 @@ public class Mock {
      */
     public static Map<String, Method> getMockMethods() {
         return new HashMap<>(MOCK_METHOD);
+    }
+
+
+    /**
+     * 根据过滤条件寻找指定的string-method
+     */
+    public static Map.Entry<String, Method> getMockMethodByFilter(Predicate<? super Map.Entry<String, Method>> predicate){
+        for (Map.Entry<String, Method> entry : MOCK_METHOD.entrySet()) {
+            if(predicate.test(entry)){
+                return entry;
+            }
+        }
+        return null;
     }
 
 

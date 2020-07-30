@@ -10,6 +10,7 @@ import com.forte.util.utils.RegexUtil;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -148,12 +149,22 @@ public abstract class BaseFieldParser implements FieldParser {
     }
 
 
+    private static final Pattern replaceForNameRegex =
+            Pattern.compile("@|(\\(\\))|(\\(((\\w+)|('.+')|(\".+\"))(\\, *((\\w+)|('.+')|(\".+\")))*\\))");
+
+//    /**
+//     * 为方法{@link #getMethodInvoker}服务，提供正则来获取方法名
+//     * @return
+//     */
+//    private static String getReplaceForNameRegex(){
+//        return "@|(\\(\\))|(\\(((\\w+)|('.+')|(\".+\"))(\\,((\\w+)|('.+')|(\".+\")))*\\))";
+//    }
     /**
      * 为方法{@link #getMethodInvoker}服务，提供正则来获取方法名
      * @return
      */
-    private static String getReplaceForNameRegex(){
-        return "@|(\\(\\))|(\\(((\\w+)|('.+')|(\".+\"))(\\,((\\w+)|('.+')|(\".+\")))*\\))";
+    private static Pattern getReplaceForNameRegex(){
+        return replaceForNameRegex;
     }
 
     /**
@@ -165,7 +176,7 @@ public abstract class BaseFieldParser implements FieldParser {
     protected static List<Invoker> getMethodInvoker(String[] methods) {
         //移除@符号、空括号、一个参数的括号、两个参数的括号
 //        String replaceForNameRegex = "@|(\\(\\))|(\\(\\w+(\\,\\w+)*\\))";
-        String replaceForNameRegex = getReplaceForNameRegex();
+        Pattern replaceForNameRegex = getReplaceForNameRegex();
 //        String replaceForParamRegex = "[(@" + getMethodNameRegexs() + ")\\(\\)]";
 //        String regex = "@" + getMethodNameRegexs() + "(((\\((\\w+|\\w+\\,\\w+)\\))|(\\(\\))|())?)";
 
@@ -174,7 +185,25 @@ public abstract class BaseFieldParser implements FieldParser {
         //遍历方法，保证顺序
         for (String methodStr : methods) {
             //获取方法名称
-            String methodName = methodStr.replaceAll(replaceForNameRegex, "");
+            String methodName;
+//            String methodName = replaceForNameRegex.matcher(methodStr).replaceAll("");
+//            String methodName = methodStr.replaceAll(replaceForNameRegex, "");
+
+
+            int head = 0;
+            int end = -1;
+            if(methodStr.charAt(0) == '@'){
+                head = 1;
+            }
+            end = methodStr.indexOf("(");
+            if(end > -1){
+                methodName = methodStr.substring(head, end);
+            }else {
+                methodName = methodStr.substring(head);
+            }
+
+//            System.out.println(methodStr);
+//            System.out.println(methodName);
 
             //获取方法的参数
             String[] params = getMethodParams(methodStr);
@@ -206,7 +235,7 @@ public abstract class BaseFieldParser implements FieldParser {
 //        String regex = "(@" + collect + "+((\\((\\w+(\\,\\w+)*)\\))|(\\(\\))|())?)";
 
         //尝试支持中文字符串
-        String regex = "(@" + collect + "{1}((\\((((\\w)+|('.+')|(\".+\"))(\\,((\\w)+|('.+')|(\".+\")))*)\\))|(\\(\\))|())?)";
+        String regex = "(@" + collect + "{1}((\\((((\\w)+|('.+')|(\".+\"))(\\, *((\\w)+|('.+')|(\".+\")))*)\\))|(\\(\\))|())?)";
 
         //值匹配0-1-2个参数
 //        String regex = "(@"+ collect +"+((\\((\\w+|\\w+\\,\\w+)\\))|(\\(\\))|())?)";
@@ -235,17 +264,26 @@ public abstract class BaseFieldParser implements FieldParser {
         //过滤出方法名匹配,参数长度也匹配的方法
         Method value = null;
 
-        try {
-            //取值，理论上来说最后的过滤结果应该只有一个结果
-            value = Mock._getMockMethod().entrySet().stream()
-                    .filter(e -> e.getKey().replaceAll("\\([\\w\\.\\,]*\\)","").equals(methodName) && e.getValue().getParameters().length == paramsLength).findFirst().get().getValue();
-        } catch (NoSuchElementException e) {
-        }
+//        try {
+            Map.Entry<String, Method> mockMethod = Mock.getMockMethodByFilter(entry ->
+//                    entry.getKey().replaceAll("\\([\\w\\.\\,]*\\)", "").equals(methodName)
+                    entry.getKey().startsWith(methodName)
+                    && entry.getValue().getParameters().length == paramsLength);
+            if(mockMethod != null){
+                value = mockMethod.getValue();
+            }
+//            //取值，理论上来说最后的过滤结果应该只有一个结果
+//            value = Mock.getMockMethods().entrySet().stream()
+//                    .filter(e -> e.getKey().replaceAll("\\([\\w\\.\\,]*\\)","").equals(methodName) && e.getValue().getParameters().length == paramsLength).findFirst().get().getValue();
+//        } catch (NoSuchElementException e) {
+//        }
 
         //返回结果
         return value;
     }
 
+
+//    private static final Pattern allMethodNameRegex;
 
     /**
      * 获取全部方法的正则匹配字符串
@@ -253,7 +291,7 @@ public abstract class BaseFieldParser implements FieldParser {
      * @return
      */
     protected static String getMethodNameRegexs() {
-        return Mock._getMockMethod().entrySet().stream().map(e -> e.getKey().replaceAll("(\\(.*\\))", "")).distinct().collect(Collectors.joining("|", "(", ")"));
+        return Mock.getMockMethods().keySet().stream().map(method -> method.replaceAll("(\\(.*\\))", "")).distinct().collect(Collectors.joining("|", "(", ")"));
     }
 
 
@@ -275,16 +313,15 @@ public abstract class BaseFieldParser implements FieldParser {
      */
     private Invoker getIntegerMethodInvoker(Integer intIntervalMin , Integer intIntervalMax){
         //拼接出方法
-        StringBuilder methodBuilder = new StringBuilder();
-        methodBuilder.append(INTEGER_METHOD_NAME)
-                     .append("(")
-                     .append(intIntervalMin)
-                     .append(",")
-                     .append(intIntervalMax)
-                     .append(")");
-
         //获取方法字符串
-        String methodStr = methodBuilder.toString();
+        String methodStr = INTEGER_METHOD_NAME +
+                "(" +
+                intIntervalMin +
+                "," +
+                intIntervalMax +
+                ")"
+                //获取方法字符串
+                ;
 
         //返回方法执行者
         return getOneMethodInvoker(methodStr);

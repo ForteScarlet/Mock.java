@@ -91,10 +91,10 @@ public class Test3 {
         // v1.9.0 优化后
         // 同步流大量数据（100w）
         // 再大一些的数据，例如1kw，推荐使用流而不是list。
-        long s7 = System.currentTimeMillis();
-        mockObject.getList(100_0000);
-        long e7 = System.currentTimeMillis();
-        System.out.println(e7 - s7);
+//        long s7 = System.currentTimeMillis();
+//        mockObject.getList(100_0000);
+//        long e7 = System.currentTimeMillis();
+//        System.out.println(e7 - s7);
         /*
             15534 16139 15522
             15736 16138 15481
@@ -103,11 +103,11 @@ public class Test3 {
          */
 
 //        // v1.9.0 优化后
-//        // 异步流大量数据（100w）
-//        long s8 = System.currentTimeMillis();
-//        mockObject.getListParallel(100_0000);
-//        long e8 = System.currentTimeMillis();
-//        System.out.println(e8 - s8);
+        // 异步流大量数据（100w）
+        long s8 = System.currentTimeMillis();
+        mockObject.getListParallel(100_0000);
+        long e8 = System.currentTimeMillis();
+        System.out.println(e8 - s8);
 //        /*
 //            6378 7313 7235
 //            7143 6654 6634
@@ -124,16 +124,16 @@ public class Test3 {
     public static Map<String, Object> getMap(){
         Map<String, Object> map = new HashMap<>();
         map.put("weaknessId", "@integer(1, 999999)");
-        map.put("schemeCode", "@schemeCode");
+        map.put("schemeCode", "@string");
         map.put("schemeName", "@ctitle(4,16)");
-        map.put("schemeCategoryFrequency", "@categoryFrequency");
-        map.put("schemeCategoryContent", "@categoryContent");
-        map.put("schemeCategoryPromote", "@categoryPromote");
+        map.put("schemeCategoryFrequency", "@string");
+        map.put("schemeCategoryContent", "@string");
+        map.put("schemeCategoryPromote", "@string");
         map.put("improvePointName", "@ctitle(8,20)");
-        map.put("improvePointCategoryFrequency", "@categoryFrequency");
+        map.put("improvePointCategoryFrequency", "@string");
         map.put("principal", "@ctitle(2,8)");
         map.put("executionSteps", "@ctitle(10,100)");
-        map.put("reportingPeriod", "@ctitle(2,4)"); //TODO
+        map.put("reportingPeriod", "@ctitle(2,4)");
         map.put("reportingMaterials", "@ctitle(8,40)");
         return map;
 

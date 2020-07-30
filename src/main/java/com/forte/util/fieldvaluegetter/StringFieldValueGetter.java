@@ -74,11 +74,15 @@ public class StringFieldValueGetter implements FieldValueGetter<String> {
         //有些少数情况，end中拼接后的字符串是可以作为简单JS代码执行的，在此处重复字符串之前，尝试使用eval进行执行
         try {
             end = MethodUtil.eval(end).toString();
-        } catch (Exception e) {}
+        } catch (Exception ignore) {}
 
 
         //重复次数并返回
-        return String.join("", Collections.nCopies(times, end));
+        if(times > 1){
+            return end;
+        }else {
+            return String.join("", Collections.nCopies(times, end));
+        }
     }
 
 
