@@ -30,7 +30,11 @@ import java.util.stream.Collectors;
 /**
  * An object that will generate text from a regular expression. In a way, it's the opposite of a regular expression
  * matcher: an instance of this class will produce text that is guaranteed to match the regular expression passed in.
+ *
+ * 存在部分缺陷
+ *
  */
+@Deprecated
 public class Xeger {
 
     public static class FailedRandomWalkException extends Exception {
@@ -42,7 +46,7 @@ public class Xeger {
     private final Automaton automaton;
     private Random random;
 
-    private volatile static Xeger instance;
+//    private volatile static Xeger instance;
 
     /**
      * Constructs a new instance, accepting the regular expression and the randomizer.
@@ -67,14 +71,7 @@ public class Xeger {
     }
 
     public static Xeger getInstance(String regex) {
-        if (instance == null) {
-            synchronized (Xeger.class) {
-                if (instance == null) {
-                    instance = new Xeger(regex);
-                }
-            }
-        }
-        return instance;
+        return new Xeger(regex);
     }
 
 

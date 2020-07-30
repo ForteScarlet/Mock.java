@@ -156,8 +156,27 @@ public class RandomUtil {
         return (char) (RandomUtil.getRandom().nextInt(26) + 97);
     }
 
+    /**
+     * 获取一个随机英文字符，大写
+     */
+    public static char getRandomUpperChar() {
+        return (char) (RandomUtil.getRandom().nextInt(26) + 65);
+    }
+
 
     /* ———————————————————— getRandomString : 获取随机字符串 ———————————————————————— */
+
+    /**
+     * 得到一串纯大写的字符串
+     * @param length 字符串长度
+     */
+    public static String getRandomUpperString(int length){
+        char[] crr = new char[length];
+        for (int i = 0; i < length; i++) {
+            crr[i] = getRandomUpperChar();
+        }
+        return String.valueOf(crr);
+    }
 
     /**
      * 获取一串指定长度的随机字符串
@@ -168,14 +187,12 @@ public class RandomUtil {
      */
     public static String getRandomString(int length, boolean randomCase) {
         char[] crr = new char[length];
-        char randomChar;
         for (int i = 0; i < length; i++) {
-            randomChar = getRandomChar();
             //如果开启了随机大写，则有概率将字符转为大写 1/2
             if (randomCase) {
-                crr[i] = RandomUtil.getRandom().nextBoolean() ? randomChar : Character.toUpperCase(randomChar);
+                crr[i] = RandomUtil.getRandom().nextBoolean() ? getRandomChar() : getRandomUpperChar();
             } else {
-                crr[i] = randomChar;
+                crr[i] = getRandomChar();
             }
         }
         return String.valueOf(crr);
