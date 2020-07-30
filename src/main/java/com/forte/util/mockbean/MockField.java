@@ -119,8 +119,13 @@ public class MockField<T> {
         this.fieldType = fieldType;
 
         // 获取field
-        this.field = FieldUtils.getField(objType, fieldName);
-        this.field.setAccessible(true);
+        if(objType != null){
+            this.field = FieldUtils.getField(objType, fieldName);
+            this.field.setAccessible(true);
+        }else{
+            // 当类型为Map类型的时候，objType为null，因此field为null。
+            this.field = null;
+        }
 
 
         this.setterMethod = null;

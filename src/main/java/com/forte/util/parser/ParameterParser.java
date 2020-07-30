@@ -13,10 +13,7 @@ import com.forte.util.mockbean.MockMapBean;
 import com.forte.util.utils.FieldUtils;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 参数解析器，用于解析用户填入的参数语法
@@ -102,7 +99,10 @@ public class ParameterParser {
             2019/10/18
             不是干什么都是多线程是好的的，所以遍历不在使用多线程遍历了~
          */
-        paramMap.forEach((key, value) -> {
+        Set<Map.Entry<String, Object>> entries = paramMap.entrySet();
+        for (Map.Entry<String, Object> entry : entries) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
             //解析
             //切割名称，检测是否有区间函数
             String[] split = key.split("\\|");
@@ -112,8 +112,7 @@ public class ParameterParser {
             String intervalStr = split.length > 1 ? split[1] : null;
             //进行解析
             parser(null, fieldName, intervalStr, value, fields);
-        });
-
+        }
 
         //解析结束，封装MockObject对象
         return getMockMapBean(fields);
