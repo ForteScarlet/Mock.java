@@ -14,8 +14,8 @@
     <artifactId>mock.java</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署应该大于1.9.0 2020/07/30 -->
-    <version>1.9.0</version>
+    <!-- 下次部署应该大于1.9.1 2020/07/30 -->
+    <version>1.9.1</version>
     <packaging>jar</packaging>
     <name>Mock.java</name>
     <url>https://github.com/ForteScarlet/Mock.java.git</url>
@@ -33,12 +33,14 @@
     <dependencies>
         <!-- 依赖apache的BeanUtils -->
         <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+        <!-- 只用到了一点儿东西，会考虑取代它 -->
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.4</version>
         </dependency>
 
+        <!-- 似乎是正则随机库 -->
         <dependency>
             <groupId>dk.brics.automaton</groupId>
             <artifactId>automaton</artifactId>

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.forte.util.utils;
+package test;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
@@ -25,6 +25,7 @@ import dk.brics.automaton.Transition;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -67,7 +68,7 @@ public class Xeger {
      * implicityly.
      */
     private Xeger(String regex) {
-        this(regex, new Random());
+        this(regex, ThreadLocalRandom.current());
     }
 
     public static Xeger getInstance(String regex) {

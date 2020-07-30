@@ -867,7 +867,12 @@ public static void main(String[] args) throws Exception {
 </dependency>
 ```
 
+
 ## 更新公告
+
+### **v1.9.1(2020/07/30)**
+修复`Mock.set(...)`使用Map类型的时候会报空指针的问题
+
 
 ### **v1.9.0(2020/07/30)**
 优化实例的获取效率（尤其是以获取中文内容为主的时候）

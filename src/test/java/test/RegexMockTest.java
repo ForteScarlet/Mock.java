@@ -1,7 +1,5 @@
 package test;
 
-import com.forte.util.utils.Xeger;
-
 /**
  * @author ForteScarlet <ForteScarlet@163.com>
  * @date 2020/7/30
