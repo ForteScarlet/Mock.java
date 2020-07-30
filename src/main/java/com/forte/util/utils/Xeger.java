@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class Xeger {
 
     public static class FailedRandomWalkException extends Exception {
-        public FailedRandomWalkException(String message) {
+        FailedRandomWalkException(String message) {
             super(message);
         }
     }
