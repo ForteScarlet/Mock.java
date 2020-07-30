@@ -33,7 +33,7 @@ public class MockMapObject implements MockObject<Map> {
      * @return
      */
     @Override
-    public Map getOne() {
+    public Map<String, Object> getOne() {
         return mockMapBean.getObject();
     }
 
