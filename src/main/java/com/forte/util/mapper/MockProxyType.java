@@ -115,7 +115,7 @@ public enum MockProxyType {
     }
 
     protected int getRandomNum(int min, int max) {
-        return RandomUtil.getNumber$right(min, max);
+        return RandomUtil.getNumberWithRight(min, max);
     }
 
 }

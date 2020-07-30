@@ -43,7 +43,7 @@ public class ArrayFieldValueGetter implements FieldValueGetter<Object[]> {
         //获取执行次数
         Integer min = integerInterval[0];
         Integer max = integerInterval[1];
-        int num = (max == null ? min : RandomUtil.getNumber$right(min, max));
+        int num = (max == null ? min : RandomUtil.getNumberWithRight(min, max));
         //创建一个Object类型的List集合，用于保存数据
         Object[] list = new Object[num];
         //判断执行者的数量

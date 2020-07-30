@@ -54,7 +54,7 @@ public class ListFieldValueGetter implements FieldValueGetter<List> {
         //获取执行次数
         Integer min = integerInterval[0];
         Integer max = integerInterval[1];
-        int num = (max == null ? min : RandomUtil.getNumber$right(min, max));
+        int num = (max == null ? min : RandomUtil.getNumberWithRight(min, max));
         //判断执行者的数量
         if (invokers.length > 1) {
 

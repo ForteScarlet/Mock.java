@@ -89,8 +89,16 @@ public class RandomUtil {
      * @param a min number
      * @param b max number
      */
-    public static int getNumber$right(int a, int b) {
+    public static int getNumberWithRight(int a, int b) {
         return getNumber(a, b+1);
+    }
+
+    /**
+     * @see #getNumberWithRight(int, int)
+     */
+    @Deprecated
+    public static int getNumber$right(int a, int b) {
+        return getNumberWithRight(a, b);
     }
 
 

@@ -317,7 +317,7 @@ public class MockUtil {
      */
     public static String[] cnames(Integer min, Integer max) {
         //获取随机数量
-        int num = RandomUtil.getNumber$right(min, max);
+        int num = RandomUtil.getNumberWithRight(min, max);
         String[] names = new String[num];
         //遍历并获取
         for (int i = 0; i < num; i++) {
@@ -360,7 +360,7 @@ public class MockUtil {
      */
     public static String[] names(Integer min, Integer max) {
         //获取随机数量
-        int num = RandomUtil.getNumber$right(min, max);
+        int num = RandomUtil.getNumberWithRight(min, max);
         String[] names = new String[num];
         //遍历并获取
         for (int i = 0; i < num; i++) {
@@ -404,7 +404,7 @@ public class MockUtil {
      * @param max 最大数量
      */
     public static String ctitle(Integer min, Integer max) {
-        return ChineseUtil.getChinese(RandomUtil.getNumber$right(min, max));
+        return ChineseUtil.getChinese(RandomUtil.getNumberWithRight(min, max));
     }
 
 
@@ -431,7 +431,7 @@ public class MockUtil {
      * @param max 最大长度
      */
     public static String title(Integer min, Integer max) {
-        int num = RandomUtil.getNumber$right(min, max);
+        int num = RandomUtil.getNumberWithRight(min, max);
         String title = RandomUtil.getRandomString(num, false);
         //全部小写，开头大写
         return FieldUtils.headUpper(title);
@@ -445,8 +445,6 @@ public class MockUtil {
      */
     public static String string(Integer min, Integer max) {
         return word(min, max);
-//        int num = RandomUtil.getNumber$right(min, max);
-//        return RandomUtil.getRandomString(num, false);
     }
 
     /**
@@ -472,7 +470,7 @@ public class MockUtil {
      * @param max 最大长度
      */
     public static String stringUpper(Integer min, Integer max) {
-        int num = RandomUtil.getNumber$right(min, max);
+        int num = RandomUtil.getNumberWithRight(min, max);
         return RandomUtil.getRandomUpperString(num);
     }
 
@@ -516,15 +514,15 @@ public class MockUtil {
         int nowDay = calendar.get(Calendar.DAY_OF_YEAR);
 
         //设置随机年份
-        calendar.set(Calendar.YEAR, RandomUtil.getNumber$right(1990, nowYear));
+        calendar.set(Calendar.YEAR, RandomUtil.getNumberWithRight(1990, nowYear));
         //设置随机日期
-        calendar.set(Calendar.DAY_OF_YEAR, RandomUtil.getNumber$right(1, nowDay));
+        calendar.set(Calendar.DAY_OF_YEAR, RandomUtil.getNumberWithRight(1, nowDay));
         //设置随机小时
-        calendar.set(Calendar.HOUR_OF_DAY, RandomUtil.getNumber$right(1, 24));
+        calendar.set(Calendar.HOUR_OF_DAY, RandomUtil.getNumberWithRight(1, 24));
         //设置随机分钟
-        calendar.set(Calendar.MINUTE, RandomUtil.getNumber$right(1, 60));
+        calendar.set(Calendar.MINUTE, RandomUtil.getNumberWithRight(1, 60));
         //设置随机秒
-        calendar.set(Calendar.SECOND, RandomUtil.getNumber$right(1, 60));
+        calendar.set(Calendar.SECOND, RandomUtil.getNumberWithRight(1, 60));
 
         //返回随机日期
         return calendar.getTime();
@@ -585,7 +583,7 @@ public class MockUtil {
      * 12 - 80
      */
     public static Integer age() {
-        return RandomUtil.getNumber$right(12, 80);
+        return RandomUtil.getNumberWithRight(12, 80);
     }
 
     /**
@@ -613,7 +611,7 @@ public class MockUtil {
      * @return
      */
     public static Integer integer(Integer a, Integer b) {
-        return RandomUtil.getNumber$right(a, b);
+        return RandomUtil.getNumberWithRight(a, b);
     }
 
 
@@ -629,7 +627,7 @@ public class MockUtil {
     public static Double doubles(Integer a, Integer b, Integer endL, Integer endR) {
         int integer = integer(a, b);
         //获取小数位数值
-        int end = RandomUtil.getNumber$right(endL, endR);
+        int end = RandomUtil.getNumberWithRight(endL, endR);
         double dou = Double.parseDouble(RandomUtil.toFixed(RandomUtil.getRandom().nextDouble(), end));
         return integer + dou;
     }
@@ -697,7 +695,7 @@ public class MockUtil {
      */
     public static String getNumber(Integer min, Integer max) {
         //获取长度
-        int length = RandomUtil.getNumber$right(min, max);
+        int length = RandomUtil.getNumberWithRight(min, max);
         StringBuilder sb = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             sb.append(integer());
@@ -785,7 +783,7 @@ public class MockUtil {
      * @param max 最大长度
      */
     public static String word(Integer min, Integer max) {
-        int num = RandomUtil.getNumber$right(min, max);
+        int num = RandomUtil.getNumberWithRight(min, max);
         return RandomUtil.getRandomString(num, false);
     }
 
@@ -852,7 +850,7 @@ public class MockUtil {
      * @param max 单词最多数量
      */
     public static String sentence(Integer min, Integer max) {
-        int num = RandomUtil.getNumber$right(min, max);
+        int num = RandomUtil.getNumberWithRight(min, max);
         StringBuilder sb = new StringBuilder(num);
         for (int i = 1; i <= num; i++) {
             //首句子字母大写
@@ -899,7 +897,7 @@ public class MockUtil {
      */
     public static String csentence(Integer min, Integer max) {
         StringBuilder sb = new StringBuilder();
-        int num = RandomUtil.getNumber$right(min, max);
+        int num = RandomUtil.getNumberWithRight(min, max);
         for (int i = 1; i <= num; i++) {
             //首句子字母大写
             sb.append(cword());
@@ -943,7 +941,7 @@ public class MockUtil {
      * @param max
      */
     public static String paragraph(Integer min, Integer max) {
-        int num = RandomUtil.getNumber$right(min, max);
+        int num = RandomUtil.getNumberWithRight(min, max);
         StringBuilder sb = new StringBuilder(num);
         for (int i = 1; i <= num; i++) {
             sb.append(sentence());
@@ -974,7 +972,7 @@ public class MockUtil {
      * @param max 最大数量
      */
     public static String cparagraph(Integer min, Integer max) {
-        int num = RandomUtil.getNumber$right(min, max);
+        int num = RandomUtil.getNumberWithRight(min, max);
         StringBuilder sb = new StringBuilder(num);
         for (int i = 1; i <= num; i++) {
             sb.append(csentence());

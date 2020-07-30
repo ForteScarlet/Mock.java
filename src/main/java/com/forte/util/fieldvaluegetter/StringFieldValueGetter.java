@@ -67,7 +67,7 @@ public class StringFieldValueGetter implements FieldValueGetter<String> {
         }else{
             int min = integerInterval[0];
             int max = integerInterval[1];
-            times = RandomUtil.getNumber$right(min , max);
+            times = RandomUtil.getNumberWithRight(min , max);
         }
 
         String end = sb.toString();
