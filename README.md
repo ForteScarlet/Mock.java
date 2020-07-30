@@ -871,21 +871,22 @@ public static void main(String[] args) throws Exception {
 ## 更新公告
 
 ### **v1.9.1(2020/07/30)**
-修复`Mock.set(...)`使用Map类型的时候会报空指针的问题
-MockUtil中追加方法`string(...)`与`stringUpper(...)`以获取纯大/小写的随机字符串([pull request:2](https://gitee.com/ForteScarlet/Mock.java/pulls/2))
+- 修复`Mock.set(...)`使用Map类型的时候会报空指针的问题
+
+- MockUtil中追加方法`string(...)`与`stringUpper(...)`以获取纯大/小写的随机字符串([pull request:2](https://gitee.com/ForteScarlet/Mock.java/pulls/2))
 
 
 ### **v1.9.0(2020/07/30)**
-优化实例的获取效率（尤其是以获取中文内容为主的时候）
+- 优化实例的获取效率（尤其是以获取中文内容为主的时候）
 效率提升约3~4倍左右。
 测试参考：100w条实例获取，getList(100w)约16s, getListParallel(100w)约7s
 
 
 ### **v1.8.0(2020/07/13)**
-增加对某个类的父类字段的处理 
+- 增加对某个类的父类字段的处理 
 fix [#I1NLT4](https://gitee.com/ForteScarlet/Mock.java/issues/I1NLT4)
 
-优化mock值的获取效率（大概提升了30倍），但是当值为字符串的时候，默认情况下不会再尝试将其视为JS脚本执行了。
+- 优化mock值的获取效率（大概提升了30倍），但是当值为字符串的时候，默认情况下不会再尝试将其视为JS脚本执行了。
 如果想要开启JS脚本尝试功能，请使用静态配置类`MockConfiguration.setEnableJsScriptEngine(true)`
 fix [#I1NLWA](https://gitee.com/ForteScarlet/Mock.java/issues/I1NLWA)
 
