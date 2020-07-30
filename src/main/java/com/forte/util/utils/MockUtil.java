@@ -438,6 +438,65 @@ public class MockUtil {
     }
 
     /**
+     * 获取指定长度的英文字符串，纯小写
+     *
+     * @param min 最小长度
+     * @param max 最大长度
+     */
+    public static String string(Integer min, Integer max) {
+        Integer num = RandomUtil.getNumber$right(min, max);
+        String title = RandomUtil.getRandomString(num);
+        //全部小写
+        return title.toLowerCase();
+    }
+
+    /**
+     * 获取指定长度的英文字符串，纯小写
+     *
+     * @param num
+     */
+    public static String string(Integer num) {
+        return string(num, num);
+    }
+
+    /**
+     * 获取5-10长度的英文字符串，纯小写
+     */
+    public static String string() {
+        return string(5, 10);
+    }
+
+    /**
+     * 获取指定长度的英文字符串，纯大写
+     *
+     * @param min 最小长度
+     * @param max 最大长度
+     */
+    public static String STRING(Integer min, Integer max) {
+        Integer num = RandomUtil.getNumber$right(min, max);
+        String title = RandomUtil.getRandomString(num);
+        //全部大写
+        return title.toUpperCase();
+    }
+
+    /**
+     * 获取指定长度的英文字符串，纯大写
+     *
+     * @param num
+     */
+    public static String STRING(Integer num) {
+        return STRING(num, num);
+    }
+    /**
+     * 获取5-10长度的英文字符串，纯大写
+     */
+    public static String STRING() {
+        return STRING(5, 10);
+    }
+
+
+
+    /**
      * 获取一个UUID
      */
     public static String UUID() {
