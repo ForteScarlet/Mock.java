@@ -872,6 +872,7 @@ public static void main(String[] args) throws Exception {
 
 ### **v1.9.1(2020/07/30)**
 修复`Mock.set(...)`使用Map类型的时候会报空指针的问题
+MockUtil中追加方法`string(...)`与`stringUpper(...)`以获取纯大/小写的随机字符串([pull request:2](https://gitee.com/ForteScarlet/Mock.java/pulls/2))
 
 
 ### **v1.9.0(2020/07/30)**
