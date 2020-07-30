@@ -438,6 +438,92 @@ public class MockUtil {
     }
 
     /**
+     * 获取指定长度的英文字符串，纯小写
+     *
+     * @param min 最小长度
+     * @param max 最大长度
+     */
+    public static String string(Integer min, Integer max) {
+        Integer num = RandomUtil.getNumber$right(min, max);
+        String title = RandomUtil.getRandomString(num);
+        //全部小写
+        return title.toLowerCase();
+    }
+
+    /**
+     * 获取指定长度的英文字符串，纯小写
+     *
+     * @param num
+     */
+    public static String string(Integer num) {
+        return string(num, num);
+    }
+
+    /**
+     * 获取5-10长度的英文字符串，纯小写
+     */
+    public static String string() {
+        return string(5, 10);
+    }
+
+    /**
+     * 获取指定长度的英文字符串，纯大写
+     *
+     * @param min 最小长度
+     * @param max 最大长度
+     */
+    public static String STRING(Integer min, Integer max) {
+        Integer num = RandomUtil.getNumber$right(min, max);
+        String title = RandomUtil.getRandomString(num);
+        //全部大写
+        return title.toUpperCase();
+    }
+
+    /**
+     * 获取指定长度的英文字符串，纯大写
+     *
+     * @param num
+     */
+    public static String STRING(Integer num) {
+        return STRING(num, num);
+    }
+    /**
+     * 获取5-10长度的英文字符串，纯大写
+     */
+    public static String STRING() {
+        return STRING(5, 10);
+    }
+
+
+    /**
+     * 根据正则规则生成随机字符串
+     * 如：[a-z][A-Z][0-9]{32} 生成32位包含大写小写数字的字符串
+     * @regex('[a-z][A-Z][0-9]{32}')
+     *
+     * @param regex
+     */
+    public static String regex(String regex) {
+        Xeger xeger = Xeger.getInstance(regex);
+        return xeger.generate();
+    }
+
+    /**
+     * 获取指定数量num个随机字符串
+     *
+     * @param regex
+     * @param num 获取数量
+     * @return
+     */
+    public static String[] regexs(String regex, Integer num) {
+        String[] regexs = new String[num];
+        for (int i = 0; i < num; i++) {
+            regexs[i] = regex(regex);
+        }
+        return regexs;
+    }
+
+
+    /**
      * 获取一个UUID
      */
     public static String UUID() {
