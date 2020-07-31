@@ -11,11 +11,6 @@ import java.lang.reflect.Method;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
 public class MethodInvoker implements Invoker {
-
-    /**
-     * 如果是一个空执行者，将会将对象返回
-     */
-    private final Object nullValue;
     /**
      * 执行方法的对象
      */
@@ -34,6 +29,26 @@ public class MethodInvoker implements Invoker {
     private final Method method;
 
     /**
+     * 获取一个普通的{@link MethodInvoker}
+     * @param obj    实例
+     * @param args   参数列表
+     * @param method 方法实例
+     * @return {@link MethodInvoker}
+     */
+    public static MethodInvoker getInstance(Object obj, Object[] args, Method method){
+        return new MethodInvoker(obj, args, method);
+    }
+
+    /**
+     * 获取一个常量{@link MethodInvoker}
+     * @param constValue 常量值
+     * @return {@link MethodInvoker}
+     */
+    public static MethodInvoker getInstance(Object constValue){
+        return new ConstValueMethodInvoker(constValue);
+    }
+
+    /**
      * 执行方法
      *
      * @return
@@ -42,34 +57,45 @@ public class MethodInvoker implements Invoker {
      */
     @Override
     public Object invoke() throws InvocationTargetException, IllegalAccessException {
-        //三元运算，如果是个空执行者(空值不为空)，返回空值返回值，否则执行方法
-        return nullValue != null ?
-                nullValue :
-                MethodUtil.invoke(null, args, method);
+        // 普通的执行者
+        return MethodUtil.invoke(obj, args, method);
     }
 
     /**
      * 构造
      */
-    public MethodInvoker(Object obj, Object[] args, Method method) {
+    MethodInvoker(Object obj, Object[] args, Method method) {
         this.obj = obj;
-        this.methodName = method.getName();
+        if(method != null){
+            this.methodName = method.getName();
+        }else{
+            this.methodName = null;
+        }
         this.args = args;
         this.method = method;
-        //空值输出为空，说明这不是一个空执行者
-        this.nullValue = null;
     }
+
 
     /**
-     * 空执行者的构造
+     * 常量值方法执行者
      */
-    public MethodInvoker(Object nullValue) {
-        this.nullValue = nullValue;
-        //其他值设为null
-        this.obj = null;
-        this.methodName = null;
-        this.args = null;
-        this.method = null;
-    }
+    static class ConstValueMethodInvoker extends MethodInvoker {
+        /**
+         * 如果是一个空执行者，将会将对象返回
+         */
+        private final Object constValue;
 
+        ConstValueMethodInvoker(Object constValue){
+            super(null, null, null);
+            this.constValue = constValue;
+        }
+
+        /**
+         * 返回常量值
+         */
+        @Override
+        public Object invoke() {
+            return constValue;
+        }
+    }
 }

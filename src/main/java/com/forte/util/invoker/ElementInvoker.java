@@ -1,7 +1,5 @@
 package com.forte.util.invoker;
 
-import com.forte.util.utils.RandomUtil;
-
 import java.util.List;
 
 /**
@@ -10,45 +8,26 @@ import java.util.List;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date 2018/12/7 20:37
  */
-public class ElementInvoker implements Invoker {
+public abstract class ElementInvoker<T> implements Invoker {
 
-    /** 集合参数 */
-    private Object[] arr;
-
-    /** 数组参数 */
-    private List list;
+    public abstract T getRandomElement();
 
     /**
      * 执行者，获取随机元素
-     * @return
-     * @throws Exception
      */
     @Override
-    public Object invoke() throws Exception {
-        //返回数组或者集合的随机值
-        if(arr != null){
-            //如果有数组，使用数组
-            return RandomUtil.getRandomElement(arr);
-        }else{
-            //如果没有数组，使用集合
-            return RandomUtil.getRandomElement(list);
-        }
+    public Object invoke() {
+        return getRandomElement();
     }
 
-    /**
-     * 数组构造
-     * @param arr
-     */
-    public ElementInvoker(Object[] arr){
-        this.arr = arr;
+    public static <T> ElementInvoker<T> getInstance(T... array){
+        return new ArrayElementInvoker<>(array);
     }
 
-    /**
-     * 集合构造
-     * @param list
-     */
-    public ElementInvoker(List list){
-        this.list = list;
+    public static <T> ElementInvoker<T> getInstance(List<T> list){
+        return new ListElementInvoker<>(list);
     }
+
+
 
 }

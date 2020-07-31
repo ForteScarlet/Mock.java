@@ -1,5 +1,6 @@
 package com.forte.util.fieldvaluegetter;
 
+import com.forte.util.exception.MockException;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
 import com.forte.util.utils.RandomUtil;
@@ -78,36 +79,36 @@ public class ArrayFieldValueGetter implements FieldValueGetter<Object[]> {
         //如果eval可以执行，则保存eval中得到的结果，如果无法执行则返回拼接字符串
         StringBuilder sb = new StringBuilder();
         //开始遍历并执行
-        for (int i = 0; i < num; i++) {
-            //执行全部执行者
-            for (int j = 0; j < invokers.length; j++) {
-                try {
+        try {
+            for (int i = 0; i < num; i++) {
+                //执行全部执行者
+                for (int j = 0; j < invokers.length; j++) {
                     //如果有多余字符，先拼接多余字符
                     if (moreStrs != null) {
                         sb.append(moreStrs[j]);
                     }
                     //拼接执行结果
                     sb.append(invokers[j].invoke());
-                } catch (Exception e) {
-                    e.printStackTrace();
+                }
+                //如果有多余字符且多余字符的数量比执行者多1
+                //只要多余字符比执行者数量大，则说明多余字符的数量为执行者的数量+1
+                if (moreStrs != null && moreStrs.length > invokers.length) {
+                    //拼接多余字符的最后值
+                    sb.append(moreStrs[moreStrs.length - 1]);
+                }
+                String invokeStr = sb.toString();
+                try {
+                    //尝试使用eval进行执行
+                    Object eval = MethodUtil.eval(invokeStr);
+                    //如果能执行成功，保存这个执行结果到集合
+                    list[i] = (eval);
+                } catch (ScriptException e) {
+                    //如果执行失败，保存执行前的字符串
+                    list[i] = (invokeStr);
                 }
             }
-            //如果有多余字符且多余字符的数量比执行者多1
-            //只要多余字符比执行者数量大，则说明多余字符的数量为执行者的数量+1
-            if (moreStrs != null && moreStrs.length > invokers.length) {
-                //拼接多余字符的最后值
-                sb.append(moreStrs[moreStrs.length - 1]);
-            }
-            String invokeStr = sb.toString();
-            try {
-                //尝试使用eval进行执行
-                Object eval = MethodUtil.eval(invokeStr);
-                //如果能执行成功，保存这个执行结果到集合
-                list[i] = (eval);
-            } catch (ScriptException e) {
-                //如果执行失败，保存执行前的字符串
-                list[i] = (invokeStr);
-            }
+        } catch (Exception e) {
+            throw new MockException(e);
         }
     }
 
@@ -130,31 +131,25 @@ public class ArrayFieldValueGetter implements FieldValueGetter<Object[]> {
             //准备拼接结果
             StringBuilder sb = new StringBuilder();
             //遍历num次数
-            for (int i = 0; i < num; i++) {
-                //先拼接多余字符，再拼接方法执行结果
-                sb.append(moreStrs[i]);
-                try {
+            try {
+                for (int i = 0; i < num; i++) {
+                    //先拼接多余字符，再拼接方法执行结果
+                    sb.append(moreStrs[i]);
                     //方法的执行结果
                     sb.append(invoker.invoke());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                //如果多余字符有结尾，拼接
-                //由于只有一个执行者，所以如果多余字符数量大于1就说明有尾部多余
-                if (moreStrs.length > 1) {
-                    //这里的元素索引不出意外的话，必定是2
-                    sb.append(moreStrs[moreStrs.length - 1]);
-                }
-                String invokeData = sb.toString();
-                //尝试对结果进行eval
-                try {
+                    //如果多余字符有结尾，拼接
+                    //由于只有一个执行者，所以如果多余字符数量大于1就说明有尾部多余
+                    if (moreStrs.length > 1) {
+                        //这里的元素索引不出意外的话，必定是2
+                        sb.append(moreStrs[moreStrs.length - 1]);
+                    }
+                    String invokeData = sb.toString();
+                    //尝试对结果进行eval
                     //如果执行成功，保存执行结果
-                    Object eval = MethodUtil.eval(invokeData);
-                    list[i] = (eval);
-                } catch (ScriptException e) {
-                    //如果执行失败，保存执行前的字符串
-                    list[i] = (invokeData);
+                    list[i] = (MethodUtil.evalCache(invokeData));
                 }
+            } catch (Exception e) {
+                throw new MockException(e);
             }
 
         } else {
@@ -162,16 +157,13 @@ public class ArrayFieldValueGetter implements FieldValueGetter<Object[]> {
             //只有一个方法执行者、且没有多余字符的情况是最稳定的情况。
             //指令参数类型情况下，这种类型只有及低的可能会出现类型异常（只要你的list类型没有填写错误）
             //遍历num次数，执行执行者并将结果保存至list集合
-            for (int i = 0; i < num; i++) {
-                Object invoke = null;
-                try {
+            try {
+                for (int i = 0; i < num; i++) {
                     //执行结果
-                    invoke = invoker.invoke();
-                    list[i] = (invoke);
-                } catch (Exception e) {
-                    //如果执行出现错误，保存一个空值 null
-                    list[i] = (null);
+                    list[i] = invoker.invoke();
                 }
+            } catch (Exception e) {
+                throw new MockException(e);
             }
         }
     }
@@ -184,7 +176,7 @@ public class ArrayFieldValueGetter implements FieldValueGetter<Object[]> {
      * @param integerInterval 区间参数
      * @param moreStrs        多余字符
      */
-    public ArrayFieldValueGetter(Invoker[] invokers,  Integer[] integerInterval,  String[] moreStrs) {
+    public ArrayFieldValueGetter(Invoker[] invokers, Integer[] integerInterval, String[] moreStrs) {
         this.invokers = invokers;
         //如果多余字符长度为0，则赋值为null
         this.moreStrs = moreStrs.length == 0 ? null : moreStrs;
@@ -203,7 +195,7 @@ public class ArrayFieldValueGetter implements FieldValueGetter<Object[]> {
      * @param invokers 方法执行者
      * @param moreStrs 多余字符
      */
-    public ArrayFieldValueGetter(Invoker[] invokers,  String[] moreStrs) {
+    public ArrayFieldValueGetter(Invoker[] invokers, String[] moreStrs) {
         this.invokers = invokers;
         this.integerInterval = new Integer[]{1, 1};
         //如果多余字符长度为0，则赋值为null
@@ -217,7 +209,7 @@ public class ArrayFieldValueGetter implements FieldValueGetter<Object[]> {
      * @param invokers        方法执行者
      * @param integerInterval 区间参数
      */
-    public ArrayFieldValueGetter(Invoker[] invokers,  Integer[] integerInterval) {
+    public ArrayFieldValueGetter(Invoker[] invokers, Integer[] integerInterval) {
         this.invokers = invokers;
         //判断：数组为null || 长度大于2 || 左参数为null || 左右参数都为null
         //如果为true，则使用默认的数组

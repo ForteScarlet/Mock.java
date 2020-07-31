@@ -9,8 +9,8 @@ public interface Invoker {
 
     /**
      * 返回方法执行的结果
-     * @return
-     * @throws Exception
+     * @return 获取执行结果
+     * @throws Exception 可能会存在异常
      */
     Object invoke() throws Exception;
 }

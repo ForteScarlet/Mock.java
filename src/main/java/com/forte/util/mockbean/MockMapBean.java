@@ -1,7 +1,5 @@
 package com.forte.util.mockbean;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BinaryOperator;
@@ -24,12 +22,20 @@ public class MockMapBean extends MockBean<Map> {
         //假字段集
         MockField[] fields = this.getFields();
 
-        return Arrays.stream(fields)
-                .map(f -> new AbstractMap.SimpleEntry<>(f.getFieldName(), f.getValue()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, Map.Entry::getValue,
-                        throwingMerger() , LinkedHashMap::new
-                ));
+        Map<String, Object> map = new LinkedHashMap<>();
+
+        for (MockField field : fields) {
+            map.merge(field.getFieldName(), field.getValue(), (old, val) -> throwingMerger());
+        }
+
+        return map;
+
+//        return Arrays.stream(fields)
+//                .map(f -> new AbstractMap.SimpleEntry<>(f.getFieldName(), f.getValue()))
+//                .collect(Collectors.toMap(
+//                        Map.Entry::getKey, Map.Entry::getValue,
+//                        throwingMerger() , LinkedHashMap::new
+//                ));
     }
 
 

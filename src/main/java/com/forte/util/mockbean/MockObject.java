@@ -1,5 +1,7 @@
 package com.forte.util.mockbean;
 
+import com.forte.util.utils.CollectorUtil;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collector;
@@ -73,7 +75,6 @@ public interface MockObject<T> {
             list.add(getOne());
         }
         return list;
-//        return collect(num, Collectors.toList());
     }
 
 
@@ -120,12 +121,11 @@ public interface MockObject<T> {
      * @return
      */
     default Set<T> getSet(int num){
-        Set<T> set = new HashSet<>((int) Math.floor(12 / 0.75));
+        Set<T> set = new LinkedHashSet<>((int) Math.ceil(num / 0.75));
         for (int i = 0; i < num; i++) {
             set.add(getOne());
         }
         return set;
-//        return collect(num, Collectors.toSet());
     }
 
 
@@ -143,12 +143,11 @@ public interface MockObject<T> {
      * 获取多个实例对象，根据转化规则转化后作为Set返回
      */
     default <R> Set<R> getSet(int num , Function<T, R> mapper){
-        Set<R> set = new HashSet<>((int) Math.ceil(12 / 0.75));
+        Set<R> set = new LinkedHashSet<>((int) Math.ceil(num / 0.75));
         for (int i = 0; i < num; i++) {
             set.add(mapper.apply(getOne()));
         }
         return set;
-//        return collectParallel(num, mapper, Collectors.toSet());
     }
 
 
@@ -164,7 +163,7 @@ public interface MockObject<T> {
      * 获取多个实例对象，作为Map返回，需要指定Map的转化方式
      */
     default <K, V> Map<K, V> getMap(int num , Function<T,K> keyMapper , Function <T,V> valueMapper){
-        Map<K, V> map = new HashMap<>((int) Math.ceil(12 / 0.75));
+        Map<K, V> map = new LinkedHashMap<>((int) Math.ceil(num / 0.75));
         for (int i = 0; i < num; i++) {
             final T value = getOne();
             final K k = keyMapper.apply(value);
@@ -172,7 +171,6 @@ public interface MockObject<T> {
             map.put(k, v);
         }
         return map;
-//        return collectToMap(num, keyMapper, valueMapper);
     }
 
     /**
@@ -202,42 +200,72 @@ public interface MockObject<T> {
      * 串行collect
      */
     default <R, A> R collect(int num, Collector<? super T, A, R> collector){
-        return getStream(num).collect(collector);
+        return CollectorUtil.collector(num, this::getOne, collector);
+//        // 获取容器
+//        A container = collector.supplier().get();
+//        // 获取累加器
+//        BiConsumer<A, ? super T> accumulator = collector.accumulator();
+//        for (int i = 0; i < num; i++) {
+//            accumulator.accept(container, getOne());
+//        }
+//        // 获取结果
+//        return collector.finisher().apply(container);
+        // return getStream(num).collect(collector);
     }
 
     /**
      * 带转化的串行collect
      */
     default <R, A, N> N collect(int num, Function<? super T, ? extends R> mapper, Collector<? super R, A, N> collector){
-        return getStream(num).map(mapper).collect(collector);
+        return CollectorUtil.collector(num, this::getOne, mapper, collector);
+        // return getStream(num).map(mapper).collect(collector);
     }
 
     /**
      * 串行collect toMap
      */
     default <A, K, V> Map<K, V> collectToMap(int num, Collector<? super T, A, Map<K, V>> collector){
-        return getStream(num).collect(collector);
+        return CollectorUtil.collector(num, this::getOne, collector);
+//        return getStream(num).collect(collector);
     }
 
     /**
      * 串行collect toMap
+     * 默认使用{@link LinkedHashMap}
      */
-    default <A, K, V> Map<K, V> collectToMap(int num, Function<T, K> keyFunction, Function<T, V> valueFunction){
-        return getStream(num).collect(Collectors.toMap(keyFunction, valueFunction));
+    default <K, V> Map<K, V> collectToMap(int num, Function<T, K> keyFunction, Function<T, V> valueFunction){
+        Map<K, V> map = new LinkedHashMap<>();
+        T one;
+        for (int i = 0; i < num; i++) {
+            one = getOne();
+            map.put(keyFunction.apply(one), valueFunction.apply(one));
+        }
+        return map;
+        // return getStream(num).collect(Collectors.toMap(keyFunction, valueFunction));
     }
 
     /**
      * 带转化的串行collect toMap
+     * 默认使用{@link LinkedHashMap}
      */
     default <A, R, K, V> Map<K, V> collectToMap(int num, Function<T, R> mapper, Collector<? super R, A, Map<K, V>> collector){
-        return getStream(num).map(mapper).collect(collector);
+        return CollectorUtil.collector(num, this::getOne, mapper, collector);
+        // return getStream(num).map(mapper).collect(collector);
     }
 
     /**
-     * 带转化的串行collect toMap
+     * 带转化的collect toMap
+     * 默认使用{@link LinkedHashMap}
      */
     default <A, R, K, V> Map<K, V> collectToMap(int num, Function<T, R> mapper, Function<R, K> keyFunction, Function<R, V> valueFunction){
-        return getStream(num).map(mapper).collect(Collectors.toMap(keyFunction, valueFunction));
+        Map<K, V> map = new LinkedHashMap<>();
+        T one;
+        for (int i = 0; i < num; i++) {
+            one = getOne();
+            map.put(keyFunction.apply(mapper.apply(one)), valueFunction.apply(mapper.apply(one)));
+        }
+        return map;
+        // return getStream(num).map(mapper).collect(Collectors.toMap(keyFunction, valueFunction));
     }
 
 
@@ -252,7 +280,7 @@ public interface MockObject<T> {
      * 带转化的并行collect
      */
     default <R, A, N> N collectParallel(int num, Function<? super T, ? extends R> mapper, Collector<? super R, A, N> collector){
-        return IntStream.range(0, num).mapToObj(i -> mapper.apply(getOne())).collect(collector);
+        return IntStream.range(0, num).parallel().mapToObj(i -> mapper.apply(getOne())).collect(collector);
     }
 
     /**
@@ -273,14 +301,14 @@ public interface MockObject<T> {
      * 带转化的并行collect
      */
     default <A, R, K, V> Map<K, V> collectToMapParallel(int num, Function<? super T, ? extends R> mapper, Collector<? super R, A, Map<K, V>> collector){
-        return IntStream.range(0, num).mapToObj(i -> mapper.apply(getOne())).collect(collector);
+        return IntStream.range(0, num).parallel().mapToObj(i -> mapper.apply(getOne())).collect(collector);
     }
 
     /**
      * 带转化的并行collect
      */
     default <A, R, K, V> Map<K, V> collectToMapParallel(int num, Function<? super T, ? extends R> mapper, Function<R, K> keyFunction, Function<R, V> valueFunction){
-        return IntStream.range(0, num).mapToObj(i -> mapper.apply(getOne())).collect(Collectors.toMap(keyFunction, valueFunction));
+        return IntStream.range(0, num).parallel().mapToObj(i -> mapper.apply(getOne())).collect(Collectors.toMap(keyFunction, valueFunction));
     }
 
 

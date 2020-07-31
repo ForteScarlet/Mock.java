@@ -1,5 +1,7 @@
 package com.forte.util.mockbean;
 
+import com.forte.util.exception.MockException;
+
 import java.util.Arrays;
 
 /**
@@ -26,7 +28,7 @@ public class ParallelMockBean<T> extends MockBean<T> {
                 field.setValue(instance);
             } catch (Exception e) {
                 // ignored ?
-                throw new RuntimeException(e);
+                throw new MockException(e);
             }
         });
         //返回这个实例

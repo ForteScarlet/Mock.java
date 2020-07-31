@@ -1,5 +1,6 @@
 package com.forte.util.fieldvaluegetter;
 
+import com.forte.util.exception.MockException;
 import com.forte.util.invoker.Invoker;
 
 
@@ -23,9 +24,7 @@ public class DoubleFieldValueGetter implements FieldValueGetter<Double> {
         try {
             return (Double) invoker.invoke();
         } catch (Exception e) {
-            //如果出现异常，返回空值
-            e.printStackTrace();
-            return null;
+            throw new MockException(e);
         }
     }
 

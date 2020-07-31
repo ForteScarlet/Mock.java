@@ -1,11 +1,13 @@
 package com.forte.util.fieldvaluegetter;
 
+import com.forte.util.exception.MockException;
 import com.forte.util.invoker.Invoker;
 import com.forte.util.utils.MethodUtil;
 
 import javax.script.ScriptException;
 
 /**
+ * 字段类型为任意未知类型的时候
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
 public class ObjectFieldValueGetter implements FieldValueGetter<Object> {
@@ -24,9 +26,7 @@ public class ObjectFieldValueGetter implements FieldValueGetter<Object> {
     public Object value() {
         try {
             //如果只有一个执行者
-            if (invokers.length == 1) {
-
-            } else {
+            if (invokers.length > 1) {
                 //不止一个，拼接结果为类js代码并执行eval()
                 //用于执行eval的拼接字符串
                 StringBuilder evalString = new StringBuilder();
@@ -47,17 +47,16 @@ public class ObjectFieldValueGetter implements FieldValueGetter<Object> {
                 try {
                     return MethodUtil.eval(forEval);
                 } catch (ScriptException e) {
-                    //如果出现异常，则直接返回结果的拼接
+                    //如果出现异常，则直接返回结果的拼接字符串
                     return returnString.toString();
                 }
-
+            }else {
+                //直接返回执行结果
+                return invokers[0].invoke();
             }
-            //直接返回执行结果
-            return invokers[0].invoke();
         } catch (Exception e) {
-            //出现异常，返回null
-            e.printStackTrace();
-            return null;
+            //出现异常，抛出
+            throw new MockException(e);
         }
     }
 

@@ -346,6 +346,7 @@ public class FieldUtils {
         }
 
         try {
+            // a public method
             Method setter = whereIn.getMethod("set" + headUpper(field.getName()), field.getType());
             //计入缓存
             saveSingleCacheFieldSetter(whereIn , field , setter);

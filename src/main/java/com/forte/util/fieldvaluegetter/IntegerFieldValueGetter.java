@@ -1,5 +1,6 @@
 package com.forte.util.fieldvaluegetter;
 
+import com.forte.util.exception.MockException;
 import com.forte.util.invoker.Invoker;
 
 
@@ -17,7 +18,7 @@ public class IntegerFieldValueGetter implements FieldValueGetter<Integer> {
 
 
     /**
-     * 获取一个字段值
+     * 获取一个整数类型的字段值
      * @return
      */
     @Override
@@ -25,8 +26,7 @@ public class IntegerFieldValueGetter implements FieldValueGetter<Integer> {
         try {
             return (Integer) invoker.invoke();
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new MockException(e);
         }
     }
 

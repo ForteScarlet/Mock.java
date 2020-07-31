@@ -127,12 +127,38 @@ public class MethodUtil {
     }
 
     /**
+     * js中的eval函数，应该是只能进行简单的计算
+     * 利用js脚本完成
+     *
+     * @param str 需要进行eval执行的函数
+     * @return 执行后的结果
+     */
+    public static Object evalCache(String str) {
+        try {
+            return eval(str);
+        } catch (ScriptException ignore) {
+            return str;
+        }
+//        //脚本执行并返回结果
+//        if(MockConfiguration.isEnableJsScriptEngine()){
+//            try {
+//                return se.eval(str);
+//            } catch (ScriptException ignore) {
+//                return str;
+//            }
+//        }else{
+//            // 未开启脚本执行，直接返回
+//            return str;
+//        }
+    }
+
+    /**
      * 创建一个方法执行者
      *
      * @return
      */
     public static Invoker createMethodInvoker(Object obj, Object[] args, Method method) {
-        return new MethodInvoker(obj, args, method);
+        return MethodInvoker.getInstance(obj, args, method);
     }
 
     /**
@@ -141,7 +167,7 @@ public class MethodUtil {
      * @return
      */
     public static Invoker createNullMethodInvoker(Object nullValue) {
-        return new MethodInvoker(nullValue);
+        return MethodInvoker.getInstance(nullValue);
     }
 
     /**
@@ -150,7 +176,7 @@ public class MethodUtil {
      * @return
      */
     public static Invoker createArrayElementInvoker(Object[] arr){
-        return new ElementInvoker(arr);
+        return ElementInvoker.getInstance(arr);
     }
 
     /**
@@ -158,8 +184,8 @@ public class MethodUtil {
      * @param list
      * @return
      */
-    public static Invoker createListElementInvoker(List list){
-        return new ElementInvoker(list);
+    public static Invoker createListElementInvoker(List<?> list){
+        return ElementInvoker.getInstance(list);
     }
 
 }

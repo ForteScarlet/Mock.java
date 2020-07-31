@@ -1,5 +1,7 @@
 package com.forte.util.mockbean;
 
+import com.forte.util.exception.MockException;
+
 import java.util.Arrays;
 
 /**
@@ -36,7 +38,8 @@ public class MockBean<T> {
                 field.setValue(instance);
             } catch (Exception e) {
                 // ignored ?
-                throw new RuntimeException(e);
+                // no
+                throw new MockException(e);
             }
         }
         //返回这个实例
