@@ -872,6 +872,7 @@ public static void main(String[] args) throws Exception {
 
 ### **v1.9.2(2020/10/24)**
 - 追加一个区间参数`const`, 当区间参数为 `const`的时候，将不会对value值进行解析，而是直接原样赋值。
+`const`区间参数常用于对`Map`类型的`MockObject`的某些字段指定默认值。
 例如：
 ```java
         Map<String, Object> map = new HashMap<>();
