@@ -870,6 +870,21 @@ public static void main(String[] args) throws Exception {
 
 ## 更新公告
 
+### **v1.9.2(2020/10/24)**
+- 追加一个区间参数`const`, 当区间参数为 `const`的时候，将不会对value值进行解析，而是直接原样赋值。
+例如：
+```java
+        Map<String, Object> map = new HashMap<>();
+        // 区间参数为 'const'
+        map.put("dataLevel|const", new int[]{51, 52, 53});
+        Mock.set("usermap", map);
+        MockObject<Map> mockObject = Mock.get("usermap");
+        Map one = mockObject.getOne();
+        
+        // 输出一个 int[] 的toString，而不是一个随机的int。
+        System.out.println(one.get("dataLevel"));   
+```
+
 ### **v1.9.1(2020/07/30)**
 - 修复`Mock.set(...)`使用Map类型的时候会报空指针的问题
 

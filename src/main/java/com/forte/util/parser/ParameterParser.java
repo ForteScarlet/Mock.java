@@ -6,6 +6,7 @@ import com.forte.util.fieldvaluegetter.ArrayFieldValueGetter;
 import com.forte.util.fieldvaluegetter.FieldValueGetter;
 import com.forte.util.fieldvaluegetter.ListFieldValueGetter;
 import com.forte.util.invoker.Invoker;
+import com.forte.util.mockbean.ConstMockField;
 import com.forte.util.mockbean.MockBean;
 import com.forte.util.mockbean.MockField;
 import com.forte.util.mockbean.MockMapBean;
@@ -47,6 +48,9 @@ public class ParameterParser {
     private static final int TYPE_ARRAY = 6;
 
     private static final int TYPE_CLASS = 7;
+
+    /** 常量类型区间。 */
+    private static final String CONST_INTERVAL = "const";
 
 
     /**
@@ -122,7 +126,7 @@ public class ParameterParser {
      *
      * @param objectClass 封装类型
      * @param fieldName   字段名称
-     * @param intervalStr 区间字符串
+     * @param intervalStr 区间字符串。可能是 const 或者数值区间。
      * @param value       参数
      * @param fields      保存字段用的list
      */
@@ -135,50 +139,58 @@ public class ParameterParser {
         //准备字段解析器
         //准备假字段对象
         MockField<T> mockField = null;
-        int typeNum = typeReferee(value);
-        //根据字段参数分配解析器
-        switch (typeNum) {
-            case TYPE_STRING:
-                //是字符串，使用指令解析器
-                //获取假字段封装类
-                mockField = stringTypeParse(objectClass, fieldName, intervalStr, value);
-                break;
-            case TYPE_DOUBLE:
-                //是Double的浮点型，使用double浮点解析器
-                //获取假字段封装类
-                mockField = doubleTypeParse(objectClass, fieldName, intervalStr, value);
-                break;
-            case TYPE_INTEGER:
-                //整数解析并获取假字段封装类
-                mockField = integerTypeParse(objectClass, fieldName, intervalStr, value);
-                break;
-            case TYPE_OBJECT:
-                //使用解析器，如果字段类型是集合或数组要重复输出
-                mockField = objectTypeParse(objectClass, fieldName, intervalStr, value);
-                break;
-            case TYPE_MAP:
-                //如果是一个Map集合，说明这个字段映射着另一个假对象
-                //这个Map集合对应的映射类型应该必然是此字段的类型
-                //获取假字段对象
-                mockField = mapTypeParse(objectClass, fieldName, intervalStr, value);
-                break;
-            case TYPE_ARRAY:
-                //如果value是数组类型，使用数组类型解析器进行解析
-                mockField = arrayTypeParse(objectClass, fieldName, intervalStr, value);
-                break;
-            case TYPE_LIST:
-                //如果value是list集合类型，使用集合类型解析器解析
-                mockField = listTypeParse(objectClass, fieldName, intervalStr, value);
-                break;
 
-            case TYPE_CLASS:
-                // 如果value是class类型的
-                mockField = classTypeParse(objectClass, fieldName, intervalStr, value);
-                break;
-            default:
-                System.out.println("无法解析映射类[ " + objectClass + " ]中的字段：" + fieldName);
-                break;
+        if(intervalStr != null && intervalStr.equalsIgnoreCase(CONST_INTERVAL)) {
+            // 区间参数为 常量类型，直接使用ConstMockField
+            mockField = new ConstMockField<>(objectClass, fieldName, value, value.getClass());
+
+        } else {
+            int typeNum = typeReferee(value);
+            //根据字段参数分配解析器
+            switch (typeNum) {
+                case TYPE_STRING:
+                    //是字符串，使用指令解析器
+                    //获取假字段封装类
+                    mockField = stringTypeParse(objectClass, fieldName, intervalStr, value);
+                    break;
+                case TYPE_DOUBLE:
+                    //是Double的浮点型，使用double浮点解析器
+                    //获取假字段封装类
+                    mockField = doubleTypeParse(objectClass, fieldName, intervalStr, value);
+                    break;
+                case TYPE_INTEGER:
+                    //整数解析并获取假字段封装类
+                    mockField = integerTypeParse(objectClass, fieldName, intervalStr, value);
+                    break;
+                case TYPE_OBJECT:
+                    //使用解析器，如果字段类型是集合或数组要重复输出
+                    mockField = objectTypeParse(objectClass, fieldName, intervalStr, value);
+                    break;
+                case TYPE_MAP:
+                    //如果是一个Map集合，说明这个字段映射着另一个假对象
+                    //这个Map集合对应的映射类型应该必然是此字段的类型
+                    //获取假字段对象
+                    mockField = mapTypeParse(objectClass, fieldName, intervalStr, value);
+                    break;
+                case TYPE_ARRAY:
+                    //如果value是数组类型，使用数组类型解析器进行解析
+                    mockField = arrayTypeParse(objectClass, fieldName, intervalStr, value);
+                    break;
+                case TYPE_LIST:
+                    //如果value是list集合类型，使用集合类型解析器解析
+                    mockField = listTypeParse(objectClass, fieldName, intervalStr, value);
+                    break;
+
+                case TYPE_CLASS:
+                    // 如果value是class类型的
+                    mockField = classTypeParse(objectClass, fieldName, intervalStr, value);
+                    break;
+                default:
+                    System.out.println("无法解析映射类[ " + objectClass + " ]中的字段：" + fieldName);
+                    break;
+            }
         }
+
 
         //添加假字段对象
         fields.add(mockField);
