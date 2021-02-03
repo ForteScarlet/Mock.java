@@ -9,8 +9,8 @@
 
 码云生成的在线javaDoc文档：[在线文档](https://apidoc.gitee.com/ForteScarlet/Mock.java/)
 
-如果存在BUG或者有什么意见、建议，可以通过邮箱`ForteScarlet@163.com`进行反馈或者联系QQ`1149159218`.
-(记得注明身份哦~)
+如果存在BUG或者有什么意见、建议，可以通过 issue 进行反馈。
+
 
 github: [github](https://github.com/ForteScarlet/Mock.java)
 
@@ -95,7 +95,7 @@ compile group: 'io.gitee.ForteScarlet', name: 'mock.java', version: '${version}'
 创建的这个Map，Key值代表了映射的字段名，value值代表了映射语法
 由于这毕竟与弱引用类型语言不同，所以在设置映射的时候请务必注意字段的数据类型。
 
-​	`Map<String, Object> map = new HashMap<>();`	
+`Map<String, Object> map = new HashMap<>();`	
 
 #### 	2·添加字段映射 
 
