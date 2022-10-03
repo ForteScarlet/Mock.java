@@ -232,7 +232,7 @@ public class RandomUtil {
      * @return
      */
     public static String toFixed(Number dnum, int length) {
-        StringBuilder sb = new StringBuilder(2 + length).append("#.");
+        final StringBuilder sb = new StringBuilder(2 + length).append("#.");
         //遍历并设置位数
         for (int i = 0; i < length; i++) {
             sb.append('0');
@@ -240,13 +240,13 @@ public class RandomUtil {
 
         //返回结果
         String formatStr = sb.toString();
-        sb = new StringBuilder();
+        sb.delete(0, sb.length());
         String douStr = numFormat(dnum, formatStr);
-        sb.append(douStr);
         if(douStr.startsWith(".")){
             //如果开头是点，说明首位是0，补位
-            sb.append('0').append(douStr);
+            sb.append('0');
         }
+        sb.append(douStr);
         return sb.toString();
     }
 

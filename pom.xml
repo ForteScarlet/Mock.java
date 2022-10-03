@@ -14,8 +14,8 @@
     <artifactId>mock.java</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署应该大于1.9.2 2020/10/24 -->
-    <version>1.9.2</version>
+    <!-- 下次部署应该大于1.9.3 2022/10/4 -->
+    <version>1.9.3</version>
     <packaging>jar</packaging>
     <name>Mock.java</name>
     <url>https://github.com/ForteScarlet/Mock.java.git</url>
@@ -49,6 +49,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
